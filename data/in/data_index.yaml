@@ -1,0 +1,380 @@
+"""
+Data index for input files in data/in directory.
+
+This file provides a comprehensive index of all input data files,
+their contents, purpose, and usage in the CMB verification project.
+
+Author: Vasiliy Zdanovskiy
+Email: vasilyvz@gmail.com
+"""
+
+# Data Index for data/in directory
+# Generated: 2024-12-03
+
+data_index:
+  description: "Index of all input data files for CMB verification project"
+  last_updated: "2024-12-03"
+  
+  # ACT DR6.02 Data
+  act_dr6_02:
+    description: "Atacama Cosmology Telescope Data Release 6.02 - CMB power spectra and maps"
+    directory: "dr6.02/"
+    files:
+      - name: "act_dr6.02_spectra_and_cov_binning_20.tar.gz"
+        size: "15 MB"
+        description: "CMB power spectra and covariance matrices with binning 20"
+        content:
+          - "Power spectra C_l for different multipole bins"
+          - "Covariance matrices for spectral analysis"
+          - "Binning configuration: 20"
+        usage: "CMB spectrum analysis and verification"
+        
+      - name: "act_dr6.02_spectra_and_cov_binning_50.tar.gz"
+        size: "1.1 MB"
+        description: "CMB power spectra and covariance matrices with binning 50"
+        content:
+          - "Power spectra C_l for different multipole bins"
+          - "Covariance matrices for spectral analysis"
+          - "Binning configuration: 50"
+        usage: "CMB spectrum analysis with coarser binning"
+        
+      - name: "act_dr6.02_spectra_and_cov_xtra.tar.gz"
+        size: "26 KB"
+        description: "Extra CMB power spectra and covariance data"
+        content:
+          - "Additional spectral data"
+          - "Extended covariance information"
+        usage: "Supplementary spectral analysis"
+        
+      - name: "act_dr6.02_std_AA_day_pa4_f150_4way_coadd_map_healpix.fits"
+        size: "6.8 GB"
+        description: "HEALPix CMB map - standard AA day, patch 4, frequency 150 GHz, 4-way coadd"
+        format: "FITS/HEALPix"
+        content:
+          - "Full-sky CMB temperature map"
+          - "HEALPix pixelization"
+          - "Frequency: 150 GHz"
+          - "Patch: PA4"
+        usage: "CMB map reconstruction and Θ-node analysis"
+        
+      - name: "act_dr6.02_windows_dr6_pa4_f220.tar.gz"
+        size: "806 MB"
+        description: "Window functions for DR6 patch 4, frequency 220 GHz"
+        content:
+          - "Window/mask functions"
+          - "Patch PA4 configuration"
+          - "Frequency: 220 GHz"
+        usage: "Map processing and masking"
+        
+      - name: "act_dr6.02_windows_dr6_pa5_f150.tar.gz"
+        size: "797 MB"
+        description: "Window functions for DR6 patch 5, frequency 150 GHz"
+        content:
+          - "Window/mask functions"
+          - "Patch PA5 configuration"
+          - "Frequency: 150 GHz"
+        usage: "Map processing and masking"
+        
+      - name: "act_dr6.02_windows_dr6_pa6_f150.tar.gz"
+        size: "806 MB"
+        description: "Window functions for DR6 patch 6, frequency 150 GHz"
+        content:
+          - "Window/mask functions"
+          - "Patch PA6 configuration"
+          - "Frequency: 150 GHz"
+        usage: "Map processing and masking"
+        
+      - name: "dr6_data_cmbonly.tar.gz"
+        size: "281 KB"
+        description: "CMB-only data from DR6"
+        content:
+          - "CMB temperature data"
+          - "Foreground-cleaned maps"
+        usage: "CMB-only analysis"
+        
+      - name: "binning_20"
+        description: "Binning configuration directory for binning 20"
+        type: "directory"
+        
+      - name: "binning_50"
+        description: "Binning configuration directory for binning 50"
+        type: "directory"
+  
+  # ACT DR6 Lenslike
+  act_dr6_lenslike:
+    description: "ACT DR6 lensing-like analysis package"
+    file: "act_dr6_lenslike-main.zip"
+    size: "17 KB"
+    content:
+      - "Python package for ACT DR6 lensing analysis"
+      - "act_dr6_lenslike/act_dr6_lenslike.py - main analysis code"
+      - "Tests and examples"
+      - "Configuration YAML files"
+    usage: "CMB lensing analysis and correlation with LSS"
+    
+  # CMB Microcells
+  cmb_microcells:
+    description: "CMB microcells review and analysis results"
+    file: "cmb_microcells_review_v2.zip"
+    size: "439 KB"
+    content:
+      - "correlation_function_results_FIXED.md - correlation analysis results"
+      - "additional_extracted_info_FIXED.md - additional extracted information"
+      - "CHANGELOG.md - version history"
+      - "numbers.json - numerical results"
+      - "comprehensive_analysis.png - visualization"
+    usage: "CMB microcell structure analysis and verification"
+    
+  # LSS Correlation Data
+  lss_correlation:
+    description: "Large Scale Structure correlation analysis with CMB"
+    files:
+      - name: "cells_LSS_correlation_pack_v1.zip"
+        size: "28 KB"
+        version: "v1"
+        content:
+          - "code/xi_match.py - correlation function matching"
+          - "code/Pk_ring.py - power spectrum ring analysis"
+          - "code/voids_check.py - void structure checking"
+          - "code/xmap_ring.py - cross-map ring analysis"
+          - "data/xi_of_r.csv - correlation function data"
+          - "data/Pk.csv - power spectrum data"
+          - "data/voids.csv - void catalog"
+          - "outputs/expected_scales.png - visualization"
+        usage: "CMB-LSS correlation analysis"
+        
+      - name: "cells_LSS_correlation_pack_v1-1.zip"
+        size: "28 KB"
+        version: "v1-1"
+        description: "Updated version of LSS correlation pack"
+        content: "Same structure as v1 with updates"
+        usage: "CMB-LSS correlation analysis (updated)"
+  
+  # SPARC Resonator Data
+  sparc_resonator:
+    description: "SPARC galaxy rotation curve resonator analysis"
+    files:
+      - name: "sparc_resonator_analysis.zip"
+        size: "4.3 KB"
+        content:
+          - "galaxy_resonator_sparc_analysis.py - analysis script"
+          - "cluster_resonator_summary.csv - cluster summary"
+          - "cluster_resonator_group_stats.csv - group statistics"
+          - "README.md - documentation"
+        usage: "Galaxy resonator analysis using SPARC data"
+        
+      - name: "sparc_resonator_full_check.zip"
+        size: "4.3 KB"
+        content:
+          - "galaxy_resonator_full_check.py - full verification script"
+          - "cluster_with_groups_and_inverse_mapping.csv - cluster mapping"
+          - "group_stats_slope.csv - slope statistics"
+          - "group_stats_dct.csv - DCT statistics"
+          - "group_contingency_slope_vs_dct.csv - contingency table"
+          - "inverse_mapping_coeffs.csv - inverse mapping coefficients"
+          - "7d-64-Галактики_резонатор_проверка.md - verification report"
+        usage: "Complete resonator verification and mapping"
+        
+      - name: "sparc_resonator_inversion.zip"
+        size: "594 B"
+        content:
+          - "resonator_inversion_solution.csv - inversion solution"
+          - "README.md - documentation"
+        usage: "Resonator inversion analysis"
+        
+      - name: "sparc_resonator_passports.zip"
+        size: "2.3 KB"
+        content:
+          - "galaxy_resonator_passports.csv - resonator passport data"
+          - "README.md - documentation"
+        usage: "Resonator passport catalog"
+  
+  # Θ-field Background Pipeline
+  theta_background:
+    description: "Θ-field background data processing pipeline"
+    file: "theta_background_data_pipeline.zip"
+    size: "8.2 KB"
+    content:
+      - "scripts/download_data.sh - data download script"
+      - "scripts/download_data.py - Python download script"
+      - "scripts/process_lensing_to_sigma_crit.py - lensing to sigma_crit conversion"
+      - "scripts/process_sn_pantheon.py - Pantheon supernova processing"
+      - "scripts/process_bao_dr16.py - BAO DR16 processing"
+      - "config/theta_background_config.yaml - configuration"
+      - "README.md - documentation"
+    usage: "Processing background data for Θ-field model"
+  
+  # Galaxy Core Model
+  galaxy_core:
+    description: "Galaxy core model bundle with field resonator analysis"
+    file: "galaxy_core_model_bundle.zip"
+    size: "168 KB"
+    content:
+      - "src/core_geometry.py - core geometry calculations"
+      - "src/field_resonator.py - field resonator analysis"
+      - "src/halo_gas_from_field.py - halo gas extraction from field"
+      - "src/run_example.py - example execution script"
+      - "data/Lphi_per_cluster.csv - L_phi per cluster data"
+      - "src/field_halo_gas_slice_z0.csv - field-halo gas slice at z=0"
+      - "src/rotation_curve_fit.png - rotation curve visualization"
+      - "Compiled Python cache files"
+    usage: "Galaxy core modeling and field resonator analysis"
+  
+  # Quench Analysis
+  quench:
+    description: "Quenching analysis from structure and energy extent"
+    files:
+      - name: "quench_from_structure_v1.zip"
+        size: "60 KB"
+        content:
+          - "code/infer_quench.py - quenching inference code"
+          - "code/grid_estimate.py - grid estimation"
+          - "outputs/results.json - analysis results"
+          - "outputs/tau_vs_z.png - tau vs redshift visualization"
+          - "example_config.json - configuration example"
+          - "README.md - documentation"
+        usage: "Quenching analysis from structure"
+        
+      - name: "quench_energy_extent_v2.zip"
+        size: "3.5 KB"
+        version: "v2"
+        content:
+          - "code/run_all.py - execution script"
+          - "data/kappa_patches.csv - kappa patch data"
+          - "config.json - configuration"
+          - "README.md - documentation"
+        usage: "Quenching energy extent analysis"
+  
+  # VBP (Voids, Bubbles, Patches) Data
+  vbp:
+    description: "Void, bubble, and patch geometry and microcell data"
+    files:
+      - name: "vbp_cells_geometry_v1.zip"
+        size: "744 KB"
+        content:
+          - "random_wave_cells_2D.png - 2D visualization of wave cells"
+          - "numbers.json - numerical parameters"
+          - "README.md - documentation"
+        usage: "VBP cell geometry analysis"
+        
+      - name: "vbp_microcells.zip"
+        size: "1.9 KB"
+        content:
+          - "calc.py - calculation script"
+          - "results.txt - calculation results"
+          - "README.md - documentation"
+        usage: "VBP microcell calculations"
+  
+  # Documentation
+  documentation:
+    description: "Theoretical and observational documentation"
+    files:
+      - name: "The_Atacama_Cosmology_Telescope_DR6_Power_Spectra_.pdf"
+        size: "7.9 MB"
+        format: "PDF"
+        description: "ACT DR6 power spectra publication"
+        content:
+          - "Theoretical framework"
+          - "Observational results"
+          - "Power spectrum analysis"
+          - "Methodology"
+        usage: "Reference for ACT DR6 power spectra analysis"
+
+# Data Categories Summary
+categories:
+  cmb_data:
+    - "act_dr6_02"
+    - "act_dr6_lenslike"
+    - "cmb_microcells"
+    description: "CMB observation and analysis data"
+    
+  lss_data:
+    - "lss_correlation"
+    description: "Large Scale Structure correlation data"
+    
+  galaxy_data:
+    - "sparc_resonator"
+    - "galaxy_core"
+    description: "Galaxy rotation curves and core models"
+    
+  theta_field:
+    - "theta_background"
+    description: "Θ-field model background data"
+    
+  analysis_tools:
+    - "quench"
+    - "vbp"
+    description: "Analysis tools and results"
+    
+  documentation:
+    - "documentation"
+    description: "Theoretical and observational documentation"
+
+# Usage Guidelines
+usage_guidelines:
+  cmb_verification:
+    primary_data:
+      - "act_dr6_02/act_dr6.02_std_AA_day_pa4_f150_4way_coadd_map_healpix.fits"
+      - "act_dr6_02/act_dr6.02_spectra_and_cov_binning_20.tar.gz"
+      - "cmb_microcells/cmb_microcells_review_v2.zip"
+    description: "Primary CMB data for verification"
+    
+  correlation_analysis:
+    primary_data:
+      - "lss_correlation/cells_LSS_correlation_pack_v1-1.zip"
+      - "act_dr6_lenslike/act_dr6_lenslike-main.zip"
+    description: "Data for CMB-LSS correlation analysis"
+    
+  theta_node_analysis:
+    primary_data:
+      - "act_dr6_02/act_dr6.02_std_AA_day_pa4_f150_4way_coadd_map_healpix.fits"
+      - "theta_background/theta_background_data_pipeline.zip"
+    description: "Data for Θ-node structure analysis"
+    
+  galaxy_verification:
+    primary_data:
+      - "sparc_resonator/sparc_resonator_*.zip"
+      - "galaxy_core/galaxy_core_model_bundle.zip"
+    description: "Data for galaxy rotation curve verification"
+
+# File Size Notes
+size_notes:
+  large_files:
+    - name: "act_dr6.02_std_AA_day_pa4_f150_4way_coadd_map_healpix.fits"
+      size: "6.8 GB"
+      note: "Very large file - use with caution, may require special handling"
+      
+    - name: "act_dr6.02_windows_dr6_pa4_f220.tar.gz"
+      size: "806 MB"
+      note: "Large archive - extract before use"
+      
+    - name: "act_dr6.02_windows_dr6_pa5_f150.tar.gz"
+      size: "797 MB"
+      note: "Large archive - extract before use"
+      
+    - name: "act_dr6.02_windows_dr6_pa6_f150.tar.gz"
+      size: "806 MB"
+      note: "Large archive - extract before use"
+
+# Data Processing Pipeline
+processing_pipeline:
+  step_1_extract:
+    description: "Extract compressed archives (zip, tar.gz)"
+    files: "All .zip and .tar.gz files"
+    
+  step_2_organize:
+    description: "Organize extracted data by category"
+    categories:
+      - "cmb_maps"
+      - "spectra"
+      - "windows"
+      - "correlation_data"
+      - "galaxy_data"
+      
+  step_3_process:
+    description: "Process data using appropriate tools"
+    tools:
+      - "HEALPix for FITS maps"
+      - "Python scripts for CSV/JSON data"
+      - "Custom analysis scripts from bundles"
+

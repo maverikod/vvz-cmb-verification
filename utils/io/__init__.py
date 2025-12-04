@@ -18,6 +18,7 @@ from utils.io.data_saver import (
     save_analysis_results,
     ensure_output_directory,
 )
+from utils.io.data_index_loader import DataIndex
 
 __all__ = [
     "load_healpix_map",
@@ -29,4 +30,5 @@ __all__ = [
     "save_power_spectrum",
     "save_analysis_results",
     "ensure_output_directory",
+    "DataIndex",
 ]

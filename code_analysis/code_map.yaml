@@ -5995,7 +5995,7 @@ functions:
     - self
     docstring: Allow conversion to numpy array.
     file: utils/cuda/array_model.py
-    line: 492
+    line: 493
     name: __array__
   utils/cuda/array_model.py:__del__:
     args:
@@ -6007,7 +6007,7 @@ functions:
 
       without explicit swap_to_cpu() call.'
     file: utils/cuda/array_model.py
-    line: 496
+    line: 497
     name: __del__
   utils/cuda/array_model.py:__init__:
     args:
@@ -6089,7 +6089,7 @@ functions:
       \ index (0 to num_blocks-1)\n\nReturns:\n    Block data (on current device)\n\
       \nRaises:\n    IndexError: If block_idx out of range"
     file: utils/cuda/array_model.py
-    line: 343
+    line: 344
     name: get_block
   utils/cuda/array_model.py:num_blocks:
     args:
@@ -6107,7 +6107,7 @@ functions:
       \ Operation function (takes block, returns processed block)\n    use_gpu: Use\
       \ GPU if available\n\nReturns:\n    New CudaArray with processed data"
     file: utils/cuda/array_model.py
-    line: 435
+    line: 436
     name: process_blocks
   utils/cuda/array_model.py:set_block:
     args:
@@ -6118,7 +6118,7 @@ functions:
       \    block_data: Processed block data\n\nRaises:\n    IndexError: If block_idx\
       \ out of range\n    ValueError: If block_data shape doesn't match expected"
     file: utils/cuda/array_model.py
-    line: 385
+    line: 386
     name: set_block
   utils/cuda/array_model.py:shape:
     args:
@@ -6137,7 +6137,7 @@ functions:
 
       Unregisters from memory watchdog and forces cleanup.'
     file: utils/cuda/array_model.py
-    line: 314
+    line: 315
     name: swap_to_cpu
   utils/cuda/array_model.py:swap_to_gpu:
     args:
@@ -6155,7 +6155,7 @@ functions:
     docstring: "Convert to numpy array (always on CPU).\n\nReturns:\n    Numpy array\
       \ on CPU"
     file: utils/cuda/array_model.py
-    line: 481
+    line: 482
     name: to_numpy
   utils/cuda/array_model.py:use_whole_array:
     args:
@@ -6164,7 +6164,7 @@ functions:
       \ array (on current device)\n\nNote:\n    This bypasses block processing - use\
       \ only for operations\n    requiring whole array (e.g., FFT)."
     file: utils/cuda/array_model.py
-    line: 464
+    line: 465
     name: use_whole_array
   utils/cuda/correlation_vectorizer.py:__init__:
     args:

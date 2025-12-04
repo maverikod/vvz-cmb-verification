@@ -10,10 +10,10 @@ issues:
     file: utils/cuda/memory_watchdog.py
     limit: 400
     lines: 489
-  - exceeds_limit: 119
+  - exceeds_limit: 120
     file: utils/cuda/array_model.py
     limit: 400
-    lines: 519
+    lines: 520
   - exceeds_limit: 480
     file: tests/unit/test_theta_evolution_processor.py
     limit: 400

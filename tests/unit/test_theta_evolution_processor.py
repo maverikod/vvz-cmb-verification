@@ -53,7 +53,9 @@ class TestThetaEvolutionProcessor:
             metadata=metadata,
         )
 
-        with pytest.raises(ValueError, match="All omega_min values must be positive"):
+        with pytest.raises(
+            ValueError, match="All omega_min values must be positive"
+        ):
             ThetaEvolutionProcessor(evolution)
 
     def test_process_creates_interpolators(self):
@@ -650,7 +652,8 @@ class TestQualityReport:
         constraint = report["physical_constraints"]["omega_min_lt_omega_macro"]
         assert "valid" in constraint
         assert "violations" in constraint
-        assert constraint["valid"] == True  # Use == instead of is for NumPy bool
+        # Use == instead of is for NumPy bool
+        assert constraint["valid"] == True  # noqa: E712
         assert constraint["violations"] == 0
 
 
@@ -722,7 +725,9 @@ class TestTimeArrayCompleteness:
         processor = ThetaEvolutionProcessor(evolution)
         processor.process()
 
-        completeness = processor.verify_time_array_completeness(expected_interval=1.0)
+        completeness = processor.verify_time_array_completeness(
+            expected_interval=1.0
+        )
 
         assert completeness["is_complete"] is True
         assert completeness["coverage_ratio"] > 0.9
@@ -776,7 +781,9 @@ class TestValidateAgainstConfig:
 
         # Create data that fully covers the required range
         times = np.array([-1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0])
-        omega_min = np.array([1.0e10, 1.1e10, 1.2e10, 1.3e10, 1.4e10, 1.5e10, 1.6e10])
+        omega_min = np.array(
+            [1.0e10, 1.1e10, 1.2e10, 1.3e10, 1.4e10, 1.5e10, 1.6e10]
+        )
         omega_macro = np.array(
             [10.0e10, 10.1e10, 10.2e10, 10.3e10, 10.4e10, 10.5e10, 10.6e10]
         )
@@ -834,7 +841,8 @@ class TestValidateAgainstConfig:
 
         # Should raise error: data doesn't start early enough
         with pytest.raises(
-            ValueError, match="Time coverage starts at 0.0, but config requires -1.0"
+            ValueError,
+            match="Time coverage starts at 0.0, but config requires -1.0",
         ):
             processor.validate_against_config()
 

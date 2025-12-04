@@ -6,10 +6,10 @@ issues:
     file: cmb/theta_evolution_processor.py
     limit: 400
     lines: 675
-  - exceeds_limit: 476
+  - exceeds_limit: 480
     file: tests/unit/test_theta_evolution_processor.py
     limit: 400
-    lines: 876
+    lines: 880
   - exceeds_limit: 62
     file: tests/unit/test_theta_data_loader.py
     limit: 400
@@ -228,6 +228,10 @@ issues:
   methods_with_pass: []
   methods_without_docstrings:
   - class: null
+    file: tests/unit/test_cuda_array.py
+    line: 80
+    method: double
+  - class: null
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py
     line: 171
     method: convert_to_serializable
@@ -250,6 +254,6 @@ summary:
   invalid_imports: 35
   max_lines_limit: 400
   methods_with_pass: 0
-  methods_without_docstrings: 2
+  methods_without_docstrings: 3
   not_implemented_in_non_abstract: 1
-  total_issues: 42
+  total_issues: 43

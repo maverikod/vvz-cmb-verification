@@ -108,12 +108,6 @@ issues:
     line: 16
     module: cmb.reconstruction.cmb_map_reconstructor
     type: import_from
-  - description: Module 'utils.io.data_index_loader' cannot be imported
-    file: docs/implementation_plan/phase_4_cmb_lss_correlation/step_4.1_correlation_core/cmb_lss_correlator.py
-    imported: DataIndex
-    line: 18
-    module: utils.io.data_index_loader
-    type: import_from
   - description: Module 'cmb.nodes.node_to_cmb_mapper' cannot be imported
     file: docs/implementation_plan/phase_4_cmb_lss_correlation/step_4.3_node_lss_mapping/node_lss_mapper.py
     imported: NodeCmbMapping
@@ -258,9 +252,9 @@ summary:
   files_without_docstrings: 0
   generic_exception_usage: 0
   imports_in_middle: 0
-  invalid_imports: 39
+  invalid_imports: 38
   max_lines_limit: 400
   methods_with_pass: 0
   methods_without_docstrings: 2
   not_implemented_in_non_abstract: 0
-  total_issues: 41
+  total_issues: 40

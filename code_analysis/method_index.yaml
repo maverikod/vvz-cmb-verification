@@ -48,6 +48,14 @@ DataIndex:
 - validate_files
 - get_usage_guidelines
 - search_by_name
+- _resolve_path
+- __init__
+- load
+- get_file_path
+- get_files_by_category
+- validate_files
+- get_usage_guidelines
+- search_by_name
 DataPaths: []
 FrequencyInvarianceTester:
 - __init__
@@ -167,6 +175,11 @@ TestConfigurationLoading:
 TestConvertHealpixToAlm:
 - test_convert_valid_map
 - test_round_trip_preserves_map
+TestDataIndexLoading:
+- test_load_valid_yaml
+- test_load_nonexistent_file
+- test_load_invalid_yaml
+- test_load_with_default_path
 TestDataPaths:
 - test_all_paths_defined
 - test_paths_can_be_created
@@ -185,11 +198,24 @@ TestFrequencyToMultipole:
 - test_negative_frequency_raises_error
 - test_zero_frequency_raises_error
 - test_negative_D_raises_error
+TestGetFilePath:
+- test_get_file_path_single_file
+- test_get_file_path_with_directory
+- test_get_file_path_nonexistent
+- test_get_file_path_invalid_category
+TestGetFilesByCategory:
+- test_get_files_single_file
+- test_get_files_list
+- test_get_files_invalid_category
 TestGetFrequencyRangeForMultipoleRange:
 - test_get_frequency_range
 - test_invalid_range_raises_error
 - test_equal_bounds_raises_error
 - test_negative_bounds_raise_error
+TestGetUsageGuidelines:
+- test_get_usage_guidelines_from_section
+- test_get_usage_guidelines_from_category
+- test_get_usage_guidelines_nonexistent
 TestLoadCsvData:
 - test_load_valid_csv
 - test_load_nonexistent_csv
@@ -261,10 +287,17 @@ TestSavePowerSpectrum:
 - test_save_spectrum_csv
 - test_save_spectrum_missing_keys
 - test_save_spectrum_invalid_format
+TestSearchByName:
+- test_search_exact_match
+- test_search_wildcard
+- test_search_no_matches
 TestSynthesizeMap:
 - test_synthesize_valid_alm
 - test_synthesize_empty_alm
 - test_synthesize_invalid_nside
+TestValidateFiles:
+- test_validate_existing_files
+- test_validate_missing_files
 TestValidateHealpixMap:
 - test_validate_valid_map
 - test_validate_invalid_size

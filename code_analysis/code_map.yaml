@@ -764,6 +764,67 @@ classes:
     - test_temperature_range
     - test_constants_immutable
     name: TestPhysicalConstants
+  tests/unit/test_data_index_loader_basic.py:TestDataIndexLoading:
+    bases: []
+    docstring: Tests for DataIndex.load() method.
+    file: tests/unit/test_data_index_loader_basic.py
+    line: 16
+    methods:
+    - test_load_valid_yaml
+    - test_load_nonexistent_file
+    - test_load_invalid_yaml
+    - test_load_with_default_path
+    name: TestDataIndexLoading
+  tests/unit/test_data_index_loader_basic.py:TestGetFilePath:
+    bases: []
+    docstring: Tests for get_file_path() method.
+    file: tests/unit/test_data_index_loader_basic.py
+    line: 71
+    methods:
+    - test_get_file_path_single_file
+    - test_get_file_path_with_directory
+    - test_get_file_path_nonexistent
+    - test_get_file_path_invalid_category
+    name: TestGetFilePath
+  tests/unit/test_data_index_loader_basic.py:TestGetFilesByCategory:
+    bases: []
+    docstring: Tests for get_files_by_category() method.
+    file: tests/unit/test_data_index_loader_basic.py
+    line: 162
+    methods:
+    - test_get_files_single_file
+    - test_get_files_list
+    - test_get_files_invalid_category
+    name: TestGetFilesByCategory
+  tests/unit/test_data_index_loader_validation.py:TestGetUsageGuidelines:
+    bases: []
+    docstring: Tests for get_usage_guidelines() method.
+    file: tests/unit/test_data_index_loader_validation.py
+    line: 72
+    methods:
+    - test_get_usage_guidelines_from_section
+    - test_get_usage_guidelines_from_category
+    - test_get_usage_guidelines_nonexistent
+    name: TestGetUsageGuidelines
+  tests/unit/test_data_index_loader_validation.py:TestSearchByName:
+    bases: []
+    docstring: Tests for search_by_name() method.
+    file: tests/unit/test_data_index_loader_validation.py
+    line: 138
+    methods:
+    - test_search_exact_match
+    - test_search_wildcard
+    - test_search_no_matches
+    name: TestSearchByName
+  tests/unit/test_data_index_loader_validation.py:TestValidateFiles:
+    bases: []
+    docstring: Tests for validate_files() method.
+    file: tests/unit/test_data_index_loader_validation.py
+    line: 16
+    methods:
+    - test_validate_existing_files
+    - test_validate_missing_files
+    name: TestValidateFiles
   tests/unit/test_data_loader.py:TestLoadCsvData:
     bases: []
     docstring: Tests for load_csv_data function.
@@ -966,6 +1027,26 @@ classes:
     - test_synthesize_empty_alm
     - test_synthesize_invalid_nside
     name: TestSynthesizeMap
+  utils/io/data_index_loader.py:DataIndex:
+    bases: []
+    docstring: 'Data index manager for querying input data files.
+
+
+      Provides methods to search and access data files based on
+
+      the comprehensive index in data/in/data_index.yaml.'
+    file: utils/io/data_index_loader.py
+    line: 18
+    methods:
+    - __init__
+    - load
+    - get_file_path
+    - get_files_by_category
+    - validate_files
+    - get_usage_guidelines
+    - search_by_name
+    - _resolve_path
+    name: DataIndex
 dependencies: {}
 files: {}
 functions:
@@ -2887,6 +2968,139 @@ functions:
     file: tests/unit/test_config.py
     line: 45
     name: test_z_cmb_range
+  tests/unit/test_data_index_loader_basic.py:test_get_file_path_invalid_category:
+    args:
+    - self
+    docstring: Test getting path for invalid category returns None.
+    file: tests/unit/test_data_index_loader_basic.py
+    line: 147
+    name: test_get_file_path_invalid_category
+  tests/unit/test_data_index_loader_basic.py:test_get_file_path_nonexistent:
+    args:
+    - self
+    docstring: Test getting path for non-existent file returns None.
+    file: tests/unit/test_data_index_loader_basic.py
+    line: 127
+    name: test_get_file_path_nonexistent
+  tests/unit/test_data_index_loader_basic.py:test_get_file_path_single_file:
+    args:
+    - self
+    docstring: Test getting path for category with single file.
+    file: tests/unit/test_data_index_loader_basic.py
+    line: 74
+    name: test_get_file_path_single_file
+  tests/unit/test_data_index_loader_basic.py:test_get_file_path_with_directory:
+    args:
+    - self
+    docstring: Test getting path for file in directory.
+    file: tests/unit/test_data_index_loader_basic.py
+    line: 99
+    name: test_get_file_path_with_directory
+  tests/unit/test_data_index_loader_basic.py:test_get_files_invalid_category:
+    args:
+    - self
+    docstring: Test getting files for invalid category returns empty list.
+    file: tests/unit/test_data_index_loader_basic.py
+    line: 215
+    name: test_get_files_invalid_category
+  tests/unit/test_data_index_loader_basic.py:test_get_files_list:
+    args:
+    - self
+    docstring: Test getting files for category with files list.
+    file: tests/unit/test_data_index_loader_basic.py
+    line: 190
+    name: test_get_files_list
+  tests/unit/test_data_index_loader_basic.py:test_get_files_single_file:
+    args:
+    - self
+    docstring: Test getting files for category with single file.
+    file: tests/unit/test_data_index_loader_basic.py
+    line: 165
+    name: test_get_files_single_file
+  tests/unit/test_data_index_loader_basic.py:test_load_invalid_yaml:
+    args:
+    - self
+    docstring: Test loading invalid YAML raises YAMLError.
+    file: tests/unit/test_data_index_loader_basic.py
+    line: 48
+    name: test_load_invalid_yaml
+  tests/unit/test_data_index_loader_basic.py:test_load_nonexistent_file:
+    args:
+    - self
+    docstring: Test loading non-existent file raises FileNotFoundError.
+    file: tests/unit/test_data_index_loader_basic.py
+    line: 41
+    name: test_load_nonexistent_file
+  tests/unit/test_data_index_loader_basic.py:test_load_valid_yaml:
+    args:
+    - self
+    docstring: Test loading a valid YAML index file.
+    file: tests/unit/test_data_index_loader_basic.py
+    line: 19
+    name: test_load_valid_yaml
+  tests/unit/test_data_index_loader_basic.py:test_load_with_default_path:
+    args:
+    - self
+    docstring: Test loading with None path uses config default.
+    file: tests/unit/test_data_index_loader_basic.py
+    line: 58
+    name: test_load_with_default_path
+  tests/unit/test_data_index_loader_validation.py:test_get_usage_guidelines_from_category:
+    args:
+    - self
+    docstring: Test getting usage guidelines from category data.
+    file: tests/unit/test_data_index_loader_validation.py
+    line: 99
+    name: test_get_usage_guidelines_from_category
+  tests/unit/test_data_index_loader_validation.py:test_get_usage_guidelines_from_section:
+    args:
+    - self
+    docstring: Test getting usage guidelines from usage_guidelines section.
+    file: tests/unit/test_data_index_loader_validation.py
+    line: 75
+    name: test_get_usage_guidelines_from_section
+  tests/unit/test_data_index_loader_validation.py:test_get_usage_guidelines_nonexistent:
+    args:
+    - self
+    docstring: Test getting usage guidelines for non-existent category.
+    file: tests/unit/test_data_index_loader_validation.py
+    line: 123
+    name: test_get_usage_guidelines_nonexistent
+  tests/unit/test_data_index_loader_validation.py:test_search_exact_match:
+    args:
+    - self
+    docstring: Test searching for exact file name.
+    file: tests/unit/test_data_index_loader_validation.py
+    line: 141
+    name: test_search_exact_match
+  tests/unit/test_data_index_loader_validation.py:test_search_no_matches:
+    args:
+    - self
+    docstring: Test searching with pattern that matches nothing.
+    file: tests/unit/test_data_index_loader_validation.py
+    line: 189
+    name: test_search_no_matches
+  tests/unit/test_data_index_loader_validation.py:test_search_wildcard:
+    args:
+    - self
+    docstring: Test searching with wildcard pattern.
+    file: tests/unit/test_data_index_loader_validation.py
+    line: 162
+    name: test_search_wildcard
+  tests/unit/test_data_index_loader_validation.py:test_validate_existing_files:
+    args:
+    - self
+    docstring: Test validation of existing files.
+    file: tests/unit/test_data_index_loader_validation.py
+    line: 19
+    name: test_validate_existing_files
+  tests/unit/test_data_index_loader_validation.py:test_validate_missing_files:
+    args:
+    - self
+    docstring: Test validation of missing files.
+    file: tests/unit/test_data_index_loader_validation.py
+    line: 47
+    name: test_validate_missing_files
   tests/unit/test_data_loader.py:test_load_invalid_hdu:
     args:
     - self
@@ -3321,6 +3535,85 @@ functions:
     file: tests/unit/test_spherical_harmonics.py
     line: 66
     name: test_synthesize_valid_alm
+  utils/io/data_index_loader.py:__init__:
+    args:
+    - self
+    - index_data
+    - index_path
+    docstring: "Initialize data index.\n\nArgs:\n    index_data: Parsed YAML data\
+      \ from index file\n    index_path: Path to index file (for resolving relative\
+      \ paths)"
+    file: utils/io/data_index_loader.py
+    line: 26
+    name: __init__
+  utils/io/data_index_loader.py:_resolve_path:
+    args:
+    - self
+    docstring: "Resolve file path relative to data index root.\n\nArgs:\n    *path_parts:\
+      \ Path components to join\n\nReturns:\n    Resolved Path object"
+    file: utils/io/data_index_loader.py
+    line: 327
+    name: _resolve_path
+  utils/io/data_index_loader.py:get_file_path:
+    args:
+    - self
+    - category
+    - file_name
+    docstring: "Get file path for specific data file.\n\nArgs:\n    category: Data\
+      \ category (e.g., 'act_dr6_02', 'cmb_microcells')\n    file_name: Name of the\
+      \ file\n\nReturns:\n    Path to file, or None if not found"
+    file: utils/io/data_index_loader.py
+    line: 73
+    name: get_file_path
+  utils/io/data_index_loader.py:get_files_by_category:
+    args:
+    - self
+    - category
+    docstring: "Get all files in a specific category.\n\nArgs:\n    category: Data\
+      \ category name\n\nReturns:\n    List of file information dictionaries"
+    file: utils/io/data_index_loader.py
+    line: 118
+    name: get_files_by_category
+  utils/io/data_index_loader.py:get_usage_guidelines:
+    args:
+    - self
+    - category
+    docstring: "Get usage guidelines for a data category.\n\nArgs:\n    category:\
+      \ Data category name (can be specific category or\n        usage guideline key\
+      \ like 'cmb_verification')\n\nReturns:\n    Usage guidelines dictionary, or\
+      \ None if not found"
+    file: utils/io/data_index_loader.py
+    line: 233
+    name: get_usage_guidelines
+  utils/io/data_index_loader.py:load:
+    args:
+    - cls
+    - index_path
+    docstring: "Load data index from YAML file.\n\nArgs:\n    index_path: Path to\
+      \ data_index.yaml. If None, uses config path.\n\nReturns:\n    DataIndex instance\n\
+      \nRaises:\n    FileNotFoundError: If index file doesn't exist\n    yaml.YAMLError:\
+      \ If YAML is invalid"
+    file: utils/io/data_index_loader.py
+    line: 39
+    name: load
+  utils/io/data_index_loader.py:search_by_name:
+    args:
+    - self
+    - pattern
+    docstring: "Search for files by name pattern.\n\nArgs:\n    pattern: Search pattern\
+      \ (supports wildcards like * and ?)\n\nReturns:\n    List of matching file information\
+      \ dictionaries"
+    file: utils/io/data_index_loader.py
+    line: 281
+    name: search_by_name
+  utils/io/data_index_loader.py:validate_files:
+    args:
+    - self
+    docstring: "Validate that all indexed files exist.\n\nReturns:\n    Dictionary\
+      \ with 'missing' and 'found' keys containing file lists"
+    file: utils/io/data_index_loader.py
+    line: 169
+    name: validate_files
   utils/io/data_loader.py:load_csv_data:
     args:
     - file_path
@@ -5231,6 +5524,60 @@ imports:
     line: 10
     name: yaml
     type: import
+  tests/unit/test_data_index_loader_basic.py:DataIndex:
+    file: tests/unit/test_data_index_loader_basic.py
+    line: 13
+    module: utils.io.data_index_loader
+    name: DataIndex
+    type: import_from
+  tests/unit/test_data_index_loader_basic.py:Path:
+    file: tests/unit/test_data_index_loader_basic.py
+    line: 10
+    module: pathlib
+    name: Path
+    type: import_from
+  tests/unit/test_data_index_loader_basic.py:pytest:
+    file: tests/unit/test_data_index_loader_basic.py
+    line: 8
+    name: pytest
+    type: import
+  tests/unit/test_data_index_loader_basic.py:tempfile:
+    file: tests/unit/test_data_index_loader_basic.py
+    line: 9
+    name: tempfile
+    type: import
+  tests/unit/test_data_index_loader_basic.py:yaml:
+    file: tests/unit/test_data_index_loader_basic.py
+    line: 11
+    name: yaml
+    type: import
+  tests/unit/test_data_index_loader_validation.py:DataIndex:
+    file: tests/unit/test_data_index_loader_validation.py
+    line: 13
+    module: utils.io.data_index_loader
+    name: DataIndex
+    type: import_from
+  tests/unit/test_data_index_loader_validation.py:Path:
+    file: tests/unit/test_data_index_loader_validation.py
+    line: 10
+    module: pathlib
+    name: Path
+    type: import_from
+  tests/unit/test_data_index_loader_validation.py:pytest:
+    file: tests/unit/test_data_index_loader_validation.py
+    line: 8
+    name: pytest
+    type: import
+  tests/unit/test_data_index_loader_validation.py:tempfile:
+    file: tests/unit/test_data_index_loader_validation.py
+    line: 9
+    name: tempfile
+    type: import
+  tests/unit/test_data_index_loader_validation.py:yaml:
+    file: tests/unit/test_data_index_loader_validation.py
+    line: 11
+    name: yaml
+    type: import
   tests/unit/test_data_loader.py:Path:
     file: tests/unit/test_data_loader.py
     line: 11
@@ -5474,6 +5821,12 @@ imports:
     module: utils.math.spherical_harmonics
     name: synthesize_map
     type: import_from
+  utils/io/__init__.py:DataIndex:
+    file: utils/io/__init__.py
+    line: 21
+    module: utils.io.data_index_loader
+    name: DataIndex
+    type: import_from
   utils/io/__init__.py:ensure_output_directory:
     file: utils/io/__init__.py
     line: 15
@@ -5528,6 +5881,52 @@ imports:
     module: utils.io.data_loader
     name: validate_healpix_map
     type: import_from
+  utils/io/data_index_loader.py:Any:
+    file: utils/io/data_index_loader.py
+    line: 12
+    module: typing
+    name: Any
+    type: import_from
+  utils/io/data_index_loader.py:Config:
+    file: utils/io/data_index_loader.py
+    line: 15
+    module: config.settings
+    name: Config
+    type: import_from
+  utils/io/data_index_loader.py:Dict:
+    file: utils/io/data_index_loader.py
+    line: 12
+    module: typing
+    name: Dict
+    type: import_from
+  utils/io/data_index_loader.py:List:
+    file: utils/io/data_index_loader.py
+    line: 12
+    module: typing
+    name: List
+    type: import_from
+  utils/io/data_index_loader.py:Optional:
+    file: utils/io/data_index_loader.py
+    line: 12
+    module: typing
+    name: Optional
+    type: import_from
+  utils/io/data_index_loader.py:Path:
+    file: utils/io/data_index_loader.py
+    line: 11
+    module: pathlib
+    name: Path
+    type: import_from
+  utils/io/data_index_loader.py:fnmatch:
+    file: utils/io/data_index_loader.py
+    line: 14
+    name: fnmatch
+    type: import
+  utils/io/data_index_loader.py:yaml:
+    file: utils/io/data_index_loader.py
+    line: 13
+    name: yaml
+    type: import
   utils/io/data_loader.py:Any:
     file: utils/io/data_loader.py
     line: 11

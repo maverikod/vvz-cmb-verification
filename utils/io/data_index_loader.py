@@ -63,14 +63,10 @@ class DataIndex:
             with open(index_path, "r", encoding="utf-8") as f:
                 index_data = yaml.safe_load(f)
         except yaml.YAMLError as e:
-            raise yaml.YAMLError(
-                f"Invalid YAML in data index file: {e}"
-            ) from e
+            raise yaml.YAMLError(f"Invalid YAML in data index file: {e}") from e
 
         if not isinstance(index_data, dict):
-            raise ValueError(
-                "Data index file must contain a dictionary at root level"
-            )
+            raise ValueError("Data index file must contain a dictionary at root level")
 
         return cls(index_data, index_path)
 
@@ -161,9 +157,7 @@ class DataIndex:
                     file_info_copy["category"] = category
                     files_list.append(file_info_copy)
                 elif isinstance(file_info, str):
-                    files_list.append(
-                        {"name": file_info, "category": category}
-                    )
+                    files_list.append({"name": file_info, "category": category})
 
         # Add directory information if present
         if "directory" in category_data:
@@ -204,17 +198,13 @@ class DataIndex:
                         if isinstance(file_info, dict):
                             file_name = file_info.get("name")
                             if file_name:
-                                file_path = self._resolve_path(
-                                    directory, file_name
-                                )
+                                file_path = self._resolve_path(directory, file_name)
                                 if file_path.exists():
                                     found_files.append(str(file_path))
                                 else:
                                     missing_files.append(str(file_path))
                         elif isinstance(file_info, str):
-                            file_path = self._resolve_path(
-                                directory, file_info
-                            )
+                            file_path = self._resolve_path(directory, file_info)
                             if file_path.exists():
                                 found_files.append(str(file_path))
                             else:
@@ -330,9 +320,7 @@ class DataIndex:
                             matches.append(file_info_copy)
                     elif isinstance(file_info, str):
                         if fnmatch.fnmatch(file_info, pattern):
-                            matches.append(
-                                {"name": file_info, "category": category}
-                            )
+                            matches.append({"name": file_info, "category": category})
 
         return matches
 

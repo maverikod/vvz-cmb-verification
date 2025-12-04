@@ -45,8 +45,13 @@ This step processes Θ-node structure data from `data/theta/` directory. It hand
 ### 3. Map Depth to Temperature
 
 - Convert node depth (Δω/ω) to temperature fluctuation (ΔT)
-- Formula: ΔT ≈ 20-30 μK via Δω/ω (see [tech_spec.md](../../../tech_spec.md) section 13.6)
-- Validate temperature range
+- **Formula (from tech_spec-new.md 2.1):** ΔT = (Δω/ω_CMB) T_0
+  - Where T_0 = 2.725 K (CMB temperature)
+  - ω_CMB ~ 10^11 Hz
+  - Δω = ω - ω_min (depth of node)
+  - Result: ΔT ≈ 20-30 μK
+- This is direct conversion from node depth, NOT linear approximation
+- Validate temperature range (20-30 μK)
 - Create depth-to-temperature mapping
 
 ### 4. Create Node Data Structure
@@ -96,31 +101,83 @@ This step processes Θ-node structure data from `data/theta/` directory. It hand
 ### Unit Tests
 
 1. **Node Geometry Loading**
-   - Test loading node geometry files
-   - Test scale validation (~300 pc)
-   - Test arcmin conversion
-   - Test error handling
+   - **What to test:**
+     - Test loading node geometry files:
+       - Verify correct parsing of node positions (theta, phi) in radians
+       - Verify correct parsing of node scales in parsec
+       - Test data format validation (CSV, JSON)
+       - Verify array shapes: positions (N, 2), scales (N,)
+     - Test scale validation (~300 pc):
+       - Verify scales are approximately 300 pc at z≈1100
+       - Test scale range validation
+       - Verify scale units are correct (parsec)
+     - Test arcmin conversion:
+       - Verify 2-5′ → 100-300 pc conversion at z≈1100
+       - Test conversion accuracy
+     - Test error handling:
+       - Missing files (FileNotFoundError)
+       - Invalid formats (ValueError)
+       - Inconsistent data shapes
 
 2. **Node Depth Processing**
-   - Test depth data loading
-   - Test depth range validation
-   - Test depth statistics calculation
+   - **What to test:**
+     - Test depth data loading:
+       - Verify correct parsing of node depths (Δω/ω)
+       - Test data format validation
+       - Verify array shape consistency with geometry data
+     - Test depth range validation:
+       - Verify depths are in valid range (typically small positive values)
+       - Test for negative depths (should raise error or handle appropriately)
+     - Test depth statistics calculation:
+       - Mean, std, min, max depth values
+       - Depth distribution analysis
 
 3. **Temperature Mapping**
-   - Test Δω/ω → ΔT conversion
-   - Test temperature range (20-30 μK)
-   - Test conversion accuracy
+   - **What to test:**
+     - Test Δω/ω → ΔT conversion:
+       - Verify formula (from tech_spec-new.md 2.1): ΔT = (Δω/ω_CMB) T_0
+       - Verify Δω = ω - ω_min (depth of node) is used correctly
+       - Verify T_0 = 2.725 K is used correctly
+       - Verify ω_CMB ~ 10^11 Hz is used correctly
+       - Test that conversion is direct (NOT linear approximation)
+     - Test temperature range (20-30 μK):
+       - Verify all converted temperatures fall within 20-30 μK for typical depths
+       - Test with various depth values
+     - Test conversion accuracy:
+       - Verify conversion precision
+       - Test round-trip consistency (if applicable)
 
 4. **Node Data Structure**
-   - Test ThetaNodeData class
-   - Test data access methods
-   - Test data validation
+   - **What to test:**
+     - Test ThetaNodeData class:
+       - Verify all attributes (positions, scales, depths, temperatures, metadata)
+       - Test data access methods
+       - Verify data consistency (all arrays have same length N)
+     - Test data access methods:
+       - Test accessing individual node properties
+       - Test array slicing and indexing
+     - Test data validation:
+       - validate_node_data() checks:
+         - All arrays have consistent lengths
+         - Positions are in valid ranges [0, π] × [0, 2π]
+         - Scales are positive
+         - Depths are in valid range
+         - Temperatures are in 20-30 μK range
 
 ### Integration Tests
 
 1. **End-to-End Node Processing**
-   - Load geometry → Process depth → Map to temperature → Create structure
-   - Test with actual node data files
+   - **What to test:**
+     - Load geometry → Process depth → Map to temperature → Create structure:
+       - Load node geometry from data files
+       - Load node depth data
+       - Map depths to temperatures using formula ΔT = (Δω/ω_CMB) T_0 (where Δω = ω - ω_min)
+       - Create ThetaNodeData structure
+       - Validate complete structure
+     - Test with actual node data files:
+       - Real data file formats
+       - Real data sizes and ranges
+       - Verify processing produces valid ThetaNodeData
 
 ---
 
@@ -130,6 +187,21 @@ This step processes Θ-node structure data from `data/theta/` directory. It hand
 - Temperature conversion must be accurate (20-30 μK range)
 - Handle large numbers of nodes efficiently
 - Provide clear error messages for invalid data
+
+## Forbidden Elements
+
+**CRITICAL PRINCIPLE (from tech_spec-new.md):** Matter does NOT influence Θ-field.
+Nodes are topological structures - NOT created by matter.
+
+**DO NOT USE:**
+- ❌ Matter as source of nodes (nodes are topological structures of Θ-field)
+- ❌ Baryon density, DM density or material terms
+- ❌ Modification of Θ-field based on observed matter
+- ❌ Linear approximation for Δω/ω → ΔT (use exact formula: ΔT = (Δω/ω_CMB) T_0)
+- ❌ Classical thermodynamic formulas
+- ❌ Potentials V(φ), V(Θ)
+- ❌ Mass terms m²φ², m²Θ²
+- ❌ Exponential damping exp(-r/λ)
 
 ---
 

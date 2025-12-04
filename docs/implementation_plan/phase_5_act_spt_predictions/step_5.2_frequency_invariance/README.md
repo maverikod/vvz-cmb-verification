@@ -99,30 +99,74 @@ This step tests the frequency invariance (achromaticity) of CMB microstructure. 
 ### Unit Tests
 
 1. **Multi-frequency Loading**
-   - Test loading maps at different frequencies
-   - Test cross-spectra extraction
-   - Test frequency normalization
+   - **What to test:**
+     - Test loading maps at different frequencies:
+       - Verify maps at 90, 150, 220, 350 GHz are loaded correctly
+       - Test map format validation
+       - Verify maps have same NSIDE and coverage
+     - Test cross-spectra extraction:
+       - Verify cross-spectra can be extracted from frequency maps
+       - Test cross-spectrum format validation
+     - Test frequency normalization:
+       - Verify frequency-dependent effects are normalized correctly
+       - Test normalization accuracy
 
 2. **Cross-spectra Calculation**
-   - Test cross-spectrum computation
-   - Test frequency pair handling
-   - Test noise accounting
+   - **What to test:**
+     - Test cross-spectrum computation:
+       - Verify calculate_cross_spectra() computes cross-spectra between frequency pairs correctly
+       - Test CrossSpectrum structure is created correctly:
+         - frequency1, frequency2, multipoles, cross_spectrum, errors
+       - Verify cross-spectrum calculation formula
+     - Test frequency pair handling:
+       - Verify all frequency pairs are processed (90-150, 90-220, 150-220, etc.)
+       - Test pair combinations are correct
+     - Test noise accounting:
+       - Verify noise is accounted for in cross-spectrum calculation
+       - Test error propagation
 
 3. **Invariance Testing**
-   - Test frequency comparison
-   - Test invariance metrics
-   - Test variation detection
+   - **What to test:**
+     - Test frequency comparison:
+       - Verify test_invariance() compares cross-spectra at different frequencies
+       - Test that cross-spectra are consistent across frequencies
+     - Test invariance metrics:
+       - Verify calculate_invariance_metrics() calculates:
+         - Frequency variation (should be minimal for achromatic CMB)
+         - Consistency metrics
+         - Invariance score
+     - Test variation detection:
+       - Verify frequency-dependent variations are detected
+       - Test variation significance
 
 4. **Validation**
-   - Test prediction comparison
-   - Test validation criteria
-   - Test report generation
+   - **What to test:**
+     - Test prediction comparison:
+       - Verify validate_achromaticity() checks that CMB is frequency-invariant
+       - Test validation against theoretical prediction (achromaticity)
+     - Test validation criteria:
+       - Verify validation_passed flag is set correctly
+       - Test validation thresholds
+     - Test report generation:
+       - Verify InvarianceTestResult structure is created correctly
+       - Test report includes all metrics and validation results
 
 ### Integration Tests
 
 1. **End-to-End Invariance Test**
-   - Load multi-frequency data → Calculate cross-spectra → Test invariance → Validate
-   - Test with actual ACT multi-frequency data
+   - **What to test:**
+     - Load multi-frequency data → Calculate cross-spectra → Test invariance → Validate:
+       - Load CMB maps at multiple frequencies (90-350 GHz)
+       - Calculate cross-spectra between frequency pairs
+       - Test frequency invariance
+       - Calculate invariance metrics
+       - Validate achromaticity prediction
+       - Generate InvarianceTestResult
+       - Verify all steps complete successfully
+     - Test with actual ACT multi-frequency data:
+       - Real ACT multi-frequency maps
+       - Verify cross-spectra are consistent across frequencies
+       - Verify achromaticity validation passes
 
 ---
 
@@ -132,6 +176,14 @@ This step tests the frequency invariance (achromaticity) of CMB microstructure. 
 - Account for instrumental frequency responses
 - Use proper statistical methods for comparison
 - Provide clear invariance documentation
+
+## Forbidden Elements
+
+**DO NOT USE:**
+- ❌ Potentials V(φ), V(Θ)
+- ❌ Mass terms m²φ², m²Θ²
+- ❌ Exponential damping exp(-r/λ)
+- ❌ Frequency-dependent models (achromaticity is fundamental property)
 
 ---
 

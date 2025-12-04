@@ -106,27 +106,79 @@ This step implements data loading for Θ-field model data from `data/theta/` dir
 ### Unit Tests
 
 1. **Data Loading**
-   - Test loading frequency spectrum files
-   - Test loading evolution data files
-   - Test error handling for missing files
-   - Test data format validation
+   - **What to test:**
+     - Test loading frequency spectrum files (ρ_Θ(ω,t)):
+       - Verify correct parsing of frequency array ω
+       - Verify correct parsing of time array t
+       - Verify correct parsing of spectrum values ρ_Θ(ω,t) as 2D array
+       - Check data shape consistency (frequencies × times = spectrum shape)
+     - Test loading evolution data files (ω_min(t), ω_macro(t)):
+       - Verify correct parsing of time array
+       - Verify correct parsing of ω_min(t) values
+       - Verify correct parsing of ω_macro(t) values
+       - Check temporal coverage (time range completeness)
+     - Test error handling for missing files:
+       - FileNotFoundError for non-existent files
+       - Appropriate error messages
+     - Test data format validation:
+       - CSV format validation
+       - JSON format validation
+       - Required columns/keys presence
+       - Data type validation (numeric arrays)
 
 2. **Data Structures**
-   - Test FrequencySpectrum class
-   - Test Evolution class
-   - Test data access methods
-   - Test data validation
+   - **What to test:**
+     - Test ThetaFrequencySpectrum class:
+       - Verify all attributes (frequencies, times, spectrum, metadata)
+       - Test data access methods
+       - Verify data immutability (if applicable)
+       - Test metadata handling
+     - Test ThetaEvolution class:
+       - Verify all attributes (times, omega_min, omega_macro, metadata)
+       - Test data access methods
+       - Verify temporal consistency (times match omega_min/omega_macro lengths)
+     - Test data validation functions:
+       - validate_frequency_spectrum() checks:
+         - Non-empty arrays
+         - Positive frequencies
+         - Valid time range
+         - Non-negative spectrum values
+         - Consistent array shapes
+       - validate_evolution_data() checks:
+         - Non-empty arrays
+         - Valid time range
+         - Positive omega values
+         - Consistent array lengths
 
 3. **Data Interpolation**
-   - Test interpolation accuracy
-   - Test edge cases (extrapolation)
-   - Test performance with large datasets
+   - **What to test:**
+     - Test interpolation accuracy:
+       - Interpolation at known data points (should return exact values)
+       - Interpolation between data points (check smoothness)
+       - Verify interpolation preserves frequency spectrum shape
+     - Test edge cases:
+       - Extrapolation beyond data range (should raise error or handle gracefully)
+       - Empty data arrays
+       - Single data point
+     - Test performance with large datasets:
+       - Memory usage with large frequency/time arrays
+       - Interpolation speed for typical data sizes
+       - Caching effectiveness (if implemented)
 
 ### Integration Tests
 
 1. **End-to-End Data Pipeline**
-   - Load data → Validate → Provide interface → Use in calculations
-   - Test with actual theta data files
+   - **What to test:**
+     - Load data → Validate → Provide interface → Use in calculations:
+       - Load frequency spectrum from data index
+       - Load evolution data from data index
+       - Validate loaded data
+       - Use data in CMB calculation (mock)
+       - Verify data integrity throughout pipeline
+     - Test with actual theta data files:
+       - Real data file formats
+       - Real data sizes and ranges
+       - Verify data matches expected Θ-field model structure
 
 ---
 
@@ -136,6 +188,22 @@ This step implements data loading for Θ-field model data from `data/theta/` dir
 - Implement caching for frequently accessed data
 - Provide clear error messages for data issues
 - Support multiple data file formats if needed
+
+## Forbidden Elements
+
+**CRITICAL PRINCIPLE (from tech_spec-new.md):** Matter does NOT influence Θ-field.
+Matter = projection/envelope of Θ-modes.
+
+**DO NOT USE:**
+- ❌ Matter as source of Θ-field (matter is projection, not source)
+- ❌ Baryon density, DM density or material terms
+- ❌ Modification of Θ-field based on observed matter
+- ❌ T_μν of matter in Θ-field equations
+- ❌ Reverse reaction of matter on Θ-field
+- ❌ Potentials V(φ), V(Θ) in data processing
+- ❌ Mass terms m²φ², m²Θ²
+- ❌ Exponential damping exp(-r/λ)
+- ❌ Classical cosmological evolution formulas
 
 ---
 

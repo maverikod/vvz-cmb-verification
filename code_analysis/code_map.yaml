@@ -669,6 +669,45 @@ classes:
     - test_config_with_actual_paths
     - test_cmb_config_available
     name: TestConfigurationIntegration
+  tests/unit/test_cmb_plots.py:TestPlotHealpixMap:
+    bases: []
+    docstring: Tests for plot_healpix_map function.
+    file: tests/unit/test_cmb_plots.py
+    line: 26
+    methods:
+    - test_plot_valid_map
+    - test_plot_empty_map_raises_error
+    - test_plot_invalid_data_raises_error
+    name: TestPlotHealpixMap
+  tests/unit/test_cmb_plots.py:TestPlotMapComparison:
+    bases: []
+    docstring: Tests for plot_map_comparison function.
+    file: tests/unit/test_cmb_plots.py
+    line: 75
+    methods:
+    - test_plot_comparison
+    - test_plot_comparison_different_sizes
+    - test_plot_comparison_invalid_data
+    name: TestPlotMapComparison
+  tests/unit/test_cmb_plots.py:TestPlotNodeOverlay:
+    bases: []
+    docstring: Tests for plot_node_overlay function.
+    file: tests/unit/test_cmb_plots.py
+    line: 108
+    methods:
+    - test_plot_node_overlay
+    - test_plot_node_overlay_invalid_shape
+    - test_plot_node_overlay_invalid_map
+    name: TestPlotNodeOverlay
+  tests/unit/test_cmb_plots.py:TestPlotTemperatureFluctuations:
+    bases: []
+    docstring: Tests for plot_temperature_fluctuations function.
+    file: tests/unit/test_cmb_plots.py
+    line: 54
+    methods:
+    - test_plot_fluctuations
+    - test_plot_invalid_data_raises_error
+    name: TestPlotTemperatureFluctuations
   tests/unit/test_config.py:TestConfigurationAccess:
     bases: []
     docstring: Test configuration access methods.
@@ -725,6 +764,208 @@ classes:
     - test_temperature_range
     - test_constants_immutable
     name: TestPhysicalConstants
+  tests/unit/test_data_loader.py:TestLoadCsvData:
+    bases: []
+    docstring: Tests for load_csv_data function.
+    file: tests/unit/test_data_loader.py
+    line: 116
+    methods:
+    - test_load_valid_csv
+    - test_load_nonexistent_csv
+    name: TestLoadCsvData
+  tests/unit/test_data_loader.py:TestLoadHealpixMap:
+    bases: []
+    docstring: Tests for load_healpix_map function.
+    file: tests/unit/test_data_loader.py
+    line: 27
+    methods:
+    - test_load_valid_healpix_map
+    - test_load_nonexistent_file
+    - test_load_invalid_hdu
+    name: TestLoadHealpixMap
+  tests/unit/test_data_loader.py:TestLoadJsonData:
+    bases: []
+    docstring: Tests for load_json_data function.
+    file: tests/unit/test_data_loader.py
+    line: 145
+    methods:
+    - test_load_valid_json
+    - test_load_nonexistent_json
+    - test_load_invalid_json
+    name: TestLoadJsonData
+  tests/unit/test_data_loader.py:TestLoadPowerSpectrumFromTar:
+    bases: []
+    docstring: Tests for load_power_spectrum_from_tar function.
+    file: tests/unit/test_data_loader.py
+    line: 67
+    methods:
+    - test_load_spectrum_from_tar
+    - test_load_nonexistent_tar
+    - test_load_nonexistent_file_in_tar
+    name: TestLoadPowerSpectrumFromTar
+  tests/unit/test_data_loader.py:TestValidateHealpixMap:
+    bases: []
+    docstring: Tests for validate_healpix_map function.
+    file: tests/unit/test_data_loader.py
+    line: 179
+    methods:
+    - test_validate_valid_map
+    - test_validate_invalid_size
+    - test_validate_nside_mismatch
+    - test_validate_empty_map
+    name: TestValidateHealpixMap
+  tests/unit/test_data_saver.py:TestEnsureOutputDirectory:
+    bases: []
+    docstring: Tests for ensure_output_directory function.
+    file: tests/unit/test_data_saver.py
+    line: 166
+    methods:
+    - test_create_directory
+    - test_existing_directory
+    name: TestEnsureOutputDirectory
+  tests/unit/test_data_saver.py:TestSaveAnalysisResults:
+    bases: []
+    docstring: Tests for save_analysis_results function.
+    file: tests/unit/test_data_saver.py
+    line: 129
+    methods:
+    - test_save_results_json
+    - test_save_results_invalid_format
+    name: TestSaveAnalysisResults
+  tests/unit/test_data_saver.py:TestSaveHealpixMap:
+    bases: []
+    docstring: Tests for save_healpix_map function.
+    file: tests/unit/test_data_saver.py
+    line: 23
+    methods:
+    - test_save_valid_map
+    - test_save_without_overwrite
+    - test_save_invalid_size
+    name: TestSaveHealpixMap
+  tests/unit/test_data_saver.py:TestSavePowerSpectrum:
+    bases: []
+    docstring: Tests for save_power_spectrum function.
+    file: tests/unit/test_data_saver.py
+    line: 67
+    methods:
+    - test_save_spectrum_json
+    - test_save_spectrum_csv
+    - test_save_spectrum_missing_keys
+    - test_save_spectrum_invalid_format
+    name: TestSavePowerSpectrum
+  tests/unit/test_frequency_conversion.py:TestFrequencyToMultipole:
+    bases: []
+    docstring: Tests for frequency_to_multipole function.
+    file: tests/unit/test_frequency_conversion.py
+    line: 18
+    methods:
+    - test_convert_single_frequency
+    - test_convert_array_frequencies
+    - test_negative_frequency_raises_error
+    - test_zero_frequency_raises_error
+    - test_negative_D_raises_error
+    name: TestFrequencyToMultipole
+  tests/unit/test_frequency_conversion.py:TestGetFrequencyRangeForMultipoleRange:
+    bases: []
+    docstring: Tests for get_frequency_range_for_multipole_range function.
+    file: tests/unit/test_frequency_conversion.py
+    line: 103
+    methods:
+    - test_get_frequency_range
+    - test_invalid_range_raises_error
+    - test_equal_bounds_raises_error
+    - test_negative_bounds_raise_error
+    name: TestGetFrequencyRangeForMultipoleRange
+  tests/unit/test_frequency_conversion.py:TestMultipoleToFrequency:
+    bases: []
+    docstring: Tests for multipole_to_frequency function.
+    file: tests/unit/test_frequency_conversion.py
+    line: 58
+    methods:
+    - test_convert_single_multipole
+    - test_convert_array_multipoles
+    - test_round_trip_conversion
+    - test_negative_multipole_raises_error
+    - test_zero_multipole_raises_error
+    name: TestMultipoleToFrequency
+  tests/unit/test_spectrum_plots.py:TestPlotHighLPeak:
+    bases: []
+    docstring: Tests for plot_high_l_peak function.
+    file: tests/unit/test_spectrum_plots.py
+    line: 94
+    methods:
+    - test_plot_peak
+    - test_plot_peak_invalid_range
+    name: TestPlotHighLPeak
+  tests/unit/test_spectrum_plots.py:TestPlotPowerSpectrum:
+    bases: []
+    docstring: Tests for plot_power_spectrum function.
+    file: tests/unit/test_spectrum_plots.py
+    line: 25
+    methods:
+    - test_plot_spectrum
+    - test_plot_spectrum_with_errors
+    - test_plot_spectrum_size_mismatch
+    - test_plot_spectrum_invalid_data
+    name: TestPlotPowerSpectrum
+  tests/unit/test_spectrum_plots.py:TestPlotSpectrumComparison:
+    bases: []
+    docstring: Tests for plot_spectrum_comparison function.
+    file: tests/unit/test_spectrum_plots.py
+    line: 67
+    methods:
+    - test_plot_comparison
+    - test_plot_comparison_size_mismatch
+    name: TestPlotSpectrumComparison
+  tests/unit/test_spectrum_plots.py:TestPlotSubpeaks:
+    bases: []
+    docstring: Tests for plot_subpeaks function.
+    file: tests/unit/test_spectrum_plots.py
+    line: 119
+    methods:
+    - test_plot_subpeaks
+    - test_plot_subpeaks_empty_list
+    name: TestPlotSubpeaks
+  tests/unit/test_spherical_harmonics.py:TestCalculatePowerSpectrumFromAlm:
+    bases: []
+    docstring: Tests for calculate_power_spectrum_from_alm function.
+    file: tests/unit/test_spherical_harmonics.py
+    line: 99
+    methods:
+    - test_calculate_power_spectrum
+    - test_calculate_with_l_max
+    - test_calculate_empty_alm
+    name: TestCalculatePowerSpectrumFromAlm
+  tests/unit/test_spherical_harmonics.py:TestConvertHealpixToAlm:
+    bases: []
+    docstring: Tests for convert_healpix_to_alm function.
+    file: tests/unit/test_spherical_harmonics.py
+    line: 138
+    methods:
+    - test_convert_valid_map
+    - test_round_trip_preserves_map
+    name: TestConvertHealpixToAlm
+  tests/unit/test_spherical_harmonics.py:TestDecomposeMap:
+    bases: []
+    docstring: Tests for decompose_map function.
+    file: tests/unit/test_spherical_harmonics.py
+    line: 20
+    methods:
+    - test_decompose_valid_map
+    - test_decompose_with_l_max
+    - test_decompose_invalid_size
+    - test_decompose_negative_l_max
+    name: TestDecomposeMap
+  tests/unit/test_spherical_harmonics.py:TestSynthesizeMap:
+    bases: []
+    docstring: Tests for synthesize_map function.
+    file: tests/unit/test_spherical_harmonics.py
+    line: 63
+    methods:
+    - test_synthesize_valid_alm
+    - test_synthesize_empty_alm
+    - test_synthesize_invalid_nside
+    name: TestSynthesizeMap
 dependencies: {}
 files: {}
 functions:
@@ -887,7 +1128,7 @@ functions:
       \ map\n    map2: Second HEALPix map\n    title: Plot title\n    output_path:\
       \ Path to save plot (optional)"
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/cmb_plots.py
-    line: 56
+    line: 112
     name: plot_map_comparison
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/cmb_plots.py:plot_node_overlay:
     args:
@@ -897,9 +1138,11 @@ functions:
     - output_path
     docstring: "Plot CMB map with node positions overlaid.\n\nArgs:\n    map_data:\
       \ HEALPix map array\n    node_positions: Array of (theta, phi) node positions\n\
-      \    title: Plot title\n    output_path: Path to save plot (optional)"
+      \        Shape: (N, 2) where N is number of nodes\n        theta: colatitude\
+      \ in radians (0 to π)\n        phi: azimuth in radians (0 to 2π)\n    title:\
+      \ Plot title\n    output_path: Path to save plot (optional)"
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/cmb_plots.py
-    line: 74
+    line: 168
     name: plot_node_overlay
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/cmb_plots.py:plot_temperature_fluctuations:
     args:
@@ -910,7 +1153,7 @@ functions:
       \ temperature map\n    title: Plot title\n    output_path: Path to save plot\
       \ (optional)"
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/cmb_plots.py
-    line: 40
+    line: 70
     name: plot_temperature_fluctuations
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_loader.py:load_csv_data:
     args:
@@ -920,7 +1163,7 @@ functions:
       Raises:\n    FileNotFoundError: If file doesn't exist\n    ValueError: If CSV\
       \ format is invalid"
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_loader.py
-    line: 59
+    line: 159
     name: load_csv_data
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_loader.py:load_healpix_map:
     args:
@@ -942,7 +1185,7 @@ functions:
       Returns:\n    Dictionary with JSON data\n\nRaises:\n    FileNotFoundError: If\
       \ file doesn't exist\n    json.JSONDecodeError: If JSON is invalid"
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_loader.py
-    line: 76
+    line: 222
     name: load_json_data
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_loader.py:load_power_spectrum_from_tar:
     args:
@@ -954,7 +1197,7 @@ functions:
       \nRaises:\n    FileNotFoundError: If archive or file doesn't exist\n    ValueError:\
       \ If data format is invalid"
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_loader.py
-    line: 39
+    line: 53
     name: load_power_spectrum_from_tar
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_loader.py:validate_healpix_map:
     args:
@@ -964,8 +1207,22 @@ functions:
       \    nside: Expected NSIDE value (optional)\n\nReturns:\n    True if map is\
       \ valid\n\nRaises:\n    ValueError: If map is invalid"
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_loader.py
-    line: 93
+    line: 251
     name: validate_healpix_map
+  docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py:convert_to_serializable:
+    args:
+    - obj
+    docstring: null
+    file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py
+    line: 157
+    name: convert_to_serializable
+  docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py:convert_to_yaml_serializable:
+    args:
+    - obj
+    docstring: null
+    file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py
+    line: 184
+    name: convert_to_yaml_serializable
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py:ensure_output_directory:
     args:
     - output_path
@@ -973,7 +1230,7 @@ functions:
       \ Path to output file or directory\n\nRaises:\n    PermissionError: If directory\
       \ cannot be created"
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py
-    line: 72
+    line: 207
     name: ensure_output_directory
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py:save_analysis_results:
     args:
@@ -984,7 +1241,7 @@ functions:
       \ analysis results\n    file_path: Path to output file\n    format: Output format\
       \ ('json', 'yaml')\n\nRaises:\n    ValueError: If format is invalid"
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py
-    line: 55
+    line: 137
     name: save_analysis_results
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py:save_healpix_map:
     args:
@@ -1009,7 +1266,7 @@ functions:
       \ file\n    format: Output format ('json', 'csv', 'npy')\n\nRaises:\n    ValueError:\
       \ If format is invalid or data is missing"
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py
-    line: 38
+    line: 69
     name: save_power_spectrum
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/frequency_conversion.py:frequency_to_multipole:
     args:
@@ -1033,7 +1290,7 @@ functions:
       \ frequency_max) in Hz\n\nRaises:\n    ValueError: If l_min >= l_max or values\
       \ are invalid"
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/frequency_conversion.py
-    line: 54
+    line: 110
     name: get_frequency_range_for_multipole_range
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/frequency_conversion.py:multipole_to_frequency:
     args:
@@ -1044,7 +1301,7 @@ functions:
       \ config value)\n\nReturns:\n    Frequency in Hz\n\nRaises:\n    ValueError:\
       \ If multipole is negative or zero"
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/frequency_conversion.py
-    line: 35
+    line: 63
     name: multipole_to_frequency
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/spectrum_plots.py:plot_high_l_peak:
     args:
@@ -1058,7 +1315,7 @@ functions:
       \ l_max) for peak region\n    title: Plot title\n    output_path: Path to save\
       \ plot (optional)"
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/spectrum_plots.py
-    line: 65
+    line: 154
     name: plot_high_l_peak
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/spectrum_plots.py:plot_power_spectrum:
     args:
@@ -1090,7 +1347,7 @@ functions:
       \ spectrum\n    label1: Label for first spectrum\n    label2: Label for second\
       \ spectrum\n    title: Plot title\n    output_path: Path to save plot (optional)"
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/spectrum_plots.py
-    line: 41
+    line: 90
     name: plot_spectrum_comparison
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/spectrum_plots.py:plot_subpeaks:
     args:
@@ -1104,7 +1361,7 @@ functions:
       \ List of peak l positions\n    title: Plot title\n    output_path: Path to\
       \ save plot (optional)"
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/spectrum_plots.py
-    line: 85
+    line: 218
     name: plot_subpeaks
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/spherical_harmonics.py:calculate_power_spectrum_from_alm:
     args:
@@ -1115,7 +1372,7 @@ functions:
       \ uses data limit)\n\nReturns:\n    Tuple of (multipoles, C_l values)\n\nRaises:\n\
       \    ValueError: If coefficients are invalid"
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/spherical_harmonics.py
-    line: 52
+    line: 90
     name: calculate_power_spectrum_from_alm
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/spherical_harmonics.py:convert_healpix_to_alm:
     args:
@@ -1126,7 +1383,7 @@ functions:
       \    map_data: HEALPix map array\n    nside: HEALPix NSIDE parameter\n    l_max:\
       \ Maximum multipole\n\nReturns:\n    Array of harmonic coefficients a_lm"
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/spherical_harmonics.py
-    line: 71
+    line: 131
     name: convert_healpix_to_alm
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/spherical_harmonics.py:decompose_map:
     args:
@@ -1148,7 +1405,7 @@ functions:
       \ Harmonic coefficients a_lm\n    nside: HEALPix NSIDE parameter\n\nReturns:\n\
       \    HEALPix map array\n\nRaises:\n    ValueError: If coefficients are invalid"
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/spherical_harmonics.py
-    line: 35
+    line: 59
     name: synthesize_map
   docs/implementation_plan/phase_0_foundation/step_0.3_data_index/data_index_loader.py:__init__:
     args:
@@ -2413,6 +2670,76 @@ functions:
     file: tests/integration/test_config_integration.py
     line: 14
     name: test_import_and_use_config
+  tests/unit/test_cmb_plots.py:test_plot_comparison:
+    args:
+    - self
+    docstring: Test plotting map comparison.
+    file: tests/unit/test_cmb_plots.py
+    line: 78
+    name: test_plot_comparison
+  tests/unit/test_cmb_plots.py:test_plot_comparison_different_sizes:
+    args:
+    - self
+    docstring: Test plotting comparison with different sizes raises ValueError.
+    file: tests/unit/test_cmb_plots.py
+    line: 91
+    name: test_plot_comparison_different_sizes
+  tests/unit/test_cmb_plots.py:test_plot_comparison_invalid_data:
+    args:
+    - self
+    docstring: Test plotting comparison with invalid data raises ValueError.
+    file: tests/unit/test_cmb_plots.py
+    line: 99
+    name: test_plot_comparison_invalid_data
+  tests/unit/test_cmb_plots.py:test_plot_empty_map_raises_error:
+    args:
+    - self
+    docstring: Test plotting empty map raises ValueError.
+    file: tests/unit/test_cmb_plots.py
+    line: 41
+    name: test_plot_empty_map_raises_error
+  tests/unit/test_cmb_plots.py:test_plot_fluctuations:
+    args:
+    - self
+    docstring: Test plotting temperature fluctuations.
+    file: tests/unit/test_cmb_plots.py
+    line: 57
+    name: test_plot_fluctuations
+  tests/unit/test_cmb_plots.py:test_plot_invalid_data_raises_error:
+    args:
+    - self
+    docstring: Test plotting invalid data raises ValueError.
+    file: tests/unit/test_cmb_plots.py
+    line: 69
+    name: test_plot_invalid_data_raises_error
+  tests/unit/test_cmb_plots.py:test_plot_node_overlay:
+    args:
+    - self
+    docstring: Test plotting map with node overlay.
+    file: tests/unit/test_cmb_plots.py
+    line: 111
+    name: test_plot_node_overlay
+  tests/unit/test_cmb_plots.py:test_plot_node_overlay_invalid_map:
+    args:
+    - self
+    docstring: Test plotting with invalid map raises ValueError.
+    file: tests/unit/test_cmb_plots.py
+    line: 141
+    name: test_plot_node_overlay_invalid_map
+  tests/unit/test_cmb_plots.py:test_plot_node_overlay_invalid_shape:
+    args:
+    - self
+    docstring: Test plotting with invalid node positions shape raises ValueError.
+    file: tests/unit/test_cmb_plots.py
+    line: 129
+    name: test_plot_node_overlay_invalid_shape
+  tests/unit/test_cmb_plots.py:test_plot_valid_map:
+    args:
+    - self
+    docstring: Test plotting a valid HEALPix map.
+    file: tests/unit/test_cmb_plots.py
+    line: 29
+    name: test_plot_valid_map
   tests/unit/test_config.py:test_all_constants_defined:
     args:
     - self
@@ -2560,6 +2887,743 @@ functions:
     file: tests/unit/test_config.py
     line: 45
     name: test_z_cmb_range
+  tests/unit/test_data_loader.py:test_load_invalid_hdu:
+    args:
+    - self
+    docstring: Test loading with invalid HDU number.
+    file: tests/unit/test_data_loader.py
+    line: 53
+    name: test_load_invalid_hdu
+  tests/unit/test_data_loader.py:test_load_invalid_json:
+    args:
+    - self
+    docstring: Test loading invalid JSON raises JSONDecodeError.
+    file: tests/unit/test_data_loader.py
+    line: 168
+    name: test_load_invalid_json
+  tests/unit/test_data_loader.py:test_load_nonexistent_csv:
+    args:
+    - self
+    docstring: Test loading non-existent CSV raises FileNotFoundError.
+    file: tests/unit/test_data_loader.py
+    line: 137
+    name: test_load_nonexistent_csv
+  tests/unit/test_data_loader.py:test_load_nonexistent_file:
+    args:
+    - self
+    docstring: Test loading non-existent file raises FileNotFoundError.
+    file: tests/unit/test_data_loader.py
+    line: 46
+    name: test_load_nonexistent_file
+  tests/unit/test_data_loader.py:test_load_nonexistent_file_in_tar:
+    args:
+    - self
+    docstring: Test loading non-existent file from tar raises ValueError.
+    file: tests/unit/test_data_loader.py
+    line: 105
+    name: test_load_nonexistent_file_in_tar
+  tests/unit/test_data_loader.py:test_load_nonexistent_json:
+    args:
+    - self
+    docstring: Test loading non-existent JSON raises FileNotFoundError.
+    file: tests/unit/test_data_loader.py
+    line: 161
+    name: test_load_nonexistent_json
+  tests/unit/test_data_loader.py:test_load_nonexistent_tar:
+    args:
+    - self
+    docstring: Test loading from non-existent tar raises FileNotFoundError.
+    file: tests/unit/test_data_loader.py
+    line: 98
+    name: test_load_nonexistent_tar
+  tests/unit/test_data_loader.py:test_load_spectrum_from_tar:
+    args:
+    - self
+    docstring: Test loading power spectrum from tar archive.
+    file: tests/unit/test_data_loader.py
+    line: 70
+    name: test_load_spectrum_from_tar
+  tests/unit/test_data_loader.py:test_load_valid_csv:
+    args:
+    - self
+    docstring: Test loading valid CSV file.
+    file: tests/unit/test_data_loader.py
+    line: 119
+    name: test_load_valid_csv
+  tests/unit/test_data_loader.py:test_load_valid_healpix_map:
+    args:
+    - self
+    docstring: Test loading a valid HEALPix map.
+    file: tests/unit/test_data_loader.py
+    line: 30
+    name: test_load_valid_healpix_map
+  tests/unit/test_data_loader.py:test_load_valid_json:
+    args:
+    - self
+    docstring: Test loading valid JSON file.
+    file: tests/unit/test_data_loader.py
+    line: 148
+    name: test_load_valid_json
+  tests/unit/test_data_loader.py:test_validate_empty_map:
+    args:
+    - self
+    docstring: Test validating empty map raises ValueError.
+    file: tests/unit/test_data_loader.py
+    line: 207
+    name: test_validate_empty_map
+  tests/unit/test_data_loader.py:test_validate_invalid_size:
+    args:
+    - self
+    docstring: Test validating map with invalid size raises ValueError.
+    file: tests/unit/test_data_loader.py
+    line: 191
+    name: test_validate_invalid_size
+  tests/unit/test_data_loader.py:test_validate_nside_mismatch:
+    args:
+    - self
+    docstring: Test validating map with wrong NSIDE raises ValueError.
+    file: tests/unit/test_data_loader.py
+    line: 198
+    name: test_validate_nside_mismatch
+  tests/unit/test_data_loader.py:test_validate_valid_map:
+    args:
+    - self
+    docstring: Test validating a valid HEALPix map.
+    file: tests/unit/test_data_loader.py
+    line: 182
+    name: test_validate_valid_map
+  tests/unit/test_data_saver.py:test_create_directory:
+    args:
+    - self
+    docstring: Test creating output directory.
+    file: tests/unit/test_data_saver.py
+    line: 169
+    name: test_create_directory
+  tests/unit/test_data_saver.py:test_existing_directory:
+    args:
+    - self
+    docstring: Test with existing directory.
+    file: tests/unit/test_data_saver.py
+    line: 177
+    name: test_existing_directory
+  tests/unit/test_data_saver.py:test_save_invalid_size:
+    args:
+    - self
+    docstring: Test saving map with invalid size raises ValueError.
+    file: tests/unit/test_data_saver.py
+    line: 55
+    name: test_save_invalid_size
+  tests/unit/test_data_saver.py:test_save_results_invalid_format:
+    args:
+    - self
+    docstring: Test saving with invalid format raises ValueError.
+    file: tests/unit/test_data_saver.py
+    line: 155
+    name: test_save_results_invalid_format
+  tests/unit/test_data_saver.py:test_save_results_json:
+    args:
+    - self
+    docstring: Test saving analysis results as JSON.
+    file: tests/unit/test_data_saver.py
+    line: 132
+    name: test_save_results_json
+  tests/unit/test_data_saver.py:test_save_spectrum_csv:
+    args:
+    - self
+    docstring: Test saving power spectrum as CSV.
+    file: tests/unit/test_data_saver.py
+    line: 92
+    name: test_save_spectrum_csv
+  tests/unit/test_data_saver.py:test_save_spectrum_invalid_format:
+    args:
+    - self
+    docstring: Test saving with invalid format raises ValueError.
+    file: tests/unit/test_data_saver.py
+    line: 115
+    name: test_save_spectrum_invalid_format
+  tests/unit/test_data_saver.py:test_save_spectrum_json:
+    args:
+    - self
+    docstring: Test saving power spectrum as JSON.
+    file: tests/unit/test_data_saver.py
+    line: 70
+    name: test_save_spectrum_json
+  tests/unit/test_data_saver.py:test_save_spectrum_missing_keys:
+    args:
+    - self
+    docstring: Test saving spectrum without required keys raises ValueError.
+    file: tests/unit/test_data_saver.py
+    line: 105
+    name: test_save_spectrum_missing_keys
+  tests/unit/test_data_saver.py:test_save_valid_map:
+    args:
+    - self
+    docstring: Test saving a valid HEALPix map.
+    file: tests/unit/test_data_saver.py
+    line: 26
+    name: test_save_valid_map
+  tests/unit/test_data_saver.py:test_save_without_overwrite:
+    args:
+    - self
+    docstring: Test saving without overwrite flag raises FileExistsError.
+    file: tests/unit/test_data_saver.py
+    line: 42
+    name: test_save_without_overwrite
+  tests/unit/test_frequency_conversion.py:test_convert_array_frequencies:
+    args:
+    - self
+    docstring: Test converting array of frequencies.
+    file: tests/unit/test_frequency_conversion.py
+    line: 32
+    name: test_convert_array_frequencies
+  tests/unit/test_frequency_conversion.py:test_convert_array_multipoles:
+    args:
+    - self
+    docstring: Test converting array of multipoles.
+    file: tests/unit/test_frequency_conversion.py
+    line: 72
+    name: test_convert_array_multipoles
+  tests/unit/test_frequency_conversion.py:test_convert_single_frequency:
+    args:
+    - self
+    docstring: Test converting a single frequency value.
+    file: tests/unit/test_frequency_conversion.py
+    line: 21
+    name: test_convert_single_frequency
+  tests/unit/test_frequency_conversion.py:test_convert_single_multipole:
+    args:
+    - self
+    docstring: Test converting a single multipole value.
+    file: tests/unit/test_frequency_conversion.py
+    line: 61
+    name: test_convert_single_multipole
+  tests/unit/test_frequency_conversion.py:test_equal_bounds_raises_error:
+    args:
+    - self
+    docstring: Test that equal bounds raises ValueError.
+    file: tests/unit/test_frequency_conversion.py
+    line: 130
+    name: test_equal_bounds_raises_error
+  tests/unit/test_frequency_conversion.py:test_get_frequency_range:
+    args:
+    - self
+    docstring: Test getting frequency range for multipole range.
+    file: tests/unit/test_frequency_conversion.py
+    line: 106
+    name: test_get_frequency_range
+  tests/unit/test_frequency_conversion.py:test_invalid_range_raises_error:
+    args:
+    - self
+    docstring: Test that invalid range raises ValueError.
+    file: tests/unit/test_frequency_conversion.py
+    line: 125
+    name: test_invalid_range_raises_error
+  tests/unit/test_frequency_conversion.py:test_negative_D_raises_error:
+    args:
+    - self
+    docstring: Test that negative D parameter raises ValueError.
+    file: tests/unit/test_frequency_conversion.py
+    line: 52
+    name: test_negative_D_raises_error
+  tests/unit/test_frequency_conversion.py:test_negative_bounds_raise_error:
+    args:
+    - self
+    docstring: Test that negative bounds raise ValueError.
+    file: tests/unit/test_frequency_conversion.py
+    line: 135
+    name: test_negative_bounds_raise_error
+  tests/unit/test_frequency_conversion.py:test_negative_frequency_raises_error:
+    args:
+    - self
+    docstring: Test that negative frequency raises ValueError.
+    file: tests/unit/test_frequency_conversion.py
+    line: 42
+    name: test_negative_frequency_raises_error
+  tests/unit/test_frequency_conversion.py:test_negative_multipole_raises_error:
+    args:
+    - self
+    docstring: Test that negative multipole raises ValueError.
+    file: tests/unit/test_frequency_conversion.py
+    line: 92
+    name: test_negative_multipole_raises_error
+  tests/unit/test_frequency_conversion.py:test_round_trip_conversion:
+    args:
+    - self
+    docstring: Test round-trip conversion preserves values.
+    file: tests/unit/test_frequency_conversion.py
+    line: 82
+    name: test_round_trip_conversion
+  tests/unit/test_frequency_conversion.py:test_zero_frequency_raises_error:
+    args:
+    - self
+    docstring: Test that zero frequency raises ValueError.
+    file: tests/unit/test_frequency_conversion.py
+    line: 47
+    name: test_zero_frequency_raises_error
+  tests/unit/test_frequency_conversion.py:test_zero_multipole_raises_error:
+    args:
+    - self
+    docstring: Test that zero multipole raises ValueError.
+    file: tests/unit/test_frequency_conversion.py
+    line: 97
+    name: test_zero_multipole_raises_error
+  tests/unit/test_spectrum_plots.py:test_plot_comparison:
+    args:
+    - self
+    docstring: Test plotting spectrum comparison.
+    file: tests/unit/test_spectrum_plots.py
+    line: 70
+    name: test_plot_comparison
+  tests/unit/test_spectrum_plots.py:test_plot_comparison_size_mismatch:
+    args:
+    - self
+    docstring: Test plotting comparison with size mismatch raises ValueError.
+    file: tests/unit/test_spectrum_plots.py
+    line: 84
+    name: test_plot_comparison_size_mismatch
+  tests/unit/test_spectrum_plots.py:test_plot_peak:
+    args:
+    - self
+    docstring: Test plotting high-l peak.
+    file: tests/unit/test_spectrum_plots.py
+    line: 97
+    name: test_plot_peak
+  tests/unit/test_spectrum_plots.py:test_plot_peak_invalid_range:
+    args:
+    - self
+    docstring: Test plotting with invalid range raises ValueError.
+    file: tests/unit/test_spectrum_plots.py
+    line: 109
+    name: test_plot_peak_invalid_range
+  tests/unit/test_spectrum_plots.py:test_plot_spectrum:
+    args:
+    - self
+    docstring: Test plotting power spectrum.
+    file: tests/unit/test_spectrum_plots.py
+    line: 28
+    name: test_plot_spectrum
+  tests/unit/test_spectrum_plots.py:test_plot_spectrum_invalid_data:
+    args:
+    - self
+    docstring: Test plotting with invalid data raises ValueError.
+    file: tests/unit/test_spectrum_plots.py
+    line: 61
+    name: test_plot_spectrum_invalid_data
+  tests/unit/test_spectrum_plots.py:test_plot_spectrum_size_mismatch:
+    args:
+    - self
+    docstring: Test plotting with size mismatch raises ValueError.
+    file: tests/unit/test_spectrum_plots.py
+    line: 53
+    name: test_plot_spectrum_size_mismatch
+  tests/unit/test_spectrum_plots.py:test_plot_spectrum_with_errors:
+    args:
+    - self
+    docstring: Test plotting power spectrum with error bars.
+    file: tests/unit/test_spectrum_plots.py
+    line: 39
+    name: test_plot_spectrum_with_errors
+  tests/unit/test_spectrum_plots.py:test_plot_subpeaks:
+    args:
+    - self
+    docstring: Test plotting sub-peaks.
+    file: tests/unit/test_spectrum_plots.py
+    line: 122
+    name: test_plot_subpeaks
+  tests/unit/test_spectrum_plots.py:test_plot_subpeaks_empty_list:
+    args:
+    - self
+    docstring: Test plotting with empty peak list raises ValueError.
+    file: tests/unit/test_spectrum_plots.py
+    line: 134
+    name: test_plot_subpeaks_empty_list
+  tests/unit/test_spherical_harmonics.py:test_calculate_empty_alm:
+    args:
+    - self
+    docstring: Test calculating with empty a_lm raises ValueError.
+    file: tests/unit/test_spherical_harmonics.py
+    line: 130
+    name: test_calculate_empty_alm
+  tests/unit/test_spherical_harmonics.py:test_calculate_power_spectrum:
+    args:
+    - self
+    docstring: Test calculating power spectrum from a_lm.
+    file: tests/unit/test_spherical_harmonics.py
+    line: 102
+    name: test_calculate_power_spectrum
+  tests/unit/test_spherical_harmonics.py:test_calculate_with_l_max:
+    args:
+    - self
+    docstring: Test calculating power spectrum with specified l_max.
+    file: tests/unit/test_spherical_harmonics.py
+    line: 117
+    name: test_calculate_with_l_max
+  tests/unit/test_spherical_harmonics.py:test_convert_valid_map:
+    args:
+    - self
+    docstring: Test converting valid HEALPix map to a_lm.
+    file: tests/unit/test_spherical_harmonics.py
+    line: 141
+    name: test_convert_valid_map
+  tests/unit/test_spherical_harmonics.py:test_decompose_invalid_size:
+    args:
+    - self
+    docstring: Test decomposing map with invalid size raises ValueError.
+    file: tests/unit/test_spherical_harmonics.py
+    line: 45
+    name: test_decompose_invalid_size
+  tests/unit/test_spherical_harmonics.py:test_decompose_negative_l_max:
+    args:
+    - self
+    docstring: Test decomposing with negative l_max raises ValueError.
+    file: tests/unit/test_spherical_harmonics.py
+    line: 53
+    name: test_decompose_negative_l_max
+  tests/unit/test_spherical_harmonics.py:test_decompose_valid_map:
+    args:
+    - self
+    docstring: Test decomposing a valid HEALPix map.
+    file: tests/unit/test_spherical_harmonics.py
+    line: 23
+    name: test_decompose_valid_map
+  tests/unit/test_spherical_harmonics.py:test_decompose_with_l_max:
+    args:
+    - self
+    docstring: Test decomposing with specified l_max.
+    file: tests/unit/test_spherical_harmonics.py
+    line: 34
+    name: test_decompose_with_l_max
+  tests/unit/test_spherical_harmonics.py:test_round_trip_preserves_map:
+    args:
+    - self
+    docstring: Test round-trip conversion preserves map within precision.
+    file: tests/unit/test_spherical_harmonics.py
+    line: 152
+    name: test_round_trip_preserves_map
+  tests/unit/test_spherical_harmonics.py:test_synthesize_empty_alm:
+    args:
+    - self
+    docstring: Test synthesizing with empty a_lm raises ValueError.
+    file: tests/unit/test_spherical_harmonics.py
+    line: 81
+    name: test_synthesize_empty_alm
+  tests/unit/test_spherical_harmonics.py:test_synthesize_invalid_nside:
+    args:
+    - self
+    docstring: Test synthesizing with invalid NSIDE raises ValueError.
+    file: tests/unit/test_spherical_harmonics.py
+    line: 88
+    name: test_synthesize_invalid_nside
+  tests/unit/test_spherical_harmonics.py:test_synthesize_valid_alm:
+    args:
+    - self
+    docstring: Test synthesizing map from valid a_lm.
+    file: tests/unit/test_spherical_harmonics.py
+    line: 66
+    name: test_synthesize_valid_alm
+  utils/io/data_loader.py:load_csv_data:
+    args:
+    - file_path
+    docstring: "Load CSV data file.\n\nArgs:\n    file_path: Path to CSV file\n\n\
+      Returns:\n    Dictionary with column names as keys and arrays as values\n\n\
+      Raises:\n    FileNotFoundError: If file doesn't exist\n    ValueError: If CSV\
+      \ format is invalid"
+    file: utils/io/data_loader.py
+    line: 159
+    name: load_csv_data
+  utils/io/data_loader.py:load_healpix_map:
+    args:
+    - file_path
+    - field
+    - hdu
+    docstring: "Load HEALPix map from FITS file.\n\nArgs:\n    file_path: Path to\
+      \ HEALPix FITS file\n    field: Field number to read (default: 0)\n    hdu:\
+      \ HDU number to read (default: 1)\n\nReturns:\n    HEALPix map array\n\nRaises:\n\
+      \    FileNotFoundError: If file doesn't exist\n    ValueError: If file format\
+      \ is invalid"
+    file: utils/io/data_loader.py
+    line: 20
+    name: load_healpix_map
+  utils/io/data_loader.py:load_json_data:
+    args:
+    - file_path
+    docstring: "Load JSON data file.\n\nArgs:\n    file_path: Path to JSON file\n\n\
+      Returns:\n    Dictionary with JSON data\n\nRaises:\n    FileNotFoundError: If\
+      \ file doesn't exist\n    json.JSONDecodeError: If JSON is invalid"
+    file: utils/io/data_loader.py
+    line: 222
+    name: load_json_data
+  utils/io/data_loader.py:load_power_spectrum_from_tar:
+    args:
+    - tar_path
+    - spectrum_file
+    docstring: "Load power spectrum data from tar.gz archive.\n\nArgs:\n    tar_path:\
+      \ Path to tar.gz archive\n    spectrum_file: Name of spectrum file within archive\n\
+      \nReturns:\n    Dictionary with spectrum data (keys: 'l', 'cl', 'error', etc.)\n\
+      \nRaises:\n    FileNotFoundError: If archive or file doesn't exist\n    ValueError:\
+      \ If data format is invalid"
+    file: utils/io/data_loader.py
+    line: 53
+    name: load_power_spectrum_from_tar
+  utils/io/data_loader.py:validate_healpix_map:
+    args:
+    - map_data
+    - nside
+    docstring: "Validate HEALPix map data.\n\nArgs:\n    map_data: HEALPix map array\n\
+      \    nside: Expected NSIDE value (optional)\n\nReturns:\n    True if map is\
+      \ valid\n\nRaises:\n    ValueError: If map is invalid"
+    file: utils/io/data_loader.py
+    line: 251
+    name: validate_healpix_map
+  utils/io/data_saver.py:convert_to_serializable:
+    args:
+    - obj
+    docstring: null
+    file: utils/io/data_saver.py
+    line: 157
+    name: convert_to_serializable
+  utils/io/data_saver.py:convert_to_yaml_serializable:
+    args:
+    - obj
+    docstring: null
+    file: utils/io/data_saver.py
+    line: 184
+    name: convert_to_yaml_serializable
+  utils/io/data_saver.py:ensure_output_directory:
+    args:
+    - output_path
+    docstring: "Ensure output directory exists, create if needed.\n\nArgs:\n    output_path:\
+      \ Path to output file or directory\n\nRaises:\n    PermissionError: If directory\
+      \ cannot be created"
+    file: utils/io/data_saver.py
+    line: 207
+    name: ensure_output_directory
+  utils/io/data_saver.py:save_analysis_results:
+    args:
+    - results
+    - file_path
+    - format
+    docstring: "Save analysis results to file.\n\nArgs:\n    results: Dictionary with\
+      \ analysis results\n    file_path: Path to output file\n    format: Output format\
+      \ ('json', 'yaml')\n\nRaises:\n    ValueError: If format is invalid"
+    file: utils/io/data_saver.py
+    line: 137
+    name: save_analysis_results
+  utils/io/data_saver.py:save_healpix_map:
+    args:
+    - map_data
+    - file_path
+    - nside
+    - overwrite
+    docstring: "Save HEALPix map to FITS file.\n\nArgs:\n    map_data: HEALPix map\
+      \ array\n    file_path: Path to output FITS file\n    nside: HEALPix NSIDE parameter\n\
+      \    overwrite: Whether to overwrite existing file\n\nRaises:\n    FileExistsError:\
+      \ If file exists and overwrite=False\n    ValueError: If map data is invalid"
+    file: utils/io/data_saver.py
+    line: 19
+    name: save_healpix_map
+  utils/io/data_saver.py:save_power_spectrum:
+    args:
+    - spectrum_data
+    - file_path
+    - format
+    docstring: "Save power spectrum data to file.\n\nArgs:\n    spectrum_data: Dictionary\
+      \ with spectrum data (keys: 'l', 'cl', 'error')\n    file_path: Path to output\
+      \ file\n    format: Output format ('json', 'csv', 'npy')\n\nRaises:\n    ValueError:\
+      \ If format is invalid or data is missing"
+    file: utils/io/data_saver.py
+    line: 69
+    name: save_power_spectrum
+  utils/math/frequency_conversion.py:frequency_to_multipole:
+    args:
+    - frequency
+    - D
+    docstring: "Convert frequency to multipole using l ≈ π D ω.\n\nArgs:\n    frequency:\
+      \ Frequency in Hz\n    D: Distance parameter (if None, uses config value)\n\n\
+      Returns:\n    Multipole l value(s)\n\nRaises:\n    ValueError: If frequency\
+      \ is negative or zero"
+    file: utils/math/frequency_conversion.py
+    line: 16
+    name: frequency_to_multipole
+  utils/math/frequency_conversion.py:get_frequency_range_for_multipole_range:
+    args:
+    - l_min
+    - l_max
+    - D
+    docstring: "Get frequency range corresponding to multipole range.\n\nArgs:\n \
+      \   l_min: Minimum multipole\n    l_max: Maximum multipole\n    D: Distance\
+      \ parameter (if None, uses config value)\n\nReturns:\n    Tuple of (frequency_min,\
+      \ frequency_max) in Hz\n\nRaises:\n    ValueError: If l_min >= l_max or values\
+      \ are invalid"
+    file: utils/math/frequency_conversion.py
+    line: 110
+    name: get_frequency_range_for_multipole_range
+  utils/math/frequency_conversion.py:multipole_to_frequency:
+    args:
+    - multipole
+    - D
+    docstring: "Convert multipole to frequency using inverse of l ≈ π D ω.\n\nArgs:\n\
+      \    multipole: Multipole l value(s)\n    D: Distance parameter (if None, uses\
+      \ config value)\n\nReturns:\n    Frequency in Hz\n\nRaises:\n    ValueError:\
+      \ If multipole is negative or zero"
+    file: utils/math/frequency_conversion.py
+    line: 63
+    name: multipole_to_frequency
+  utils/math/spherical_harmonics.py:calculate_power_spectrum_from_alm:
+    args:
+    - alm
+    - l_max
+    docstring: "Calculate power spectrum C_l from harmonic coefficients.\n\nArgs:\n\
+      \    alm: Harmonic coefficients a_lm\n    l_max: Maximum multipole (if None,\
+      \ uses data limit)\n\nReturns:\n    Tuple of (multipoles, C_l values)\n\nRaises:\n\
+      \    ValueError: If coefficients are invalid"
+    file: utils/math/spherical_harmonics.py
+    line: 90
+    name: calculate_power_spectrum_from_alm
+  utils/math/spherical_harmonics.py:convert_healpix_to_alm:
+    args:
+    - map_data
+    - nside
+    - l_max
+    docstring: "Convert HEALPix map to spherical harmonic coefficients.\n\nArgs:\n\
+      \    map_data: HEALPix map array\n    nside: HEALPix NSIDE parameter\n    l_max:\
+      \ Maximum multipole\n\nReturns:\n    Array of harmonic coefficients a_lm"
+    file: utils/math/spherical_harmonics.py
+    line: 131
+    name: convert_healpix_to_alm
+  utils/math/spherical_harmonics.py:decompose_map:
+    args:
+    - map_data
+    - nside
+    - l_max
+    docstring: "Decompose HEALPix map into spherical harmonics.\n\nArgs:\n    map_data:\
+      \ HEALPix map array\n    nside: HEALPix NSIDE parameter\n    l_max: Maximum\
+      \ multipole (if None, uses default)\n\nReturns:\n    Array of harmonic coefficients\
+      \ a_lm\n\nRaises:\n    ValueError: If map data is invalid"
+    file: utils/math/spherical_harmonics.py
+    line: 15
+    name: decompose_map
+  utils/math/spherical_harmonics.py:synthesize_map:
+    args:
+    - alm
+    - nside
+    docstring: "Synthesize HEALPix map from spherical harmonics.\n\nArgs:\n    alm:\
+      \ Harmonic coefficients a_lm\n    nside: HEALPix NSIDE parameter\n\nReturns:\n\
+      \    HEALPix map array\n\nRaises:\n    ValueError: If coefficients are invalid"
+    file: utils/math/spherical_harmonics.py
+    line: 59
+    name: synthesize_map
+  utils/visualization/cmb_plots.py:plot_healpix_map:
+    args:
+    - map_data
+    - title
+    - output_path
+    - projection
+    - unit
+    docstring: "Plot HEALPix CMB map.\n\nArgs:\n    map_data: HEALPix map array\n\
+      \    title: Plot title\n    output_path: Path to save plot (optional)\n    projection:\
+      \ Map projection ('mollweide', 'orthographic', etc.)\n    unit: Temperature\
+      \ unit for colorbar\n\nRaises:\n    ValueError: If map data is invalid"
+    file: utils/visualization/cmb_plots.py
+    line: 17
+    name: plot_healpix_map
+  utils/visualization/cmb_plots.py:plot_map_comparison:
+    args:
+    - map1
+    - map2
+    - title
+    - output_path
+    docstring: "Plot comparison of two CMB maps.\n\nArgs:\n    map1: First HEALPix\
+      \ map\n    map2: Second HEALPix map\n    title: Plot title\n    output_path:\
+      \ Path to save plot (optional)"
+    file: utils/visualization/cmb_plots.py
+    line: 112
+    name: plot_map_comparison
+  utils/visualization/cmb_plots.py:plot_node_overlay:
+    args:
+    - map_data
+    - node_positions
+    - title
+    - output_path
+    docstring: "Plot CMB map with node positions overlaid.\n\nArgs:\n    map_data:\
+      \ HEALPix map array\n    node_positions: Array of (theta, phi) node positions\n\
+      \        Shape: (N, 2) where N is number of nodes\n        theta: colatitude\
+      \ in radians (0 to π)\n        phi: azimuth in radians (0 to 2π)\n    title:\
+      \ Plot title\n    output_path: Path to save plot (optional)"
+    file: utils/visualization/cmb_plots.py
+    line: 168
+    name: plot_node_overlay
+  utils/visualization/cmb_plots.py:plot_temperature_fluctuations:
+    args:
+    - map_data
+    - title
+    - output_path
+    docstring: "Plot temperature fluctuation map.\n\nArgs:\n    map_data: HEALPix\
+      \ temperature map\n    title: Plot title\n    output_path: Path to save plot\
+      \ (optional)"
+    file: utils/visualization/cmb_plots.py
+    line: 70
+    name: plot_temperature_fluctuations
+  utils/visualization/spectrum_plots.py:plot_high_l_peak:
+    args:
+    - multipoles
+    - spectrum
+    - peak_range
+    - title
+    - output_path
+    docstring: "Plot high-l peak region with highlighting.\n\nArgs:\n    multipoles:\
+      \ Multipole array l\n    spectrum: Power spectrum values\n    peak_range: (l_min,\
+      \ l_max) for peak region\n    title: Plot title\n    output_path: Path to save\
+      \ plot (optional)"
+    file: utils/visualization/spectrum_plots.py
+    line: 154
+    name: plot_high_l_peak
+  utils/visualization/spectrum_plots.py:plot_power_spectrum:
+    args:
+    - multipoles
+    - spectrum
+    - errors
+    - title
+    - output_path
+    - log_scale
+    docstring: "Plot C_l power spectrum.\n\nArgs:\n    multipoles: Multipole array\
+      \ l\n    spectrum: Power spectrum values C_l\n    errors: Error bars (optional)\n\
+      \    title: Plot title\n    output_path: Path to save plot (optional)\n    log_scale:\
+      \ Whether to use logarithmic scale\n\nRaises:\n    ValueError: If data arrays\
+      \ are invalid"
+    file: utils/visualization/spectrum_plots.py
+    line: 16
+    name: plot_power_spectrum
+  utils/visualization/spectrum_plots.py:plot_spectrum_comparison:
+    args:
+    - multipoles
+    - spectrum1
+    - spectrum2
+    - label1
+    - label2
+    - title
+    - output_path
+    docstring: "Plot comparison of two power spectra.\n\nArgs:\n    multipoles: Multipole\
+      \ array l\n    spectrum1: First power spectrum\n    spectrum2: Second power\
+      \ spectrum\n    label1: Label for first spectrum\n    label2: Label for second\
+      \ spectrum\n    title: Plot title\n    output_path: Path to save plot (optional)"
+    file: utils/visualization/spectrum_plots.py
+    line: 90
+    name: plot_spectrum_comparison
+  utils/visualization/spectrum_plots.py:plot_subpeaks:
+    args:
+    - multipoles
+    - spectrum
+    - peak_positions
+    - title
+    - output_path
+    docstring: "Plot power spectrum with sub-peaks highlighted.\n\nArgs:\n    multipoles:\
+      \ Multipole array l\n    spectrum: Power spectrum values\n    peak_positions:\
+      \ List of peak l positions\n    title: Plot title\n    output_path: Path to\
+      \ save plot (optional)"
+    file: utils/visualization/spectrum_plots.py
+    line: 218
+    name: plot_subpeaks
 imports:
   config/__init__.py:Config:
     file: config/__init__.py
@@ -2820,6 +3884,11 @@ imports:
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py
     line: 12
     name: numpy
+    type: import
+  docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py:yaml:
+    file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py
+    line: 178
+    name: yaml
     type: import
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/frequency_conversion.py:Config:
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/frequency_conversion.py
@@ -4076,6 +5145,61 @@ imports:
     module: config
     name: initialize_config
     type: import_from
+  tests/unit/test_cmb_plots.py:Path:
+    file: tests/unit/test_cmb_plots.py
+    line: 11
+    module: pathlib
+    name: Path
+    type: import_from
+  tests/unit/test_cmb_plots.py:healpy:
+    file: tests/unit/test_cmb_plots.py
+    line: 12
+    name: healpy
+    type: import
+  tests/unit/test_cmb_plots.py:matplotlib:
+    file: tests/unit/test_cmb_plots.py
+    line: 13
+    name: matplotlib
+    type: import
+  tests/unit/test_cmb_plots.py:numpy:
+    file: tests/unit/test_cmb_plots.py
+    line: 9
+    name: numpy
+    type: import
+  tests/unit/test_cmb_plots.py:plot_healpix_map:
+    file: tests/unit/test_cmb_plots.py
+    line: 18
+    module: utils.visualization.cmb_plots
+    name: plot_healpix_map
+    type: import_from
+  tests/unit/test_cmb_plots.py:plot_map_comparison:
+    file: tests/unit/test_cmb_plots.py
+    line: 18
+    module: utils.visualization.cmb_plots
+    name: plot_map_comparison
+    type: import_from
+  tests/unit/test_cmb_plots.py:plot_node_overlay:
+    file: tests/unit/test_cmb_plots.py
+    line: 18
+    module: utils.visualization.cmb_plots
+    name: plot_node_overlay
+    type: import_from
+  tests/unit/test_cmb_plots.py:plot_temperature_fluctuations:
+    file: tests/unit/test_cmb_plots.py
+    line: 18
+    module: utils.visualization.cmb_plots
+    name: plot_temperature_fluctuations
+    type: import_from
+  tests/unit/test_cmb_plots.py:pytest:
+    file: tests/unit/test_cmb_plots.py
+    line: 8
+    name: pytest
+    type: import
+  tests/unit/test_cmb_plots.py:tempfile:
+    file: tests/unit/test_cmb_plots.py
+    line: 10
+    name: tempfile
+    type: import
   tests/unit/test_config.py:Config:
     file: tests/unit/test_config.py
     line: 12
@@ -4132,4 +5256,637 @@ imports:
     file: tests/unit/test_config.py
     line: 10
     name: yaml
+    type: import
+  tests/unit/test_data_loader.py:Path:
+    file: tests/unit/test_data_loader.py
+    line: 11
+    module: pathlib
+    name: Path
+    type: import_from
+  tests/unit/test_data_loader.py:csv:
+    file: tests/unit/test_data_loader.py
+    line: 16
+    name: csv
+    type: import
+  tests/unit/test_data_loader.py:fits:
+    file: tests/unit/test_data_loader.py
+    line: 13
+    module: astropy.io
+    name: fits
+    type: import_from
+  tests/unit/test_data_loader.py:healpy:
+    file: tests/unit/test_data_loader.py
+    line: 12
+    name: healpy
+    type: import
+  tests/unit/test_data_loader.py:json:
+    file: tests/unit/test_data_loader.py
+    line: 15
+    name: json
+    type: import
+  tests/unit/test_data_loader.py:load_csv_data:
+    file: tests/unit/test_data_loader.py
+    line: 18
+    module: utils.io.data_loader
+    name: load_csv_data
+    type: import_from
+  tests/unit/test_data_loader.py:load_healpix_map:
+    file: tests/unit/test_data_loader.py
+    line: 18
+    module: utils.io.data_loader
+    name: load_healpix_map
+    type: import_from
+  tests/unit/test_data_loader.py:load_json_data:
+    file: tests/unit/test_data_loader.py
+    line: 18
+    module: utils.io.data_loader
+    name: load_json_data
+    type: import_from
+  tests/unit/test_data_loader.py:load_power_spectrum_from_tar:
+    file: tests/unit/test_data_loader.py
+    line: 18
+    module: utils.io.data_loader
+    name: load_power_spectrum_from_tar
+    type: import_from
+  tests/unit/test_data_loader.py:numpy:
+    file: tests/unit/test_data_loader.py
+    line: 9
+    name: numpy
+    type: import
+  tests/unit/test_data_loader.py:pytest:
+    file: tests/unit/test_data_loader.py
+    line: 8
+    name: pytest
+    type: import
+  tests/unit/test_data_loader.py:tarfile:
+    file: tests/unit/test_data_loader.py
+    line: 14
+    name: tarfile
+    type: import
+  tests/unit/test_data_loader.py:tempfile:
+    file: tests/unit/test_data_loader.py
+    line: 10
+    name: tempfile
+    type: import
+  tests/unit/test_data_loader.py:validate_healpix_map:
+    file: tests/unit/test_data_loader.py
+    line: 18
+    module: utils.io.data_loader
+    name: validate_healpix_map
+    type: import_from
+  tests/unit/test_data_saver.py:Path:
+    file: tests/unit/test_data_saver.py
+    line: 11
+    module: pathlib
+    name: Path
+    type: import_from
+  tests/unit/test_data_saver.py:ensure_output_directory:
+    file: tests/unit/test_data_saver.py
+    line: 15
+    module: utils.io.data_saver
+    name: ensure_output_directory
+    type: import_from
+  tests/unit/test_data_saver.py:healpy:
+    file: tests/unit/test_data_saver.py
+    line: 12
+    name: healpy
+    type: import
+  tests/unit/test_data_saver.py:json:
+    file: tests/unit/test_data_saver.py
+    line: 13
+    name: json
+    type: import
+  tests/unit/test_data_saver.py:numpy:
+    file: tests/unit/test_data_saver.py
+    line: 9
+    name: numpy
+    type: import
+  tests/unit/test_data_saver.py:pytest:
+    file: tests/unit/test_data_saver.py
+    line: 8
+    name: pytest
+    type: import
+  tests/unit/test_data_saver.py:save_analysis_results:
+    file: tests/unit/test_data_saver.py
+    line: 15
+    module: utils.io.data_saver
+    name: save_analysis_results
+    type: import_from
+  tests/unit/test_data_saver.py:save_healpix_map:
+    file: tests/unit/test_data_saver.py
+    line: 15
+    module: utils.io.data_saver
+    name: save_healpix_map
+    type: import_from
+  tests/unit/test_data_saver.py:save_power_spectrum:
+    file: tests/unit/test_data_saver.py
+    line: 15
+    module: utils.io.data_saver
+    name: save_power_spectrum
+    type: import_from
+  tests/unit/test_data_saver.py:tempfile:
+    file: tests/unit/test_data_saver.py
+    line: 10
+    name: tempfile
+    type: import
+  tests/unit/test_frequency_conversion.py:frequency_to_multipole:
+    file: tests/unit/test_frequency_conversion.py
+    line: 11
+    module: utils.math.frequency_conversion
+    name: frequency_to_multipole
+    type: import_from
+  tests/unit/test_frequency_conversion.py:get_frequency_range_for_multipole_range:
+    file: tests/unit/test_frequency_conversion.py
+    line: 11
+    module: utils.math.frequency_conversion
+    name: get_frequency_range_for_multipole_range
+    type: import_from
+  tests/unit/test_frequency_conversion.py:multipole_to_frequency:
+    file: tests/unit/test_frequency_conversion.py
+    line: 11
+    module: utils.math.frequency_conversion
+    name: multipole_to_frequency
+    type: import_from
+  tests/unit/test_frequency_conversion.py:numpy:
+    file: tests/unit/test_frequency_conversion.py
+    line: 9
+    name: numpy
+    type: import
+  tests/unit/test_frequency_conversion.py:pytest:
+    file: tests/unit/test_frequency_conversion.py
+    line: 8
+    name: pytest
+    type: import
+  tests/unit/test_spectrum_plots.py:Path:
+    file: tests/unit/test_spectrum_plots.py
+    line: 11
+    module: pathlib
+    name: Path
+    type: import_from
+  tests/unit/test_spectrum_plots.py:matplotlib:
+    file: tests/unit/test_spectrum_plots.py
+    line: 12
+    name: matplotlib
+    type: import
+  tests/unit/test_spectrum_plots.py:numpy:
+    file: tests/unit/test_spectrum_plots.py
+    line: 9
+    name: numpy
+    type: import
+  tests/unit/test_spectrum_plots.py:plot_high_l_peak:
+    file: tests/unit/test_spectrum_plots.py
+    line: 17
+    module: utils.visualization.spectrum_plots
+    name: plot_high_l_peak
+    type: import_from
+  tests/unit/test_spectrum_plots.py:plot_power_spectrum:
+    file: tests/unit/test_spectrum_plots.py
+    line: 17
+    module: utils.visualization.spectrum_plots
+    name: plot_power_spectrum
+    type: import_from
+  tests/unit/test_spectrum_plots.py:plot_spectrum_comparison:
+    file: tests/unit/test_spectrum_plots.py
+    line: 17
+    module: utils.visualization.spectrum_plots
+    name: plot_spectrum_comparison
+    type: import_from
+  tests/unit/test_spectrum_plots.py:plot_subpeaks:
+    file: tests/unit/test_spectrum_plots.py
+    line: 17
+    module: utils.visualization.spectrum_plots
+    name: plot_subpeaks
+    type: import_from
+  tests/unit/test_spectrum_plots.py:pytest:
+    file: tests/unit/test_spectrum_plots.py
+    line: 8
+    name: pytest
+    type: import
+  tests/unit/test_spectrum_plots.py:tempfile:
+    file: tests/unit/test_spectrum_plots.py
+    line: 10
+    name: tempfile
+    type: import
+  tests/unit/test_spherical_harmonics.py:calculate_power_spectrum_from_alm:
+    file: tests/unit/test_spherical_harmonics.py
+    line: 12
+    module: utils.math.spherical_harmonics
+    name: calculate_power_spectrum_from_alm
+    type: import_from
+  tests/unit/test_spherical_harmonics.py:convert_healpix_to_alm:
+    file: tests/unit/test_spherical_harmonics.py
+    line: 12
+    module: utils.math.spherical_harmonics
+    name: convert_healpix_to_alm
+    type: import_from
+  tests/unit/test_spherical_harmonics.py:decompose_map:
+    file: tests/unit/test_spherical_harmonics.py
+    line: 12
+    module: utils.math.spherical_harmonics
+    name: decompose_map
+    type: import_from
+  tests/unit/test_spherical_harmonics.py:healpy:
+    file: tests/unit/test_spherical_harmonics.py
+    line: 10
+    name: healpy
+    type: import
+  tests/unit/test_spherical_harmonics.py:numpy:
+    file: tests/unit/test_spherical_harmonics.py
+    line: 9
+    name: numpy
+    type: import
+  tests/unit/test_spherical_harmonics.py:pytest:
+    file: tests/unit/test_spherical_harmonics.py
+    line: 8
+    name: pytest
+    type: import
+  tests/unit/test_spherical_harmonics.py:synthesize_map:
+    file: tests/unit/test_spherical_harmonics.py
+    line: 12
+    module: utils.math.spherical_harmonics
+    name: synthesize_map
+    type: import_from
+  utils/io/__init__.py:ensure_output_directory:
+    file: utils/io/__init__.py
+    line: 15
+    module: utils.io.data_saver
+    name: ensure_output_directory
+    type: import_from
+  utils/io/__init__.py:load_csv_data:
+    file: utils/io/__init__.py
+    line: 8
+    module: utils.io.data_loader
+    name: load_csv_data
+    type: import_from
+  utils/io/__init__.py:load_healpix_map:
+    file: utils/io/__init__.py
+    line: 8
+    module: utils.io.data_loader
+    name: load_healpix_map
+    type: import_from
+  utils/io/__init__.py:load_json_data:
+    file: utils/io/__init__.py
+    line: 8
+    module: utils.io.data_loader
+    name: load_json_data
+    type: import_from
+  utils/io/__init__.py:load_power_spectrum_from_tar:
+    file: utils/io/__init__.py
+    line: 8
+    module: utils.io.data_loader
+    name: load_power_spectrum_from_tar
+    type: import_from
+  utils/io/__init__.py:save_analysis_results:
+    file: utils/io/__init__.py
+    line: 15
+    module: utils.io.data_saver
+    name: save_analysis_results
+    type: import_from
+  utils/io/__init__.py:save_healpix_map:
+    file: utils/io/__init__.py
+    line: 15
+    module: utils.io.data_saver
+    name: save_healpix_map
+    type: import_from
+  utils/io/__init__.py:save_power_spectrum:
+    file: utils/io/__init__.py
+    line: 15
+    module: utils.io.data_saver
+    name: save_power_spectrum
+    type: import_from
+  utils/io/__init__.py:validate_healpix_map:
+    file: utils/io/__init__.py
+    line: 8
+    module: utils.io.data_loader
+    name: validate_healpix_map
+    type: import_from
+  utils/io/data_loader.py:Any:
+    file: utils/io/data_loader.py
+    line: 11
+    module: typing
+    name: Any
+    type: import_from
+  utils/io/data_loader.py:Dict:
+    file: utils/io/data_loader.py
+    line: 11
+    module: typing
+    name: Dict
+    type: import_from
+  utils/io/data_loader.py:Optional:
+    file: utils/io/data_loader.py
+    line: 11
+    module: typing
+    name: Optional
+    type: import_from
+  utils/io/data_loader.py:Path:
+    file: utils/io/data_loader.py
+    line: 10
+    module: pathlib
+    name: Path
+    type: import_from
+  utils/io/data_loader.py:Union:
+    file: utils/io/data_loader.py
+    line: 11
+    module: typing
+    name: Union
+    type: import_from
+  utils/io/data_loader.py:csv:
+    file: utils/io/data_loader.py
+    line: 17
+    name: csv
+    type: import
+  utils/io/data_loader.py:fits:
+    file: utils/io/data_loader.py
+    line: 14
+    module: astropy.io
+    name: fits
+    type: import_from
+  utils/io/data_loader.py:healpy:
+    file: utils/io/data_loader.py
+    line: 13
+    name: healpy
+    type: import
+  utils/io/data_loader.py:json:
+    file: utils/io/data_loader.py
+    line: 16
+    name: json
+    type: import
+  utils/io/data_loader.py:numpy:
+    file: utils/io/data_loader.py
+    line: 12
+    name: numpy
+    type: import
+  utils/io/data_loader.py:tarfile:
+    file: utils/io/data_loader.py
+    line: 15
+    name: tarfile
+    type: import
+  utils/io/data_saver.py:Any:
+    file: utils/io/data_saver.py
+    line: 11
+    module: typing
+    name: Any
+    type: import_from
+  utils/io/data_saver.py:Dict:
+    file: utils/io/data_saver.py
+    line: 11
+    module: typing
+    name: Dict
+    type: import_from
+  utils/io/data_saver.py:Optional:
+    file: utils/io/data_saver.py
+    line: 11
+    module: typing
+    name: Optional
+    type: import_from
+  utils/io/data_saver.py:Path:
+    file: utils/io/data_saver.py
+    line: 10
+    module: pathlib
+    name: Path
+    type: import_from
+  utils/io/data_saver.py:Union:
+    file: utils/io/data_saver.py
+    line: 11
+    module: typing
+    name: Union
+    type: import_from
+  utils/io/data_saver.py:csv:
+    file: utils/io/data_saver.py
+    line: 16
+    name: csv
+    type: import
+  utils/io/data_saver.py:fits:
+    file: utils/io/data_saver.py
+    line: 14
+    module: astropy.io
+    name: fits
+    type: import_from
+  utils/io/data_saver.py:healpy:
+    file: utils/io/data_saver.py
+    line: 13
+    name: healpy
+    type: import
+  utils/io/data_saver.py:json:
+    file: utils/io/data_saver.py
+    line: 15
+    name: json
+    type: import
+  utils/io/data_saver.py:numpy:
+    file: utils/io/data_saver.py
+    line: 12
+    name: numpy
+    type: import
+  utils/io/data_saver.py:yaml:
+    file: utils/io/data_saver.py
+    line: 178
+    name: yaml
+    type: import
+  utils/math/__init__.py:calculate_power_spectrum_from_alm:
+    file: utils/math/__init__.py
+    line: 13
+    module: utils.math.spherical_harmonics
+    name: calculate_power_spectrum_from_alm
+    type: import_from
+  utils/math/__init__.py:convert_healpix_to_alm:
+    file: utils/math/__init__.py
+    line: 13
+    module: utils.math.spherical_harmonics
+    name: convert_healpix_to_alm
+    type: import_from
+  utils/math/__init__.py:decompose_map:
+    file: utils/math/__init__.py
+    line: 13
+    module: utils.math.spherical_harmonics
+    name: decompose_map
+    type: import_from
+  utils/math/__init__.py:frequency_to_multipole:
+    file: utils/math/__init__.py
+    line: 8
+    module: utils.math.frequency_conversion
+    name: frequency_to_multipole
+    type: import_from
+  utils/math/__init__.py:get_frequency_range_for_multipole_range:
+    file: utils/math/__init__.py
+    line: 8
+    module: utils.math.frequency_conversion
+    name: get_frequency_range_for_multipole_range
+    type: import_from
+  utils/math/__init__.py:multipole_to_frequency:
+    file: utils/math/__init__.py
+    line: 8
+    module: utils.math.frequency_conversion
+    name: multipole_to_frequency
+    type: import_from
+  utils/math/__init__.py:synthesize_map:
+    file: utils/math/__init__.py
+    line: 13
+    module: utils.math.spherical_harmonics
+    name: synthesize_map
+    type: import_from
+  utils/math/frequency_conversion.py:Config:
+    file: utils/math/frequency_conversion.py
+    line: 13
+    module: config.settings
+    name: Config
+    type: import_from
+  utils/math/frequency_conversion.py:Optional:
+    file: utils/math/frequency_conversion.py
+    line: 11
+    module: typing
+    name: Optional
+    type: import_from
+  utils/math/frequency_conversion.py:Tuple:
+    file: utils/math/frequency_conversion.py
+    line: 11
+    module: typing
+    name: Tuple
+    type: import_from
+  utils/math/frequency_conversion.py:Union:
+    file: utils/math/frequency_conversion.py
+    line: 11
+    module: typing
+    name: Union
+    type: import_from
+  utils/math/frequency_conversion.py:numpy:
+    file: utils/math/frequency_conversion.py
+    line: 12
+    name: numpy
+    type: import
+  utils/math/spherical_harmonics.py:Optional:
+    file: utils/math/spherical_harmonics.py
+    line: 10
+    module: typing
+    name: Optional
+    type: import_from
+  utils/math/spherical_harmonics.py:Tuple:
+    file: utils/math/spherical_harmonics.py
+    line: 10
+    module: typing
+    name: Tuple
+    type: import_from
+  utils/math/spherical_harmonics.py:healpy:
+    file: utils/math/spherical_harmonics.py
+    line: 12
+    name: healpy
+    type: import
+  utils/math/spherical_harmonics.py:numpy:
+    file: utils/math/spherical_harmonics.py
+    line: 11
+    name: numpy
+    type: import
+  utils/visualization/__init__.py:plot_healpix_map:
+    file: utils/visualization/__init__.py
+    line: 8
+    module: utils.visualization.cmb_plots
+    name: plot_healpix_map
+    type: import_from
+  utils/visualization/__init__.py:plot_high_l_peak:
+    file: utils/visualization/__init__.py
+    line: 14
+    module: utils.visualization.spectrum_plots
+    name: plot_high_l_peak
+    type: import_from
+  utils/visualization/__init__.py:plot_map_comparison:
+    file: utils/visualization/__init__.py
+    line: 8
+    module: utils.visualization.cmb_plots
+    name: plot_map_comparison
+    type: import_from
+  utils/visualization/__init__.py:plot_node_overlay:
+    file: utils/visualization/__init__.py
+    line: 8
+    module: utils.visualization.cmb_plots
+    name: plot_node_overlay
+    type: import_from
+  utils/visualization/__init__.py:plot_power_spectrum:
+    file: utils/visualization/__init__.py
+    line: 14
+    module: utils.visualization.spectrum_plots
+    name: plot_power_spectrum
+    type: import_from
+  utils/visualization/__init__.py:plot_spectrum_comparison:
+    file: utils/visualization/__init__.py
+    line: 14
+    module: utils.visualization.spectrum_plots
+    name: plot_spectrum_comparison
+    type: import_from
+  utils/visualization/__init__.py:plot_subpeaks:
+    file: utils/visualization/__init__.py
+    line: 14
+    module: utils.visualization.spectrum_plots
+    name: plot_subpeaks
+    type: import_from
+  utils/visualization/__init__.py:plot_temperature_fluctuations:
+    file: utils/visualization/__init__.py
+    line: 8
+    module: utils.visualization.cmb_plots
+    name: plot_temperature_fluctuations
+    type: import_from
+  utils/visualization/cmb_plots.py:Optional:
+    file: utils/visualization/cmb_plots.py
+    line: 11
+    module: typing
+    name: Optional
+    type: import_from
+  utils/visualization/cmb_plots.py:Path:
+    file: utils/visualization/cmb_plots.py
+    line: 10
+    module: pathlib
+    name: Path
+    type: import_from
+  utils/visualization/cmb_plots.py:Tuple:
+    file: utils/visualization/cmb_plots.py
+    line: 11
+    module: typing
+    name: Tuple
+    type: import_from
+  utils/visualization/cmb_plots.py:healpy:
+    file: utils/visualization/cmb_plots.py
+    line: 14
+    name: healpy
+    type: import
+  utils/visualization/cmb_plots.py:matplotlib.pyplot:
+    file: utils/visualization/cmb_plots.py
+    line: 13
+    name: matplotlib.pyplot
+    type: import
+  utils/visualization/cmb_plots.py:numpy:
+    file: utils/visualization/cmb_plots.py
+    line: 12
+    name: numpy
+    type: import
+  utils/visualization/spectrum_plots.py:List:
+    file: utils/visualization/spectrum_plots.py
+    line: 11
+    module: typing
+    name: List
+    type: import_from
+  utils/visualization/spectrum_plots.py:Optional:
+    file: utils/visualization/spectrum_plots.py
+    line: 11
+    module: typing
+    name: Optional
+    type: import_from
+  utils/visualization/spectrum_plots.py:Path:
+    file: utils/visualization/spectrum_plots.py
+    line: 10
+    module: pathlib
+    name: Path
+    type: import_from
+  utils/visualization/spectrum_plots.py:Tuple:
+    file: utils/visualization/spectrum_plots.py
+    line: 11
+    module: typing
+    name: Tuple
+    type: import_from
+  utils/visualization/spectrum_plots.py:matplotlib.pyplot:
+    file: utils/visualization/spectrum_plots.py
+    line: 13
+    name: matplotlib.pyplot
+    type: import
+  utils/visualization/spectrum_plots.py:numpy:
+    file: utils/visualization/spectrum_plots.py
+    line: 12
+    name: numpy
     type: import

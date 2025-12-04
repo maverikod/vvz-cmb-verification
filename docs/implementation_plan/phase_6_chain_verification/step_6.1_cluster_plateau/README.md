@@ -101,30 +101,76 @@ This step analyzes cluster plateau slopes and correlates them with CMB node dire
 ### Unit Tests
 
 1. **Cluster Data Loading**
-   - Test cluster catalog loading
-   - Test plateau slope extraction
-   - Test data format handling
+   - **What to test:**
+     - Test cluster catalog loading:
+       - Verify load_cluster_data() loads cluster catalogs correctly
+       - Test catalog format validation
+       - Verify cluster properties are extracted
+     - Test plateau slope extraction:
+       - Verify plateau slopes are extracted from cluster data correctly
+       - Test slope data format validation
+       - Verify slope_uncertainty is extracted
+     - Test data format handling:
+       - Verify different cluster data formats are handled
+       - Test format conversion if needed
 
 2. **Slope Analysis**
-   - Test slope calculation
-   - Test distribution analysis
-   - Test pattern identification
+   - **What to test:**
+     - Test slope calculation:
+       - Verify analyze_plateau_slopes() calculates:
+         - mean_slope, std_slope, slope_distribution
+       - Test slope statistics are calculated correctly
+     - Test distribution analysis:
+       - Verify slope distribution is analyzed correctly
+       - Test distribution shape analysis
+     - Test pattern identification:
+       - Verify slope patterns are identified
+       - Test pattern consistency
 
 3. **Node Correlation**
-   - Test node-cluster matching
-   - Test direction calculation
-   - Test correlation computation
+   - **What to test:**
+     - Test node-cluster matching:
+       - Verify clusters are matched to CMB nodes correctly
+       - Test matching uses NodeCmbMapping and NodeLssMapping
+     - Test direction calculation:
+       - Verify node directions are calculated correctly
+       - Test direction vector calculation
+     - Test correlation computation:
+       - Verify correlate_with_node_directions() creates PlateauNodeCorrelation:
+         - cluster_ids, node_ids, plateau_slopes, node_directions
+         - correlation_coefficient, significance
+       - Test correlation coefficient is calculated correctly
 
 4. **Chain Validation**
-   - Test connection validation
-   - Test prediction comparison
-   - Test report generation
+   - **What to test:**
+     - Test connection validation:
+       - Verify validate_chain_connection() validates CMB → cluster connection
+       - Test validation criteria
+       - Verify validation_passed flag
+     - Test prediction comparison:
+       - Verify predictions are compared with observations
+       - Test comparison accuracy
+     - Test report generation:
+       - Verify analysis results are documented correctly
+       - Test report completeness
 
 ### Integration Tests
 
 1. **End-to-End Chain Analysis**
-   - Load clusters → Analyze slopes → Correlate with nodes → Validate chain
-   - Test with actual cluster and node data
+   - **What to test:**
+     - Load clusters → Analyze slopes → Correlate with nodes → Validate chain:
+       - Load cluster plateau data
+       - Load NodeCmbMapping and NodeLssMapping
+       - Analyze plateau slopes
+       - Correlate slopes with node directions
+       - Validate CMB → cluster chain connection
+       - Generate analysis report
+       - Verify all steps complete successfully
+     - Test with actual cluster and node data:
+       - Real cluster data
+       - Real node-CMB and node-LSS mappings
+       - Verify correlation is calculated correctly
+       - Verify chain connection is validated
 
 ---
 
@@ -134,6 +180,14 @@ This step analyzes cluster plateau slopes and correlates them with CMB node dire
 - Use proper statistical methods for correlation
 - Account for selection effects
 - Provide clear chain validation documentation
+
+## Forbidden Elements
+
+**DO NOT USE:**
+- ❌ Potentials V(φ), V(Θ)
+- ❌ Mass terms m²φ², m²Θ²
+- ❌ Exponential damping exp(-r/λ)
+- ❌ Classical gravitational models for cluster analysis
 
 ---
 

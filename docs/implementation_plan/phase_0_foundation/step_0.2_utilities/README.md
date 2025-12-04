@@ -107,36 +107,104 @@ All modules provide well-documented, reusable functions that can be imported and
 ### Unit Tests
 
 1. **Data Loader Tests**
-   - Test HEALPix FITS file loading
-   - Test power spectrum archive extraction
-   - Test CSV/JSON loading
-   - Test error handling for invalid files
+   - **What to test:**
+     - Test HEALPix FITS file loading:
+       - Verify correct reading of HEALPix maps from FITS
+       - Test NSIDE parameter extraction
+       - Test field selection (field parameter)
+       - Test HDU selection (hdu parameter)
+       - Verify map data type and shape
+     - Test power spectrum archive extraction:
+       - Verify tar.gz archive extraction
+       - Test finding spectrum file within archive
+       - Verify spectrum data parsing (l, C_l, errors)
+       - Test archive format handling
+     - Test CSV/JSON loading:
+       - Verify CSV column parsing
+       - Verify JSON structure parsing
+       - Test data type conversion
+       - Test missing value handling
+     - Test error handling for invalid files:
+       - FileNotFoundError for missing files
+       - ValueError for invalid formats
+       - Appropriate error messages
 
 2. **Data Saver Tests**
-   - Test FITS file writing
-   - Test output directory creation
-   - Test format validation
+   - **What to test:**
+     - Test FITS file writing:
+       - Verify HEALPix map is written correctly
+       - Test NSIDE parameter is saved
+       - Verify map can be read back correctly
+       - Test overwrite flag behavior
+     - Test output directory creation:
+       - Verify directories are created if missing
+       - Test permission handling
+       - Test path resolution
+     - Test format validation:
+       - Verify data format matches output format
+       - Test format conversion (json, csv, npy)
+       - Test required fields presence
 
 3. **Frequency Conversion Tests**
-   - Test l ≈ π D ω conversion accuracy
-   - Test inverse conversion (l → ω)
-   - Test edge cases (very low/high frequencies)
+   - **What to test:**
+     - Test l ≈ π D ω conversion accuracy:
+       - Verify formula: l = π D ω (test with known values)
+       - Test D parameter from config is used correctly
+       - Verify conversion precision
+       - Test array conversion (vectorized operation)
+     - Test inverse conversion (l → ω):
+       - Verify ω = l/(π D) formula
+       - Test round-trip conversion (ω → l → ω)
+       - Verify inverse is exact (within numerical precision)
+     - Test edge cases:
+       - Very low frequencies (near zero)
+       - Very high frequencies
+       - Negative values (should raise error)
+       - Zero frequency (should raise error)
 
 4. **Spherical Harmonics Tests**
-   - Test decomposition accuracy
-   - Test synthesis round-trip
-   - Test HEALPix conversion
+   - **What to test:**
+     - Test decomposition accuracy:
+       - Verify decomposition of known map produces correct a_lm
+       - Test decomposition preserves map information
+       - Verify l_max parameter handling
+     - Test synthesis round-trip:
+       - Decompose map → Synthesize map → Compare with original
+       - Verify round-trip preserves map within numerical precision
+       - Test with different NSIDE values
+     - Test HEALPix conversion:
+       - Verify HEALPix to a_lm conversion
+       - Verify a_lm to HEALPix conversion
+       - Test pixel indexing correctness
 
 5. **Visualization Tests**
-   - Test plot generation (no errors)
-   - Test figure saving
-   - Test projection correctness
+   - **What to test:**
+     - Test plot generation (no errors):
+       - Verify plots are created without exceptions
+       - Test with various map sizes
+       - Test with different projections (mollweide, orthographic)
+     - Test figure saving:
+       - Verify figures are saved to specified paths
+       - Test different formats (PNG, PDF, SVG)
+       - Verify saved files can be opened
+     - Test projection correctness:
+       - Verify Mollweide projection shows correct sky coverage
+       - Test coordinate system (theta, phi) mapping
+       - Verify colorbar units and scales
 
 ### Integration Tests
 
 1. **End-to-End Data Pipeline**
-   - Load data → Process → Save → Load again
-   - Verify data integrity throughout pipeline
+   - **What to test:**
+     - Load data → Process → Save → Load again:
+       - Load HEALPix map from FITS
+       - Process map (e.g., apply conversion)
+       - Save processed map to FITS
+       - Load saved map and verify it matches processed map
+     - Verify data integrity throughout pipeline:
+       - Test that no data is lost or corrupted
+       - Verify metadata is preserved
+       - Test with actual ACT DR6.02 data files
 
 ---
 

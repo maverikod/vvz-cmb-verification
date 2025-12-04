@@ -9,7 +9,7 @@ Email: vasilyvz@gmail.com
 """
 
 from pathlib import Path
-from typing import Optional, Dict, List, Tuple
+from typing import Optional, Dict, List, Tuple, Any
 import numpy as np
 from dataclasses import dataclass
 from cmb.nodes.node_to_cmb_mapper import NodeCmbMapping
@@ -21,24 +21,25 @@ from utils.io.data_loader import load_csv_data
 class ClusterPlateau:
     """
     Cluster plateau data.
-    
+
     Attributes:
         cluster_id: Cluster identifier
         plateau_slope: Plateau slope value
         slope_uncertainty: Slope measurement uncertainty
         properties: Additional cluster properties
     """
+
     cluster_id: str
     plateau_slope: float
     slope_uncertainty: float
-    properties: Dict[str, any]
+    properties: Dict[str, Any]
 
 
 @dataclass
 class PlateauNodeCorrelation:
     """
     Plateau-node correlation data.
-    
+
     Attributes:
         cluster_ids: Array of cluster IDs
         node_ids: Array of corresponding node IDs
@@ -47,6 +48,7 @@ class PlateauNodeCorrelation:
         correlation_coefficient: Correlation coefficient
         significance: Statistical significance
     """
+
     cluster_ids: np.ndarray
     node_ids: np.ndarray
     plateau_slopes: np.ndarray
@@ -58,19 +60,19 @@ class PlateauNodeCorrelation:
 class ClusterPlateauAnalyzer:
     """
     Cluster plateau analyzer.
-    
+
     Analyzes plateau slopes and correlates with CMB node directions.
     """
-    
+
     def __init__(
         self,
         cluster_data_path: Path,
         node_mapping: NodeCmbMapping,
-        node_lss_mapping: NodeLssMapping
+        node_lss_mapping: NodeLssMapping,
     ):
         """
         Initialize analyzer.
-        
+
         Args:
             cluster_data_path: Path to cluster data
             node_mapping: Node-CMB mapping
@@ -80,21 +82,21 @@ class ClusterPlateauAnalyzer:
         self.node_mapping = node_mapping
         self.node_lss_mapping = node_lss_mapping
         self.clusters: List[ClusterPlateau] = []
-    
+
     def load_cluster_data(self) -> None:
         """
         Load cluster plateau data.
-        
+
         Raises:
             FileNotFoundError: If cluster data file doesn't exist
             ValueError: If data format is invalid
         """
         pass
-    
-    def analyze_plateau_slopes(self) -> Dict[str, any]:
+
+    def analyze_plateau_slopes(self) -> Dict[str, Any]:
         """
         Analyze cluster plateau slopes.
-        
+
         Returns:
             Dictionary with slope analysis results:
             - mean_slope: Mean plateau slope
@@ -102,31 +104,28 @@ class ClusterPlateauAnalyzer:
             - slope_distribution: Slope distribution
         """
         pass
-    
-    def correlate_with_node_directions(
-        self
-    ) -> PlateauNodeCorrelation:
+
+    def correlate_with_node_directions(self) -> PlateauNodeCorrelation:
         """
         Correlate plateau slopes with node directions.
-        
+
         Returns:
             PlateauNodeCorrelation instance
-            
+
         Raises:
             ValueError: If correlation fails
         """
         pass
-    
+
     def validate_chain_connection(
-        self,
-        correlation: PlateauNodeCorrelation
-    ) -> Dict[str, any]:
+        self, correlation: PlateauNodeCorrelation
+    ) -> Dict[str, Any]:
         """
         Validate CMB → cluster chain connection.
-        
+
         Args:
             correlation: Plateau-node correlation data
-            
+
         Returns:
             Dictionary with validation results
         """

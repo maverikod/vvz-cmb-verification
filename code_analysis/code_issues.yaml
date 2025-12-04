@@ -6,11 +6,6 @@ issues:
   generic_exception_usage: []
   imports_in_middle: []
   invalid_imports:
-  - description: Module 'numpy' cannot be imported
-    file: docs/implementation_plan/phase_5_act_spt_predictions/step_5.1_highl_peak/highl_peak_predictor.py
-    line: 13
-    module: numpy
-    type: import
   - description: Module 'cmb.spectrum.power_spectrum' cannot be imported
     file: docs/implementation_plan/phase_5_act_spt_predictions/step_5.1_highl_peak/highl_peak_predictor.py
     imported: PowerSpectrum
@@ -29,28 +24,11 @@ issues:
     line: 17
     module: cmb.theta_evolution_processor
     type: import_from
-  - description: Module 'utils.io.data_loader' cannot be imported
-    file: docs/implementation_plan/phase_5_act_spt_predictions/step_5.1_highl_peak/highl_peak_predictor.py
-    imported: load_power_spectrum_from_tar
-    line: 18
-    module: utils.io.data_loader
-    type: import_from
-  - description: Module 'numpy' cannot be imported
-    file: docs/implementation_plan/phase_5_act_spt_predictions/step_5.2_frequency_invariance/frequency_invariance.py
-    line: 13
-    module: numpy
-    type: import
   - description: Module 'cmb.reconstruction.cmb_map_reconstructor' cannot be imported
     file: docs/implementation_plan/phase_5_act_spt_predictions/step_5.2_frequency_invariance/frequency_invariance.py
     imported: CmbMapReconstructor
     line: 15
     module: cmb.reconstruction.cmb_map_reconstructor
-    type: import_from
-  - description: Module 'utils.io.data_loader' cannot be imported
-    file: docs/implementation_plan/phase_5_act_spt_predictions/step_5.2_frequency_invariance/frequency_invariance.py
-    imported: load_healpix_map
-    line: 16
-    module: utils.io.data_loader
     type: import_from
   - description: Module 'cmb.predictions.highl_peak_predictor' cannot be imported
     file: docs/implementation_plan/phase_5_act_spt_predictions/step_5.3_predictions_report/predictions_report.py
@@ -76,16 +54,6 @@ issues:
     line: 17
     module: cmb.correlation.phi_split_analyzer
     type: import_from
-  - description: Module 'numpy' cannot be imported
-    file: docs/implementation_plan/phase_2_cmb_reconstruction/step_2.3_node_mapping/node_to_cmb_mapper.py
-    line: 12
-    module: numpy
-    type: import
-  - description: Module 'healpy' cannot be imported
-    file: docs/implementation_plan/phase_2_cmb_reconstruction/step_2.3_node_mapping/node_to_cmb_mapper.py
-    line: 13
-    module: healpy
-    type: import
   - description: Module 'cmb.theta_node_processor' cannot be imported
     file: docs/implementation_plan/phase_2_cmb_reconstruction/step_2.3_node_mapping/node_to_cmb_mapper.py
     imported: ThetaNodeData
@@ -98,16 +66,6 @@ issues:
     line: 16
     module: cmb.reconstruction.cmb_map_reconstructor
     type: import_from
-  - description: Module 'numpy' cannot be imported
-    file: docs/implementation_plan/phase_2_cmb_reconstruction/step_2.1_reconstruction_core/cmb_map_reconstructor.py
-    line: 18
-    module: numpy
-    type: import
-  - description: Module 'healpy' cannot be imported
-    file: docs/implementation_plan/phase_2_cmb_reconstruction/step_2.1_reconstruction_core/cmb_map_reconstructor.py
-    line: 19
-    module: healpy
-    type: import
   - description: Module 'cmb.theta_data_loader' cannot be imported
     file: docs/implementation_plan/phase_2_cmb_reconstruction/step_2.1_reconstruction_core/cmb_map_reconstructor.py
     imported: ThetaFrequencySpectrum
@@ -126,56 +84,12 @@ issues:
     line: 21
     module: cmb.theta_node_processor
     type: import_from
-  - description: Module 'utils.math.spherical_harmonics' cannot be imported
-    file: docs/implementation_plan/phase_2_cmb_reconstruction/step_2.1_reconstruction_core/cmb_map_reconstructor.py
-    imported: synthesize_map
-    line: 22
-    module: utils.math.spherical_harmonics
-    type: import_from
-  - description: Module 'utils.math.frequency_conversion' cannot be imported
-    file: docs/implementation_plan/phase_2_cmb_reconstruction/step_2.1_reconstruction_core/cmb_map_reconstructor.py
-    imported: frequency_to_multipole
-    line: 23
-    module: utils.math.frequency_conversion
-    type: import_from
-  - description: Module 'numpy' cannot be imported
-    file: docs/implementation_plan/phase_2_cmb_reconstruction/step_2.2_map_validation/map_validator.py
-    line: 13
-    module: numpy
-    type: import
-  - description: Module 'healpy' cannot be imported
-    file: docs/implementation_plan/phase_2_cmb_reconstruction/step_2.2_map_validation/map_validator.py
-    line: 14
-    module: healpy
-    type: import
   - description: Module 'cmb.reconstruction.cmb_map_reconstructor' cannot be imported
     file: docs/implementation_plan/phase_2_cmb_reconstruction/step_2.2_map_validation/map_validator.py
     imported: CmbMapReconstructor
     line: 15
     module: cmb.reconstruction.cmb_map_reconstructor
     type: import_from
-  - description: Module 'utils.io.data_loader' cannot be imported
-    file: docs/implementation_plan/phase_2_cmb_reconstruction/step_2.2_map_validation/map_validator.py
-    imported: load_healpix_map
-    line: 16
-    module: utils.io.data_loader
-    type: import_from
-  - description: Module 'utils.visualization.cmb_plots' cannot be imported
-    file: docs/implementation_plan/phase_2_cmb_reconstruction/step_2.2_map_validation/map_validator.py
-    imported: plot_map_comparison
-    line: 17
-    module: utils.visualization.cmb_plots
-    type: import_from
-  - description: Module 'numpy' cannot be imported
-    file: docs/implementation_plan/phase_4_cmb_lss_correlation/step_4.2_phi_split/phi_split_analyzer.py
-    line: 12
-    module: numpy
-    type: import
-  - description: Module 'healpy' cannot be imported
-    file: docs/implementation_plan/phase_4_cmb_lss_correlation/step_4.2_phi_split/phi_split_analyzer.py
-    line: 13
-    module: healpy
-    type: import
   - description: Module 'cmb.correlation.cmb_lss_correlator' cannot be imported
     file: docs/implementation_plan/phase_4_cmb_lss_correlation/step_4.2_phi_split/phi_split_analyzer.py
     imported: CmbLssCorrelator
@@ -188,27 +102,11 @@ issues:
     line: 15
     module: cmb.correlation.cmb_lss_correlator
     type: import_from
-  - description: Module 'numpy' cannot be imported
-    file: docs/implementation_plan/phase_4_cmb_lss_correlation/step_4.1_correlation_core/cmb_lss_correlator.py
-    line: 13
-    module: numpy
-    type: import
-  - description: Module 'healpy' cannot be imported
-    file: docs/implementation_plan/phase_4_cmb_lss_correlation/step_4.1_correlation_core/cmb_lss_correlator.py
-    line: 14
-    module: healpy
-    type: import
   - description: Module 'cmb.reconstruction.cmb_map_reconstructor' cannot be imported
     file: docs/implementation_plan/phase_4_cmb_lss_correlation/step_4.1_correlation_core/cmb_lss_correlator.py
     imported: CmbMapReconstructor
     line: 16
     module: cmb.reconstruction.cmb_map_reconstructor
-    type: import_from
-  - description: Module 'utils.io.data_loader' cannot be imported
-    file: docs/implementation_plan/phase_4_cmb_lss_correlation/step_4.1_correlation_core/cmb_lss_correlator.py
-    imported: load_csv_data
-    line: 17
-    module: utils.io.data_loader
     type: import_from
   - description: Module 'utils.io.data_index_loader' cannot be imported
     file: docs/implementation_plan/phase_4_cmb_lss_correlation/step_4.1_correlation_core/cmb_lss_correlator.py
@@ -216,16 +114,6 @@ issues:
     line: 18
     module: utils.io.data_index_loader
     type: import_from
-  - description: Module 'numpy' cannot be imported
-    file: docs/implementation_plan/phase_4_cmb_lss_correlation/step_4.3_node_lss_mapping/node_lss_mapper.py
-    line: 21
-    module: numpy
-    type: import
-  - description: Module 'healpy' cannot be imported
-    file: docs/implementation_plan/phase_4_cmb_lss_correlation/step_4.3_node_lss_mapping/node_lss_mapper.py
-    line: 22
-    module: healpy
-    type: import
   - description: Module 'cmb.nodes.node_to_cmb_mapper' cannot be imported
     file: docs/implementation_plan/phase_4_cmb_lss_correlation/step_4.3_node_lss_mapping/node_lss_mapper.py
     imported: NodeCmbMapping
@@ -238,17 +126,6 @@ issues:
     line: 25
     module: cmb.correlation.cmb_lss_correlator
     type: import_from
-  - description: Module 'utils.io.data_loader' cannot be imported
-    file: docs/implementation_plan/phase_4_cmb_lss_correlation/step_4.3_node_lss_mapping/node_lss_mapper.py
-    imported: load_csv_data
-    line: 26
-    module: utils.io.data_loader
-    type: import_from
-  - description: Module 'numpy' cannot be imported
-    file: docs/implementation_plan/phase_1_theta_data/step_1.4_node_map_generation/theta_node_map.py
-    line: 15
-    module: numpy
-    type: import
   - description: Module 'scipy.ndimage' cannot be imported
     file: docs/implementation_plan/phase_1_theta_data/step_1.4_node_map_generation/theta_node_map.py
     imported: minimum_filter
@@ -261,51 +138,12 @@ issues:
     line: 18
     module: cmb.theta_data_loader
     type: import_from
-  - description: Module 'numpy' cannot be imported
-    file: docs/implementation_plan/phase_1_theta_data/step_1.1_data_loader/theta_data_loader.py
-    line: 13
-    module: numpy
-    type: import
-  - description: Module 'utils.io.data_loader' cannot be imported
-    file: docs/implementation_plan/phase_1_theta_data/step_1.1_data_loader/theta_data_loader.py
-    imported: load_csv_data
-    line: 16
-    module: utils.io.data_loader
-    type: import_from
-  - description: Module 'utils.io.data_loader' cannot be imported
-    file: docs/implementation_plan/phase_1_theta_data/step_1.1_data_loader/theta_data_loader.py
-    imported: load_json_data
-    line: 16
-    module: utils.io.data_loader
-    type: import_from
-  - description: Module 'numpy' cannot be imported
-    file: docs/implementation_plan/phase_1_theta_data/step_1.2_node_processing/theta_node_processor.py
-    line: 13
-    module: numpy
-    type: import
   - description: Module 'cmb.theta_data_loader' cannot be imported
     file: docs/implementation_plan/phase_1_theta_data/step_1.2_node_processing/theta_node_processor.py
     imported: ThetaFrequencySpectrum
     line: 15
     module: cmb.theta_data_loader
     type: import_from
-  - description: Module 'utils.io.data_loader' cannot be imported
-    file: docs/implementation_plan/phase_1_theta_data/step_1.2_node_processing/theta_node_processor.py
-    imported: load_csv_data
-    line: 17
-    module: utils.io.data_loader
-    type: import_from
-  - description: Module 'utils.io.data_loader' cannot be imported
-    file: docs/implementation_plan/phase_1_theta_data/step_1.2_node_processing/theta_node_processor.py
-    imported: load_json_data
-    line: 17
-    module: utils.io.data_loader
-    type: import_from
-  - description: Module 'numpy' cannot be imported
-    file: docs/implementation_plan/phase_1_theta_data/step_1.3_evolution_data/theta_evolution_processor.py
-    line: 13
-    module: numpy
-    type: import
   - description: Module 'scipy.interpolate' cannot be imported
     file: docs/implementation_plan/phase_1_theta_data/step_1.3_evolution_data/theta_evolution_processor.py
     imported: interp1d
@@ -318,23 +156,6 @@ issues:
     line: 15
     module: cmb.theta_data_loader
     type: import_from
-  - description: Module 'utils.io.data_loader' cannot be imported
-    file: docs/implementation_plan/phase_1_theta_data/step_1.3_evolution_data/theta_evolution_processor.py
-    imported: load_csv_data
-    line: 17
-    module: utils.io.data_loader
-    type: import_from
-  - description: Module 'utils.io.data_loader' cannot be imported
-    file: docs/implementation_plan/phase_1_theta_data/step_1.3_evolution_data/theta_evolution_processor.py
-    imported: load_json_data
-    line: 17
-    module: utils.io.data_loader
-    type: import_from
-  - description: Module 'numpy' cannot be imported
-    file: docs/implementation_plan/phase_3_power_spectrum/step_3.1_spectrum_calculation/power_spectrum.py
-    line: 20
-    module: numpy
-    type: import
   - description: Module 'cmb.theta_data_loader' cannot be imported
     file: docs/implementation_plan/phase_3_power_spectrum/step_3.1_spectrum_calculation/power_spectrum.py
     imported: ThetaFrequencySpectrum
@@ -353,23 +174,6 @@ issues:
     line: 23
     module: cmb.theta_evolution_processor
     type: import_from
-  - description: Module 'utils.math.frequency_conversion' cannot be imported
-    file: docs/implementation_plan/phase_3_power_spectrum/step_3.1_spectrum_calculation/power_spectrum.py
-    imported: frequency_to_multipole
-    line: 24
-    module: utils.math.frequency_conversion
-    type: import_from
-  - description: Module 'utils.math.frequency_conversion' cannot be imported
-    file: docs/implementation_plan/phase_3_power_spectrum/step_3.1_spectrum_calculation/power_spectrum.py
-    imported: multipole_to_frequency
-    line: 24
-    module: utils.math.frequency_conversion
-    type: import_from
-  - description: Module 'numpy' cannot be imported
-    file: docs/implementation_plan/phase_3_power_spectrum/step_3.2_subpeaks_analysis/subpeaks_analyzer.py
-    line: 12
-    module: numpy
-    type: import
   - description: Module 'scipy.signal' cannot be imported
     file: docs/implementation_plan/phase_3_power_spectrum/step_3.2_subpeaks_analysis/subpeaks_analyzer.py
     imported: find_peaks
@@ -388,28 +192,11 @@ issues:
     line: 16
     module: cmb.theta_evolution_processor
     type: import_from
-  - description: Module 'numpy' cannot be imported
-    file: docs/implementation_plan/phase_3_power_spectrum/step_3.3_spectrum_comparison/spectrum_comparator.py
-    line: 13
-    module: numpy
-    type: import
   - description: Module 'cmb.spectrum.power_spectrum' cannot be imported
     file: docs/implementation_plan/phase_3_power_spectrum/step_3.3_spectrum_comparison/spectrum_comparator.py
     imported: PowerSpectrum
     line: 14
     module: cmb.spectrum.power_spectrum
-    type: import_from
-  - description: Module 'utils.io.data_loader' cannot be imported
-    file: docs/implementation_plan/phase_3_power_spectrum/step_3.3_spectrum_comparison/spectrum_comparator.py
-    imported: load_power_spectrum_from_tar
-    line: 15
-    module: utils.io.data_loader
-    type: import_from
-  - description: Module 'utils.visualization.spectrum_plots' cannot be imported
-    file: docs/implementation_plan/phase_3_power_spectrum/step_3.3_spectrum_comparison/spectrum_comparator.py
-    imported: plot_spectrum_comparison
-    line: 16
-    module: utils.visualization.spectrum_plots
     type: import_from
   - description: Module 'cmb.correlation.node_lss_mapper' cannot be imported
     file: docs/implementation_plan/phase_6_chain_verification/step_6.3_chain_report/chain_verifier.py
@@ -429,11 +216,6 @@ issues:
     line: 16
     module: cmb.correlation.galaxy_distribution_analyzer
     type: import_from
-  - description: Module 'numpy' cannot be imported
-    file: docs/implementation_plan/phase_6_chain_verification/step_6.2_galaxy_distribution/galaxy_distribution_analyzer.py
-    line: 13
-    module: numpy
-    type: import
   - description: Module 'cmb.nodes.node_to_cmb_mapper' cannot be imported
     file: docs/implementation_plan/phase_6_chain_verification/step_6.2_galaxy_distribution/galaxy_distribution_analyzer.py
     imported: NodeCmbMapping
@@ -446,17 +228,6 @@ issues:
     line: 16
     module: cmb.correlation.cluster_plateau_analyzer
     type: import_from
-  - description: Module 'utils.io.data_loader' cannot be imported
-    file: docs/implementation_plan/phase_6_chain_verification/step_6.2_galaxy_distribution/galaxy_distribution_analyzer.py
-    imported: load_csv_data
-    line: 17
-    module: utils.io.data_loader
-    type: import_from
-  - description: Module 'numpy' cannot be imported
-    file: docs/implementation_plan/phase_6_chain_verification/step_6.1_cluster_plateau/cluster_plateau_analyzer.py
-    line: 13
-    module: numpy
-    type: import
   - description: Module 'cmb.nodes.node_to_cmb_mapper' cannot be imported
     file: docs/implementation_plan/phase_6_chain_verification/step_6.1_cluster_plateau/cluster_plateau_analyzer.py
     imported: NodeCmbMapping
@@ -469,86 +240,24 @@ issues:
     line: 16
     module: cmb.correlation.node_lss_mapper
     type: import_from
-  - description: Module 'utils.io.data_loader' cannot be imported
-    file: docs/implementation_plan/phase_6_chain_verification/step_6.1_cluster_plateau/cluster_plateau_analyzer.py
-    imported: load_csv_data
-    line: 17
-    module: utils.io.data_loader
-    type: import_from
-  - description: Module 'numpy' cannot be imported
-    file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/spectrum_plots.py
-    line: 12
-    module: numpy
-    type: import
-  - description: Module 'matplotlib.pyplot' cannot be imported
-    file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/spectrum_plots.py
-    line: 13
-    module: matplotlib.pyplot
-    type: import
-  - description: Module 'numpy' cannot be imported
-    file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/cmb_plots.py
-    line: 12
-    module: numpy
-    type: import
-  - description: Module 'matplotlib.pyplot' cannot be imported
-    file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/cmb_plots.py
-    line: 13
-    module: matplotlib.pyplot
-    type: import
-  - description: Module 'healpy' cannot be imported
-    file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/cmb_plots.py
-    line: 14
-    module: healpy
-    type: import
-  - description: Module 'numpy' cannot be imported
-    file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_loader.py
-    line: 12
-    module: numpy
-    type: import
-  - description: Module 'healpy' cannot be imported
-    file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_loader.py
-    line: 13
-    module: healpy
-    type: import
-  - description: Module 'astropy.io' cannot be imported
-    file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_loader.py
-    imported: fits
-    line: 14
-    module: astropy.io
-    type: import_from
-  - description: Module 'numpy' cannot be imported
-    file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/frequency_conversion.py
-    line: 12
-    module: numpy
-    type: import
-  - description: Module 'numpy' cannot be imported
-    file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/spherical_harmonics.py
-    line: 11
-    module: numpy
-    type: import
-  - description: Module 'healpy' cannot be imported
-    file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/spherical_harmonics.py
-    line: 12
-    module: healpy
-    type: import
-  - description: Module 'numpy' cannot be imported
-    file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py
-    line: 12
-    module: numpy
-    type: import
-  - description: Module 'healpy' cannot be imported
-    file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py
-    line: 13
-    module: healpy
-    type: import
-  - description: Module 'astropy.io' cannot be imported
-    file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py
-    imported: fits
-    line: 14
-    module: astropy.io
-    type: import_from
   methods_with_pass: []
-  methods_without_docstrings: []
+  methods_without_docstrings:
+  - class: null
+    file: utils/io/data_saver.py
+    line: 157
+    method: convert_to_serializable
+  - class: null
+    file: utils/io/data_saver.py
+    line: 184
+    method: convert_to_yaml_serializable
+  - class: null
+    file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py
+    line: 157
+    method: convert_to_serializable
+  - class: null
+    file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py
+    line: 184
+    method: convert_to_yaml_serializable
   not_implemented_in_non_abstract: []
 summary:
   any_type_usage: 0
@@ -557,9 +266,9 @@ summary:
   files_without_docstrings: 0
   generic_exception_usage: 0
   imports_in_middle: 0
-  invalid_imports: 96
+  invalid_imports: 39
   max_lines_limit: 400
   methods_with_pass: 0
-  methods_without_docstrings: 0
+  methods_without_docstrings: 4
   not_implemented_in_non_abstract: 0
-  total_issues: 96
+  total_issues: 43

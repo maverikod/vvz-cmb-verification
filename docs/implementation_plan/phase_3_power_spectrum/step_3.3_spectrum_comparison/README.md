@@ -101,30 +101,80 @@ This step compares the reconstructed power spectrum with ACT DR6.02 observationa
 ### Unit Tests
 
 1. **Spectrum Loading**
-   - Test ACT spectrum loading
-   - Test covariance matrix loading
-   - Test binning handling
+   - **What to test:**
+     - Test ACT spectrum loading:
+       - Verify load_observed_spectrum() loads ACT DR6.02 spectrum from tar.gz
+       - Test spectrum data parsing (l, C_l, errors)
+       - Verify spectrum format validation
+     - Test covariance matrix loading:
+       - Verify covariance matrix is loaded if available
+       - Test covariance matrix format validation
+     - Test binning handling:
+       - Verify different multipole binning schemes are handled
+       - Test binning conversion if needed
+       - Verify binning consistency
 
 2. **Spectrum Comparison**
-   - Test difference calculation
-   - Test χ² computation
-   - Test shape comparison
+   - **What to test:**
+     - Test difference calculation:
+       - Verify difference = reconstructed - observed is calculated correctly
+       - Test difference statistics (mean_diff, rms_diff)
+       - Verify difference is in correct units
+     - Test χ² computation:
+       - Verify calculate_chi_squared() computes χ² correctly
+       - Test χ² with and without covariance matrix
+       - Verify χ² formula: χ² = Σ (C_l_recon - C_l_obs)² / σ²
+     - Test shape comparison:
+       - Verify correlation coefficient calculation
+       - Test shape correlation analysis
+       - Verify shape matching
 
 3. **High-l Validation**
-   - Test high-l tail comparison
-   - Test no Silk damping validation
-   - Test tail shape analysis
+   - **What to test:**
+     - Test high-l tail comparison:
+       - Verify validate_high_l_tail() compares l>2000 range correctly
+       - Test tail_match boolean result
+       - Verify shape_correlation calculation
+       - Verify amplitude_ratio calculation
+     - Test no Silk damping validation:
+       - Verify no_silk_damping flag checks for absence of exp(-l²/l_silk²) behavior
+       - Test that high-l tail continues without exponential cutoff
+       - Verify tail follows power law (l⁻²–l⁻³)
+     - Test tail shape analysis:
+       - Verify tail shape matches theoretical prediction
+       - Test shape consistency
 
 4. **Report Generation**
-   - Test metric calculations
-   - Test report generation
-   - Test visualization creation
+   - **What to test:**
+     - Test metric calculations:
+       - Verify all comparison metrics are calculated:
+         - chi_squared, correlation, mean_diff, rms_diff
+         - tail_match, shape_correlation, amplitude_ratio, no_silk_damping
+     - Test report generation:
+       - Verify generate_comparison_report() creates comprehensive report
+       - Test report includes all metrics
+       - Verify report can be saved to file
+     - Test visualization creation:
+       - Verify comparison plots are created
+       - Test spectrum overlay visualization
+       - Verify plots are saved correctly
 
 ### Integration Tests
 
 1. **End-to-End Comparison**
-   - Load spectra → Compare → Validate → Generate report
-   - Test with actual ACT data
+   - **What to test:**
+     - Load spectra → Compare → Validate → Generate report:
+       - Load reconstructed PowerSpectrum (from Step 3.1)
+       - Load observed ACT DR6.02 spectrum
+       - Compare spectra (difference, χ², correlation)
+       - Validate high-l tail (l>2000)
+       - Generate comparison report
+       - Verify all comparison steps complete successfully
+     - Test with actual ACT data:
+       - Real ACT DR6.02 spectrum
+       - Real reconstructed spectrum
+       - Verify comparison metrics match expected values
+       - Verify high-l tail validation passes (no Silk damping)
 
 ---
 
@@ -134,6 +184,15 @@ This step compares the reconstructed power spectrum with ACT DR6.02 observationa
 - Use proper error propagation with covariance
 - Provide detailed comparison metrics
 - Create clear visualization outputs
+
+## Forbidden Elements
+
+**DO NOT USE:**
+- ❌ Potentials V(φ), V(Θ)
+- ❌ Mass terms m²φ², m²Θ²
+- ❌ Exponential damping exp(-r/λ)
+- ❌ Silk damping formulas (no damping in Θ-model)
+- ❌ Classical power spectrum models for comparison
 
 ---
 

@@ -144,9 +144,9 @@ class TestDataPaths:
             )
 
             # All paths should be absolute or relative to project_root
-            assert paths.data_in.is_absolute() or str(
-                paths.data_in
-            ).startswith(str(project_root))
+            assert paths.data_in.is_absolute() or str(paths.data_in).startswith(
+                str(project_root)
+            )
 
 
 class TestConfigurationLoading:
@@ -161,9 +161,7 @@ class TestConfigurationLoading:
 
     def test_load_from_valid_yaml(self):
         """Test loading from valid YAML file."""
-        with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".yaml", delete=False
-        ) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
             config_data = {
                 "constants": {
                     "D": 1.0e-8,
@@ -201,9 +199,7 @@ class TestConfigurationLoading:
 
     def test_load_invalid_yaml(self):
         """Test error handling for invalid YAML syntax."""
-        with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".yaml", delete=False
-        ) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
             f.write("invalid: yaml: content: [")
             config_file = Path(f.name)
 
@@ -221,9 +217,7 @@ class TestConfigurationLoading:
 
     def test_load_with_missing_fields(self):
         """Test loading with missing required fields (uses defaults)."""
-        with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".yaml", delete=False
-        ) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
             config_data = {"constants": {}, "paths": {}, "logging": {}}
             yaml.dump(config_data, f)
             config_file = Path(f.name)
@@ -267,9 +261,7 @@ class TestConfigurationLoading:
                 max_bytes=10485760,
                 backup_count=5,
             )
-            invalid_config = Config(
-                invalid_constants, invalid_paths, invalid_logging
-            )
+            invalid_config = Config(invalid_constants, invalid_paths, invalid_logging)
             invalid_config.validate()
 
 
@@ -337,9 +329,7 @@ class TestLoggingConfig:
 
     def test_invalid_logging_level(self):
         """Test validation of invalid logging level."""
-        with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".yaml", delete=False
-        ) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
             config_data = {
                 "constants": {
                     "D": 1.0e-8,

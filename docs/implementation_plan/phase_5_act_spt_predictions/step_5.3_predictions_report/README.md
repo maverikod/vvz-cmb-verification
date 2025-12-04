@@ -100,30 +100,76 @@ This step compiles all ACT/SPT predictions and generates a comprehensive validat
 ### Unit Tests
 
 1. **Data Compilation**
-   - Test collecting prediction results
-   - Test data integration
-   - Test format validation
+   - **What to test:**
+     - Test collecting prediction results:
+       - Verify compile_predictions() collects all prediction results:
+         - PeakValidation (high-l peak)
+         - InvarianceTestResult (frequency invariance)
+         - SubPeakAnalysis (sub-peaks)
+         - PhiSplitResult list (φ-split)
+       - Test all predictions are included
+     - Test data integration:
+       - Verify predictions are integrated into PredictionSummary list
+       - Test data consistency
+     - Test format validation:
+       - Verify PredictionSummary structure is correct:
+         - prediction_name, predicted_value, observed_value
+         - agreement, validated
+       - Test all fields are populated
 
 2. **Observation Comparison**
-   - Test loading observational data
-   - Test comparison calculations
-   - Test agreement metrics
+   - **What to test:**
+     - Test loading observational data:
+       - Verify observational data is loaded for comparison
+       - Test data format validation
+     - Test comparison calculations:
+       - Verify predicted vs observed values are compared correctly
+       - Test comparison for each prediction type
+     - Test agreement metrics:
+       - Verify agreement metric is calculated for each prediction
+       - Test agreement thresholds
 
 3. **Report Generation**
-   - Test report creation
-   - Test visualization generation
-   - Test statistical analysis
+   - **What to test:**
+     - Test report creation:
+       - Verify generate_report() creates PredictionsReport structure:
+         - predictions, overall_validation, statistics, visualizations
+       - Test report includes all predictions
+     - Test visualization generation:
+       - Verify create_visualizations() creates visualization plots
+       - Test all visualizations are saved correctly
+     - Test statistical analysis:
+       - Verify statistics are calculated correctly
+       - Test statistical summary
 
 4. **Framework Validation**
-   - Test validation criteria
-   - Test success assessment
-   - Test discrepancy identification
+   - **What to test:**
+     - Test validation criteria:
+       - Verify validate_framework() validates theoretical framework based on predictions
+       - Test validation criteria are applied correctly
+     - Test success assessment:
+       - Verify overall framework validation assesses success correctly
+       - Test success criteria
+     - Test discrepancy identification:
+       - Verify discrepancies between predictions and observations are identified
+       - Test discrepancy analysis
 
 ### Integration Tests
 
 1. **End-to-End Report Generation**
-   - Compile predictions → Compare → Generate report → Validate framework
-   - Test with all prediction results
+   - **What to test:**
+     - Compile predictions → Compare → Generate report → Validate framework:
+       - Collect all prediction results (peak, invariance, sub-peaks, φ-split)
+       - Compare predictions with observations
+       - Generate comprehensive predictions report
+       - Validate theoretical framework
+       - Create visualizations
+       - Verify all steps complete successfully
+     - Test with all prediction results:
+       - Real prediction results from all steps
+       - Real observational data
+       - Verify report is comprehensive and accurate
+       - Verify framework validation is correct
 
 ---
 
@@ -133,6 +179,14 @@ This step compiles all ACT/SPT predictions and generates a comprehensive validat
 - Use clear visualization
 - Include statistical rigor
 - Document all assumptions
+
+## Forbidden Elements
+
+**DO NOT USE:**
+- ❌ Potentials V(φ), V(Θ)
+- ❌ Mass terms m²φ², m²Θ²
+- ❌ Exponential damping exp(-r/λ)
+- ❌ Classical prediction models (use only Θ-model predictions)
 
 ---
 

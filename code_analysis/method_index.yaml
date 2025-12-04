@@ -141,6 +141,10 @@ SubpeaksAnalyzer:
 - _find_subpeaks
 - _detect_high_l_peak
 - _match_beatings_to_peaks
+TestCalculatePowerSpectrumFromAlm:
+- test_calculate_power_spectrum
+- test_calculate_with_l_max
+- test_calculate_empty_alm
 TestConfigurationAccess:
 - test_get_config_before_initialization
 - test_initialize_config
@@ -160,19 +164,112 @@ TestConfigurationLoading:
 - test_load_missing_file
 - test_load_with_missing_fields
 - test_validation
+TestConvertHealpixToAlm:
+- test_convert_valid_map
+- test_round_trip_preserves_map
 TestDataPaths:
 - test_all_paths_defined
 - test_paths_can_be_created
 - test_path_resolution
+TestDecomposeMap:
+- test_decompose_valid_map
+- test_decompose_with_l_max
+- test_decompose_invalid_size
+- test_decompose_negative_l_max
+TestEnsureOutputDirectory:
+- test_create_directory
+- test_existing_directory
+TestFrequencyToMultipole:
+- test_convert_single_frequency
+- test_convert_array_frequencies
+- test_negative_frequency_raises_error
+- test_zero_frequency_raises_error
+- test_negative_D_raises_error
+TestGetFrequencyRangeForMultipoleRange:
+- test_get_frequency_range
+- test_invalid_range_raises_error
+- test_equal_bounds_raises_error
+- test_negative_bounds_raise_error
+TestLoadCsvData:
+- test_load_valid_csv
+- test_load_nonexistent_csv
+TestLoadHealpixMap:
+- test_load_valid_healpix_map
+- test_load_nonexistent_file
+- test_load_invalid_hdu
+TestLoadJsonData:
+- test_load_valid_json
+- test_load_nonexistent_json
+- test_load_invalid_json
+TestLoadPowerSpectrumFromTar:
+- test_load_spectrum_from_tar
+- test_load_nonexistent_tar
+- test_load_nonexistent_file_in_tar
 TestLoggingConfig:
 - test_logging_setup
 - test_logging_levels
 - test_invalid_logging_level
+TestMultipoleToFrequency:
+- test_convert_single_multipole
+- test_convert_array_multipoles
+- test_round_trip_conversion
+- test_negative_multipole_raises_error
+- test_zero_multipole_raises_error
 TestPhysicalConstants:
 - test_all_constants_defined
 - test_z_cmb_range
 - test_temperature_range
 - test_constants_immutable
+TestPlotHealpixMap:
+- test_plot_valid_map
+- test_plot_empty_map_raises_error
+- test_plot_invalid_data_raises_error
+TestPlotHighLPeak:
+- test_plot_peak
+- test_plot_peak_invalid_range
+TestPlotMapComparison:
+- test_plot_comparison
+- test_plot_comparison_different_sizes
+- test_plot_comparison_invalid_data
+TestPlotNodeOverlay:
+- test_plot_node_overlay
+- test_plot_node_overlay_invalid_shape
+- test_plot_node_overlay_invalid_map
+TestPlotPowerSpectrum:
+- test_plot_spectrum
+- test_plot_spectrum_with_errors
+- test_plot_spectrum_size_mismatch
+- test_plot_spectrum_invalid_data
+TestPlotSpectrumComparison:
+- test_plot_comparison
+- test_plot_comparison_size_mismatch
+TestPlotSubpeaks:
+- test_plot_subpeaks
+- test_plot_subpeaks_empty_list
+TestPlotTemperatureFluctuations:
+- test_plot_fluctuations
+- test_plot_invalid_data_raises_error
+TestSaveAnalysisResults:
+- test_save_results_json
+- test_save_results_invalid_format
+TestSaveHealpixMap:
+- test_save_valid_map
+- test_save_without_overwrite
+- test_save_invalid_size
+TestSavePowerSpectrum:
+- test_save_spectrum_json
+- test_save_spectrum_csv
+- test_save_spectrum_missing_keys
+- test_save_spectrum_invalid_format
+TestSynthesizeMap:
+- test_synthesize_valid_alm
+- test_synthesize_empty_alm
+- test_synthesize_invalid_nside
+TestValidateHealpixMap:
+- test_validate_valid_map
+- test_validate_invalid_size
+- test_validate_nside_mismatch
+- test_validate_empty_map
 ThetaEvolution: []
 ThetaEvolutionProcessor:
 - __init__

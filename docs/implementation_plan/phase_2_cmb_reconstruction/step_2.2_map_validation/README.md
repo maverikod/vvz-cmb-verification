@@ -109,30 +109,83 @@ This step validates reconstructed CMB maps by comparing them with ACT DR6.02 obs
 ### Unit Tests
 
 1. **Map Loading**
-   - Test ACT map loading
-   - Test resolution handling
-   - Test format normalization
+   - **What to test:**
+     - Test ACT map loading:
+       - Verify ACT DR6.02 map is loaded correctly from FITS
+       - Test NSIDE parameter extraction
+       - Verify map data type and units (μK)
+     - Test resolution handling:
+       - Verify maps with different NSIDE are handled correctly
+       - Test resolution matching between reconstructed and observed maps
+       - Test resolution conversion if needed
+     - Test format normalization:
+       - Verify maps are normalized to same format
+       - Test unit conversion if needed
+       - Verify coordinate system consistency
 
 2. **Map Comparison**
-   - Test difference map calculation
-   - Test correlation computation
-   - Test spatial correlation analysis
+   - **What to test:**
+     - Test difference map calculation:
+       - Verify difference = reconstructed - observed
+       - Test difference map statistics (mean, std, RMS)
+       - Verify difference map is in correct units (μK)
+     - Test correlation computation:
+       - Verify correlation coefficient calculation (Pearson correlation)
+       - Test correlation is between -1 and 1
+       - Verify correlation significance calculation
+     - Test spatial correlation analysis:
+       - Test correlation at different angular scales
+       - Verify correlation map creation
+       - Test correlation pattern analysis
 
 3. **Structure Validation**
-   - Test arcmin-scale extraction
-   - Test structure matching
-   - Test amplitude validation
+   - **What to test:**
+     - Test arcmin-scale extraction:
+       - Verify structures at 2-5′ scales are identified
+       - Test structure detection algorithm
+       - Verify structure positions match between maps
+     - Test structure matching:
+       - Verify position_matches counts structures at same positions
+       - Test matching tolerance (angular separation)
+       - Verify structure identification accuracy
+     - Test amplitude validation:
+       - Verify validate_amplitude() checks 20-30 μK range
+       - Test mean_amplitude and std_amplitude calculations
+       - Verify in_range_fraction calculation
+       - Test validation_passed flag
 
 4. **Validation Metrics**
-   - Test metric calculations
-   - Test report generation
-   - Test visualization creation
+   - **What to test:**
+     - Test metric calculations:
+       - Verify all metrics are calculated correctly:
+         - correlation, mean_diff, std_diff, rms_diff
+         - structure_count, position_matches, amplitude_matches
+         - mean_amplitude, std_amplitude, in_range_fraction
+     - Test report generation:
+       - Verify generate_validation_report() creates comprehensive report
+       - Test report includes all validation metrics
+       - Verify report can be saved to file
+     - Test visualization creation:
+       - Verify comparison plots are created
+       - Test difference map visualization
+       - Verify plots are saved correctly
 
 ### Integration Tests
 
 1. **End-to-End Validation**
-   - Load maps → Compare → Validate → Generate report
-   - Test with actual ACT data
+   - **What to test:**
+     - Load maps → Compare → Validate → Generate report:
+       - Load reconstructed CMB map
+       - Load observed ACT DR6.02 map
+       - Compare maps (correlation, difference)
+       - Validate arcmin structures (2-5′)
+       - Validate amplitude (20-30 μK)
+       - Generate validation report
+       - Verify all validation steps complete successfully
+     - Test with actual ACT data:
+       - Real ACT DR6.02 maps
+       - Verify validation metrics match expected values
+       - Verify validation report is comprehensive and accurate
 
 ---
 
@@ -142,6 +195,21 @@ This step validates reconstructed CMB maps by comparing them with ACT DR6.02 obs
 - Use efficient map comparison algorithms
 - Provide detailed validation metrics
 - Create clear visualization outputs
+
+## Forbidden Elements
+
+**CRITICAL PRINCIPLE (from tech_spec-new.md):** Matter does NOT influence Θ-field.
+CMB is projection of Θ-nodes, not plasma effects.
+
+**DO NOT USE:**
+- ❌ Matter as source of CMB (CMB is projection of Θ-nodes)
+- ❌ Baryon density, DM density or material terms
+- ❌ Plasma terms or sound horizons
+- ❌ Baryon acoustic oscillations as physical mechanism
+- ❌ Potentials V(φ), V(Θ)
+- ❌ Mass terms m²φ², m²Θ²
+- ❌ Exponential damping exp(-r/λ)
+- ❌ Classical cosmological models for validation (use Θ-model predictions)
 
 ---
 

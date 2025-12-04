@@ -100,31 +100,84 @@ This step processes Θ-field temporal evolution data from `data/theta/evolution/
 ### Unit Tests
 
 1. **Evolution Data Loading**
-   - Test loading ω_min(t) files
-   - Test loading ω_macro(t) files
-   - Test time array parsing
-   - Test error handling
+   - **What to test:**
+     - Test loading ω_min(t) files:
+       - Verify correct parsing of time array t
+       - Verify correct parsing of ω_min(t) values
+       - Test data format validation
+     - Test loading ω_macro(t) files:
+       - Verify correct parsing of time array t
+       - Verify correct parsing of ω_macro(t) values
+       - Verify time arrays match between ω_min and ω_macro
+     - Test time array parsing:
+       - Verify time values are in valid range
+       - Test time unit handling
+       - Verify time array is sorted (monotonic)
+     - Test error handling:
+       - Missing files (FileNotFoundError)
+       - Invalid formats (ValueError)
+       - Inconsistent time arrays
 
 2. **Time Processing**
-   - Test time range validation
-   - Test interpolation accuracy
-   - Test evolution rate calculation
+   - **What to test:**
+     - Test time range validation:
+       - Verify validate_time_range() checks time is within data range
+       - Test error for times outside range
+       - Test boundary conditions (min/max time)
+     - Test interpolation accuracy:
+       - Verify interpolation at known data points returns exact values
+       - Test interpolation between data points (check smoothness)
+       - Verify interpolation preserves evolution trends
+     - Test evolution rate calculation:
+       - Verify get_evolution_rate_min() calculates d(ω_min)/dt correctly
+       - Verify get_evolution_rate_macro() calculates d(ω_macro)/dt correctly
+       - Test rate calculation accuracy (numerical derivative)
 
 3. **Evolution Interface**
-   - Test time query methods
-   - Test interpolation for arbitrary times
-   - Test evolution calculations
+   - **What to test:**
+     - Test time query methods:
+       - Verify get_omega_min(time) returns correct value
+       - Verify get_omega_macro(time) returns correct value
+       - Test with various time values within range
+     - Test interpolation for arbitrary times:
+       - Test interpolation at times not in original data
+       - Verify interpolation is smooth and continuous
+       - Test extrapolation behavior (should raise error or handle gracefully)
+     - Test evolution calculations:
+       - Verify evolution processor creates correct interpolators
+       - Test that interpolators are created during process() call
 
 4. **Data Validation**
-   - Test time coverage validation
-   - Test frequency range validation
-   - Test data consistency checks
+   - **What to test:**
+     - Test time coverage validation:
+       - Verify time array covers required range
+       - Test for gaps in time coverage
+       - Verify time array completeness
+     - Test frequency range validation:
+       - Verify ω_min(t) values are positive
+       - Verify ω_macro(t) values are positive
+       - Verify ω_min(t) < ω_macro(t) (if applicable)
+     - Test data consistency checks:
+       - Verify all arrays have consistent lengths
+       - Verify time arrays match between ω_min and ω_macro
+       - Test for NaN or infinite values
 
 ### Integration Tests
 
 1. **End-to-End Evolution Processing**
-   - Load data → Process → Validate → Provide interface
-   - Test with actual evolution data files
+   - **What to test:**
+     - Load data → Process → Validate → Provide interface:
+       - Load ThetaEvolution data
+       - Create ThetaEvolutionProcessor
+       - Call process() to create interpolators
+       - Query evolution values at various times
+       - Calculate evolution rates
+       - Validate all operations work correctly
+     - Test with actual evolution data files:
+       - Real data file formats
+       - Real time ranges and frequency values
+       - Verify processing produces valid interpolators
+       - Test that interpolators can be used in CMB calculations
 
 ---
 
@@ -134,6 +187,22 @@ This step processes Θ-field temporal evolution data from `data/theta/evolution/
 - Handle large time arrays efficiently
 - Provide clear error messages for time range issues
 - Support multiple evolution data formats if needed
+
+## Forbidden Elements
+
+**CRITICAL PRINCIPLE (from tech_spec-new.md):** Matter does NOT influence Θ-field.
+Evolution uses ONLY phase parameters.
+
+**DO NOT USE:**
+- ❌ Matter as source of evolution (evolution is from Θ-field only)
+- ❌ Baryon density, DM density or material terms
+- ❌ Classical cosmological evolution formulas (FRW, ΛCDM)
+- ❌ FRW metric as primary model
+- ❌ Mass, dark matter, or gravitational sources
+- ❌ Potentials V(φ), V(Θ)
+- ❌ Mass terms m²φ², m²Θ²
+- ❌ Exponential damping exp(-r/λ)
+- ❌ Use ONLY phase parameters (ω_min(t), ω_macro(t))
 
 ---
 

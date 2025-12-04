@@ -31,8 +31,10 @@ This step creates a mapping between Θ-nodes and CMB map positions. It maps node
 ### 1. Map Nodes to Sky Coordinates
 
 - Convert early universe node positions to current sky coordinates
-- Handle cosmological projection (z≈1100 → z=0)
-- Account for proper motion and evolution
+- Handle projection from z≈1100 to z=0
+- **Use ONLY phase parameters** (ω_min(t), ω_macro(t)) for evolution
+- **DO NOT use classical concepts** like "proper motion" (not applicable to Θ-nodes)
+- **DO NOT use classical cosmological formulas** (FRW, ΛCDM)
 - Map to HEALPix pixel indices
 
 ### 2. Create Node Catalog
@@ -99,30 +101,80 @@ This step creates a mapping between Θ-nodes and CMB map positions. It maps node
 ### Unit Tests
 
 1. **Coordinate Mapping**
-   - Test early universe to sky coordinate conversion
-   - Test cosmological projection
-   - Test HEALPix pixel mapping
+   - **What to test:**
+     - Test early universe to sky coordinate conversion:
+       - Verify map_nodes_to_sky() converts z≈1100 to z=0 correctly
+       - Test that ONLY phase parameters (ω_min(t), ω_macro(t)) are used
+       - Verify NO classical cosmological formulas (FRW, ΛCDM) are used
+       - Test coordinate ranges: theta [0, π], phi [0, 2π]
+     - Test cosmological projection:
+       - Verify projection preserves node relationships
+       - Test projection accuracy
+       - Verify all nodes are mapped to valid sky positions
+     - Test HEALPix pixel mapping:
+       - Verify sky coordinates are converted to HEALPix pixel indices
+       - Test pixel indexing correctness
+       - Verify pixel indices are valid for given NSIDE
 
 2. **Node Catalog**
-   - Test catalog creation
-   - Test data integrity
-   - Test query methods
+   - **What to test:**
+     - Test catalog creation:
+       - Verify create_node_catalog() creates NodeCmbMapping structure
+       - Test all catalog fields are populated:
+         - node_ids, sky_positions, pixel_indices
+         - cmb_values, node_depths, node_temperatures
+       - Verify catalog data integrity (all arrays have same length)
+     - Test data integrity:
+       - Verify sky_positions match pixel_indices
+       - Verify cmb_values match CMB map at pixel positions
+       - Verify node_depths and node_temperatures are consistent
+     - Test query methods:
+       - Verify get_nodes_at_position() finds nodes near given position
+       - Test search radius parameter
+       - Verify get_cmb_value_at_node() returns correct CMB map value
 
 3. **Position Validation**
-   - Test position validity checks
-   - Test edge case handling
-   - Test coordinate transformations
+   - **What to test:**
+     - Test position validity checks:
+       - Verify positions are in valid ranges [0, π] × [0, 2π]
+       - Test for invalid coordinates (should raise error)
+     - Test edge case handling:
+       - Test positions at boundaries (theta=0, π; phi=0, 2π)
+       - Test positions near poles
+       - Test empty node data
+     - Test coordinate transformations:
+       - Verify coordinate system consistency
+       - Test transformation round-trip (if applicable)
 
 4. **Mapping Interface**
-   - Test query methods
-   - Test reverse lookup
-   - Test visualization support
+   - **What to test:**
+     - Test query methods:
+       - Verify get_nodes_at_position() returns correct node IDs
+       - Test search radius affects results correctly
+       - Verify get_cmb_value_at_node() returns correct value
+     - Test reverse lookup:
+       - Verify can find nodes from CMB map positions
+       - Test lookup accuracy
+     - Test visualization support:
+       - Verify mapping data can be used for visualization
+       - Test node overlay on CMB maps
 
 ### Integration Tests
 
 1. **End-to-End Mapping**
-   - Load nodes → Map to sky → Create catalog → Validate
-   - Test with actual node and map data
+   - **What to test:**
+     - Load nodes → Map to sky → Create catalog → Validate:
+       - Load ThetaNodeData with node positions
+       - Load reconstructed CMB map
+       - Map nodes to sky coordinates (using phase parameters only)
+       - Create node catalog with CMB positions
+       - Validate catalog integrity
+       - Test query methods
+     - Test with actual node and map data:
+       - Real Θ-node data
+       - Real reconstructed CMB map
+       - Verify mapping produces valid catalog
+       - Verify nodes are correctly positioned on CMB map
 
 ---
 
@@ -132,6 +184,22 @@ This step creates a mapping between Θ-nodes and CMB map positions. It maps node
 - Handle large numbers of nodes
 - Provide clear mapping documentation
 - Support multiple coordinate systems if needed
+
+## Forbidden Elements
+
+**CRITICAL PRINCIPLE (from tech_spec-new.md):** Matter does NOT influence Θ-field.
+Nodes are topological structures - NOT created by matter.
+
+**DO NOT USE:**
+- ❌ Matter as source of nodes (nodes are topological structures of Θ-field)
+- ❌ Baryon density, DM density or material terms
+- ❌ Modification of Θ-field based on observed matter
+- ❌ "Proper motion" (classical concept, not applicable to Θ-nodes)
+- ❌ Classical cosmological formulas (FRW, ΛCDM) for projection
+- ❌ FRW metric as primary model
+- ❌ Potentials V(φ), V(Θ)
+- ❌ Mass terms m²φ², m²Θ²
+- ❌ Exponential damping exp(-r/λ)
 
 ---
 

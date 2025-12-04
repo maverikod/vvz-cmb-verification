@@ -100,30 +100,78 @@ This step analyzes galaxy distributions (U1/U2/U3) and calculates SWI, χ₆ by 
 ### Unit Tests
 
 1. **Galaxy Data Loading**
-   - Test galaxy catalog loading
-   - Test U1/U2/U3 extraction
-   - Test data format handling
+   - **What to test:**
+     - Test galaxy catalog loading:
+       - Verify load_galaxy_data() loads galaxy catalogs correctly
+       - Test catalog format validation
+       - Verify galaxy properties are extracted
+     - Test U1/U2/U3 extraction:
+       - Verify U1, U2, U3 distribution values are extracted correctly
+       - Test distribution data format validation
+       - Verify galaxy positions (theta, phi) are extracted
+     - Test data format handling:
+       - Verify different galaxy data formats are handled
+       - Test format conversion if needed
 
 2. **SWI and χ₆ Calculation**
-   - Test SWI calculation
-   - Test χ₆ calculation
-   - Test directional binning
+   - **What to test:**
+     - Test SWI calculation:
+       - Verify calculate_swi_by_direction() calculates SWI (structure-weighted index) correctly
+       - Test SWI is calculated for each node direction
+       - Verify SWI values are in expected range
+     - Test χ₆ calculation:
+       - Verify calculate_chi6_by_direction() calculates χ₆ (sixth-order moment) correctly
+       - Test χ₆ is calculated for each node direction
+       - Verify χ₆ values are in expected range
+     - Test directional binning:
+       - Verify node directions are binned correctly
+       - Test binning affects SWI and χ₆ calculations
 
 3. **Distribution Analysis**
-   - Test U1/U2/U3 analysis
-   - Test node direction correlation
-   - Test trend identification
+   - **What to test:**
+     - Test U1/U2/U3 analysis:
+       - Verify analyze_u_distributions() creates NodeDirectionAnalysis:
+         - node_directions, swi_values, chi6_values
+         - u1_distributions, u2_distributions, u3_distributions (by direction)
+       - Test distributions are analyzed correctly for each direction
+     - Test node direction correlation:
+       - Verify distributions correlate with node directions
+       - Test correlation strength
+     - Test trend identification:
+       - Verify trends in distributions are identified
+       - Test trend consistency
 
 4. **Chain Verification**
-   - Test chain connection validation
-   - Test prediction comparison
-   - Test report generation
+   - **What to test:**
+     - Test chain connection validation:
+       - Verify verify_chain_connection() validates CMB → cluster → galaxy chain
+       - Test validation criteria
+       - Verify validation_passed flag
+     - Test prediction comparison:
+       - Verify predictions are compared with observations
+       - Test comparison accuracy
+     - Test report generation:
+       - Verify analysis results are documented correctly
+       - Test report completeness
 
 ### Integration Tests
 
 1. **End-to-End Chain Verification**
-   - Load galaxies → Calculate SWI/χ₆ → Analyze distributions → Verify chain
-   - Test with actual galaxy and node data
+   - **What to test:**
+     - Load galaxies → Calculate SWI/χ₆ → Analyze distributions → Verify chain:
+       - Load galaxy distribution data
+       - Load NodeCmbMapping and PlateauNodeCorrelation
+       - Calculate SWI and χ₆ by node directions
+       - Analyze U1/U2/U3 distributions by directions
+       - Verify CMB → cluster → galaxy chain connection
+       - Generate analysis report
+       - Verify all steps complete successfully
+     - Test with actual galaxy and node data:
+       - Real galaxy data
+       - Real node-CMB mapping and cluster correlation
+       - Verify SWI and χ₆ are calculated correctly
+       - Verify distributions correlate with node directions
+       - Verify chain connection is validated
 
 ---
 
@@ -133,6 +181,14 @@ This step analyzes galaxy distributions (U1/U2/U3) and calculates SWI, χ₆ by 
 - Use proper statistical methods
 - Account for selection effects
 - Provide clear chain verification documentation
+
+## Forbidden Elements
+
+**DO NOT USE:**
+- ❌ Potentials V(φ), V(Θ)
+- ❌ Mass terms m²φ², m²Θ²
+- ❌ Exponential damping exp(-r/λ)
+- ❌ Classical galaxy formation models
 
 ---
 

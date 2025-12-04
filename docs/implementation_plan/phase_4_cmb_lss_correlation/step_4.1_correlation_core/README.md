@@ -101,30 +101,77 @@ This step implements the core CMB-LSS correlation analysis. It calculates correl
 ### Unit Tests
 
 1. **LSS Data Loading**
-   - Test LSS data loading
-   - Test catalog format handling
-   - Test correlation data extraction
+   - **What to test:**
+     - Test LSS data loading:
+       - Verify load_lss_data() loads LSS correlation data correctly
+       - Test loading from tar.gz archives (cells_LSS_correlation_pack_v1-1.zip)
+       - Test SDSS catalog loading
+       - Verify data format validation
+     - Test catalog format handling:
+       - Verify different LSS catalog formats are handled
+       - Test format conversion if needed
+     - Test correlation data extraction:
+       - Verify LSS structure positions are extracted correctly
+       - Test correlation function data extraction
 
 2. **Correlation Calculation**
-   - Test correlation function computation
-   - Test scale handling (10-12 Mpc)
-   - Test angular separation calculations
+   - **What to test:**
+     - Test correlation function computation:
+       - Verify calculate_correlation_function() computes cross-correlation correctly
+       - Test correlation at 10-12 Mpc scales
+       - Verify CorrelationFunction structure is created correctly:
+         - angular_separation, correlation, errors, scale_mpc
+     - Test scale handling (10-12 Mpc):
+       - Verify scale_min_mpc and scale_max_mpc parameters are used correctly
+       - Test scale conversion (Mpc to angular separation)
+     - Test angular separation calculations:
+       - Verify angular separation is calculated correctly
+       - Test separation range handling
 
 3. **Correlation Tests**
-   - Test significance calculation
-   - Test correlation coefficient computation
-   - Test statistical analysis
+   - **What to test:**
+     - Test significance calculation:
+       - Verify test_correlation_significance() calculates:
+         - correlation_coefficient (Pearson correlation)
+         - p_value (statistical significance)
+         - significance_sigma (significance in sigma)
+     - Test correlation coefficient computation:
+       - Verify Pearson correlation is calculated correctly
+       - Test correlation is between -1 and 1
+     - Test statistical analysis:
+       - Verify analyze_scale_dependence() analyzes correlation scale dependence
+       - Test scale_slope, peak_scale, scale_range calculations
 
 4. **Map Generation**
-   - Test correlation map creation
-   - Test visualization
-   - Test data integrity
+   - **What to test:**
+     - Test correlation map creation:
+       - Verify create_correlation_map() projects correlation function onto HEALPix map
+       - Test map has same NSIDE as input CMB map
+       - Verify correlation values are correctly mapped
+     - Test visualization:
+       - Verify correlation maps can be visualized
+       - Test visualization accuracy
+     - Test data integrity:
+       - Verify correlation map data is valid
+       - Test map format consistency
 
 ### Integration Tests
 
 1. **End-to-End Correlation Analysis**
-   - Load data → Calculate correlation → Test → Generate maps
-   - Test with actual CMB and LSS data
+   - **What to test:**
+     - Load data → Calculate correlation → Test → Generate maps:
+       - Load reconstructed CMB map
+       - Load LSS correlation data
+       - Calculate correlation function at 10-12 Mpc scales
+       - Test correlation significance
+       - Analyze scale dependence
+       - Create correlation map
+       - Verify all steps complete successfully
+     - Test with actual CMB and LSS data:
+       - Real reconstructed CMB map
+       - Real LSS data (SDSS, etc.)
+       - Verify correlation is calculated correctly
+       - Verify correlation matches theoretical predictions
 
 ---
 
@@ -134,6 +181,14 @@ This step implements the core CMB-LSS correlation analysis. It calculates correl
 - Account for selection effects
 - Use proper statistical methods
 - Provide detailed correlation documentation
+
+## Forbidden Elements
+
+**DO NOT USE:**
+- ❌ Potentials V(φ), V(Θ)
+- ❌ Mass terms m²φ², m²Θ²
+- ❌ Exponential damping exp(-r/λ)
+- ❌ Classical correlation formulas without Θ-model basis
 
 ---
 

@@ -13,13 +13,16 @@ This document provides a step-by-step implementation plan for the CMB verificati
 
 ## Project Goals
 
-Based on the technical specification (tech_spec.md), the project must implement:
+Based on the technical specification (tech_spec-new.md), the project must implement:
 
-1. **CMB map reconstruction** from Θ-field frequency spectrum
-2. **C_l power spectrum generation** without Silk damping
-3. **Θ-node to LSS correlation** analysis
-4. **ACT/SPT predictions** (high-l peaks, frequency invariance)
-5. **CMB → LSS → clusters → galaxies chain verification**
+1. **CMB map reconstruction** from Θ-field frequency spectrum (Module A)
+2. **C_l power spectrum generation** without Silk damping (Module B)
+3. **Θ-node map generation** from field ω(x) (Module C - NEW)
+4. **CMB → LSS correlation** with galaxy type prediction (Module D)
+5. **ACT/SPT predictions** (high-l peaks, frequency invariance)
+6. **CMB → LSS → clusters → galaxies chain verification**
+
+**CRITICAL PRINCIPLE:** Matter does NOT influence Θ-field. Matter = projection/envelope of Θ-modes.
 
 ---
 
@@ -132,26 +135,39 @@ utils/io        utils/math        utils/visualization   cmb/nodes
 - **Dependencies:** `cmb/theta_data_loader.py`
 - **Output:** Evolution data processing
 
+#### Step 1.4: Θ-Node Map Generation (NEW - Module C)
+- **Module:** `cmb/nodes/`
+- **Files:**
+  - `cmb/nodes/theta_node_map.py` - Generate Θ-node map
+- **Tasks:**
+  - Find nodes as points of local minima: x_node = {x : ω(x) = ω_min(x)}
+  - Classify nodes by depth, area, and local curvature
+  - Create map ω_min(x) and node mask
+- **Dependencies:** `cmb/theta_data_loader.py`
+- **Output:** Θ-node map and node mask
+
 ---
 
 ### Phase 2: CMB Map Reconstruction
 
 **Goal:** Reconstruct CMB temperature map from Θ-field
 
-#### Step 2.1: CMB Reconstruction Core
+#### Step 2.1: CMB Reconstruction Core (Module A)
 - **Module:** `cmb/reconstruction/`
 - **Files:**
   - `cmb/reconstruction/cmb_map_reconstructor.py` - Main reconstruction class
 - **Tasks:**
-  - Implement formula CMB2.1 for map reconstruction
-  - Convert Θ-field nodes to temperature fluctuations
+  - Implement Formula 2.1 (from tech_spec-new.md) for map reconstruction
+  - For each direction n̂: compute node depth Δω(n̂) = ω(n̂) - ω_min(n̂)
+  - Apply formula ΔT = (Δω/ω_CMB) T_0
   - Generate spherical harmonic map ΔT(n̂)
 - **Dependencies:**
   - `cmb/theta_node_processor.py`
   - `cmb/theta_data_loader.py`
+  - `cmb/nodes/theta_node_map.py` (node mask from Step 1.4)
   - `utils/math/spherical_harmonics.py`
   - `utils/math/frequency_conversion.py`
-- **Output:** Reconstructed CMB map (HEALPix format)
+- **Output:** Reconstructed CMB map (HEALPix format, Nside≥2048)
 
 #### Step 2.2: CMB Map Validation
 - **Module:** `cmb/reconstruction/`
@@ -183,21 +199,30 @@ utils/io        utils/math        utils/visualization   cmb/nodes
 
 ### Phase 3: Power Spectrum Generation
 
-**Goal:** Generate C_l power spectrum from reconstructed CMB
+**Goal:** Generate C_l power spectrum DIRECTLY from Θ-field frequency spectrum
 
-#### Step 3.1: Power Spectrum Calculation
+**CRITICAL:** C_l is calculated directly from ρ_Θ(ω,t), NOT from reconstructed map.
+This is the fundamental difference from classical cosmology.
+
+#### Step 3.1: Power Spectrum Calculation (Module B)
 - **Module:** `cmb/spectrum/`
 - **Files:**
   - `cmb/spectrum/power_spectrum.py` - C_l calculation
 - **Tasks:**
-  - Calculate C_l from reconstructed map
-  - Implement C_l ∝ l⁻²–l⁻³ behavior
+  - Calculate C_l DIRECTLY from ρ_Θ(ω,t) using formulas from tech_spec-new.md
+  - Use: l(ω) ≈ π D ω (Formula 2.2)
+  - Use: C_l ∝ ρ_Θ(ω(ℓ)) / ℓ² (Formula 2.3)
+  - Result: C_l ∝ l⁻² (Formula 2.4)
   - Handle high-l range (up to l≈10000)
   - No Silk damping implementation
+  - No plasma terms, no sound horizons
+  - Spherical Harmonic Decomposition (for Module B)
+  - Extract sub-peaks according to ρ_Θ(ω) structure
 - **Dependencies:**
-  - `cmb/reconstruction/cmb_map_reconstructor.py`
-  - `utils/math/spherical_harmonics.py`
-- **Output:** C_l power spectrum
+  - `cmb/theta_data_loader.py` (for ρ_Θ(ω,t))
+  - `cmb/theta_evolution_processor.py` (for temporal evolution)
+  - `utils/math/frequency_conversion.py` (for l = π D ω)
+- **Output:** C_l power spectrum array
 
 #### Step 3.2: High-l Sub-peaks Analysis
 - **Module:** `cmb/spectrum/`
@@ -256,18 +281,25 @@ utils/io        utils/math        utils/visualization   cmb/nodes
   - `cmb/correlation/cmb_lss_correlator.py`
 - **Output:** φ-split results
 
-#### Step 4.3: Node-LSS Mapping
+#### Step 4.3: Node-LSS Mapping (Module D)
 - **Module:** `cmb/correlation/`
 - **Files:**
   - `cmb/correlation/node_lss_mapper.py` - Map nodes to LSS
 - **Tasks:**
-  - Map CMB nodes to LSS structures
+  - **Maximize overlap with filaments** (Module D requirement)
+  - **Predict galaxy types by node strength:**
+    - Stronger nodes (larger ΔT) → more U3 galaxies
+    - Weaker nodes (smaller ΔT) → more U1 galaxies
+    - (without using matter as source)
+  - Map CMB nodes to LSS structures (SDSS / DESI / Euclid)
   - Identify clusters/filaments at node positions
-  - Create correlation maps
+  - Create correlation map (карта корреляций)
+  - Create displacement map (карта смещений)
 - **Dependencies:**
   - `cmb/nodes/node_to_cmb_mapper.py`
+  - `cmb/nodes/theta_node_map.py` (node mask from Step 1.4)
   - `cmb/correlation/cmb_lss_correlator.py`
-- **Output:** Node-LSS mapping
+- **Output:** Node-LSS mapping with galaxy type predictions
 
 ---
 
@@ -367,8 +399,8 @@ utils/io        utils/math        utils/visualization   cmb/nodes
 
 ### Can Proceed in Parallel After Foundation:
 3. Phase 2: CMB Map Reconstruction (depends on Phase 1)
-4. Phase 3: Power Spectrum Generation (depends on Phase 2)
-5. Phase 4: CMB-LSS Correlation (depends on Phase 2)
+4. Phase 3: Power Spectrum Generation (depends on Phase 1, NOT Phase 2)
+5. Phase 4: CMB-LSS Correlation (depends on Phase 2 and Phase 1.4)
 
 ### Final Steps:
 6. Phase 5: ACT/SPT Predictions (depends on Phases 3, 4)
@@ -391,6 +423,7 @@ cmb/
 │   └── __init__.py
 ├── nodes/
 │   ├── node_to_cmb_mapper.py
+│   ├── theta_node_map.py
 │   └── __init__.py
 ├── correlation/
 │   ├── cmb_lss_correlator.py
@@ -409,6 +442,8 @@ cmb/
 ├── theta_node_processor.py
 ├── theta_evolution_processor.py
 └── __init__.py
+
+**Note:** Step 1.4 (Node Map Generation) creates `cmb/nodes/theta_node_map.py`
 
 utils/
 ├── io/
@@ -464,14 +499,22 @@ config/
 
 ## Success Criteria
 
+Based on tech_spec-new.md requirements:
+
 1. ✅ Reconstructed CMB map matches ACT DR6.02 observations (arcmin scale, 20-30 μK)
 2. ✅ Generated C_l spectrum shows l⁻²–l⁻³ behavior without Silk damping
 3. ✅ High-l peak detected at l≈4500-6000
 4. ✅ CMB-LSS correlation validated at 10-12 Mpc scales
 5. ✅ Frequency invariance confirmed (90-350 GHz)
 6. ✅ Chain CMB → LSS → clusters → galaxies verified
+7. ✅ **Θ-node map generated** (ω_min(x) map and node mask) - Module C
+8. ✅ **Filament overlap maximized** - Module D
+9. ✅ **Galaxy type prediction validated** (stronger nodes → U3, weaker → U1) - Module D
+10. ✅ **Principle verified:** Matter does NOT influence Θ-field
 
 ---
 
 **Last Updated:** 2024-12-03
+
+**Updated based on:** tech_spec-new.md (see PLAN_UPDATES_FROM_NEW_SPEC.md for details)
 

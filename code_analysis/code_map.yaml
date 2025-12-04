@@ -832,20 +832,52 @@ classes:
     - test_temperature_range
     - test_constants_immutable
     name: TestPhysicalConstants
+  tests/unit/test_correlation_vectorizer.py:TestCorrelationVectorizer:
+    bases: []
+    docstring: Test CorrelationVectorizer class.
+    file: tests/unit/test_correlation_vectorizer.py
+    line: 15
+    methods:
+    - test_init
+    - test_fft_correlation
+    - test_fft_correlation_different_sizes
+    - test_direct_correlation
+    - test_invalid_method
+    - test_process_whole_array_error
+    name: TestCorrelationVectorizer
   tests/unit/test_cuda_array.py:TestCudaArray:
     bases: []
     docstring: Test CudaArray class.
     file: tests/unit/test_cuda_array.py
-    line: 14
+    line: 19
     methods:
     - test_init_cpu
+    - test_init_invalid_data
     - test_init_with_block_size
+    - test_init_auto_block_size
+    - test_init_small_array
+    - test_init_2d_array
+    - test_properties
     - test_get_block
+    - test_get_block_all_blocks
+    - test_get_block_invalid_index
     - test_set_block
+    - test_set_block_invalid_index
+    - test_set_block_invalid_size
     - test_use_whole_array
+    - test_use_whole_array_2d
     - test_to_numpy
+    - test_to_numpy_2d
+    - test_array_conversion
     - test_swap_to_gpu_unavailable
+    - test_swap_to_cpu
     - test_process_blocks
+    - test_process_blocks_identity
+    - test_process_blocks_square
+    - test_calculate_block_shape_1d
+    - test_calculate_block_shape_2d
+    - test_single_block_array
+    - test_memory_limit_check
     name: TestCudaArray
   tests/unit/test_data_index_loader_basic.py:TestDataIndexLoading:
     bases: []
@@ -1003,12 +1035,28 @@ classes:
     file: tests/unit/test_elementwise_vectorizer.py
     line: 15
     methods:
+    - test_init
+    - test_init_with_options
     - test_multiply
+    - test_multiply_with_array
     - test_add
     - test_subtract
+    - test_divide
     - test_power
     - test_sqrt
+    - test_abs
     - test_sin
+    - test_cos
+    - test_exp
+    - test_log
+    - test_vectorize_operation_invalid
+    - test_vectorize_operation_unary
+    - test_vectorize_operation_binary
+    - test_whole_array_mode
+    - test_batch_processing
+    - test_2d_array_operations
+    - test_float_operations
+    - test_operation_with_cuda_array_operand
     name: TestElementWiseVectorizer
   tests/unit/test_frequency_conversion.py:TestFrequencyToMultipole:
     bases: []
@@ -1045,6 +1093,41 @@ classes:
     - test_negative_multipole_raises_error
     - test_zero_multipole_raises_error
     name: TestMultipoleToFrequency
+  tests/unit/test_grid_vectorizer.py:TestGridVectorizer:
+    bases: []
+    docstring: Test GridVectorizer class.
+    file: tests/unit/test_grid_vectorizer.py
+    line: 15
+    methods:
+    - test_init
+    - test_local_minima
+    - test_local_maxima
+    - test_gradient
+    - test_laplacian
+    - test_curvature
+    - test_invalid_operation
+    - test_1d_local_minima
+    name: TestGridVectorizer
+  tests/unit/test_memory_watchdog.py:TestMemoryWatchdog:
+    bases: []
+    docstring: Test MemoryWatchdog class.
+    file: tests/unit/test_memory_watchdog.py
+    line: 19
+    methods:
+    - setup_method
+    - test_singleton
+    - test_register_process
+    - test_register_process_with_id
+    - test_unregister_process
+    - test_update_process_memory
+    - test_get_memory_usage
+    - test_get_registered_processes
+    - test_multiple_processes
+    - test_process_priority
+    - test_update_nonexistent_process
+    - test_stop_monitoring
+    - test_memory_process_dataclass
+    name: TestMemoryWatchdog
   tests/unit/test_reduction_vectorizer.py:TestReductionVectorizer:
     bases: []
     docstring: Test ReductionVectorizer class.
@@ -1342,6 +1425,35 @@ classes:
     - test_validate_node_data_negative_scales
     - test_validate_node_data_negative_depths
     name: TestValidateNodeData
+  tests/unit/test_transform_vectorizer.py:TestTransformVectorizer:
+    bases: []
+    docstring: Test TransformVectorizer class.
+    file: tests/unit/test_transform_vectorizer.py
+    line: 15
+    methods:
+    - test_init
+    - test_fft
+    - test_ifft
+    - test_rfft
+    - test_irfft
+    - test_invalid_transform
+    - test_2d_fft
+    name: TestTransformVectorizer
+  tests/unit/test_vectorizer.py:TestBaseVectorizer:
+    bases: []
+    docstring: Test BaseVectorizer class.
+    file: tests/unit/test_vectorizer.py
+    line: 16
+    methods:
+    - test_init
+    - test_init_with_options
+    - test_use_gpu_property
+    - test_whole_array_property
+    - test_vectorize_whole_array_mode
+    - test_vectorize_block_mode
+    - test_batch_processing
+    - test_gpu_fallback
+    name: TestBaseVectorizer
   utils/cuda/array_model.py:CudaArray:
     bases: []
     docstring: "Block-based array model for CUDA acceleration.\n\nSupports:\n- Block-based\
@@ -1353,7 +1465,7 @@ classes:
       \ Array shape\n    _dtype: Data type\n    _num_blocks: Number of blocks\n  \
       \  _block_shape: Shape of each block"
     file: utils/cuda/array_model.py
-    line: 36
+    line: 34
     methods:
     - __init__
     - _calculate_block_size
@@ -1364,6 +1476,7 @@ classes:
     - device
     - num_blocks
     - block_size
+    - _check_gpu_memory_limit
     - swap_to_gpu
     - swap_to_cpu
     - get_block
@@ -1372,23 +1485,8 @@ classes:
     - use_whole_array
     - to_numpy
     - __array__
+    - __del__
     name: CudaArray
-  utils/cuda/array_model.py:CudaMemoryError:
-    bases:
-    - Exception
-    docstring: Raised when CUDA memory operations fail.
-    file: utils/cuda/array_model.py
-    line: 30
-    methods: []
-    name: CudaMemoryError
-  utils/cuda/array_model.py:CudaUnavailableError:
-    bases:
-    - Exception
-    docstring: Raised when CUDA is requested but unavailable.
-    file: utils/cuda/array_model.py
-    line: 24
-    methods: []
-    name: CudaUnavailableError
   utils/cuda/correlation_vectorizer.py:CorrelationVectorizer:
     bases:
     - BaseVectorizer
@@ -1443,7 +1541,79 @@ classes:
     - log
     - sqrt
     - abs
+    - batch
     name: ElementWiseVectorizer
+  utils/cuda/exceptions.py:CudaBlockProcessingError:
+    bases:
+    - CudaError
+    docstring: Raised when block processing fails.
+    file: utils/cuda/exceptions.py
+    line: 134
+    methods:
+    - __init__
+    name: CudaBlockProcessingError
+  utils/cuda/exceptions.py:CudaError:
+    bases:
+    - Exception
+    docstring: Base exception for all CUDA-related errors.
+    file: utils/cuda/exceptions.py
+    line: 11
+    methods: []
+    name: CudaError
+  utils/cuda/exceptions.py:CudaMemoryError:
+    bases:
+    - CudaError
+    docstring: Raised when CUDA memory operations fail.
+    file: utils/cuda/exceptions.py
+    line: 31
+    methods:
+    - __init__
+    name: CudaMemoryError
+  utils/cuda/exceptions.py:CudaMemoryLimitExceededError:
+    bases:
+    - CudaError
+    docstring: Raised when GPU memory usage exceeds 80% limit.
+    file: utils/cuda/exceptions.py
+    line: 45
+    methods:
+    - __init__
+    name: CudaMemoryLimitExceededError
+  utils/cuda/exceptions.py:CudaProcessKilledError:
+    bases:
+    - CudaError
+    docstring: Raised when a CUDA process is killed by memory watchdog.
+    file: utils/cuda/exceptions.py
+    line: 78
+    methods:
+    - __init__
+    name: CudaProcessKilledError
+  utils/cuda/exceptions.py:CudaProcessRegistrationError:
+    bases:
+    - CudaError
+    docstring: Raised when process registration with memory watchdog fails.
+    file: utils/cuda/exceptions.py
+    line: 98
+    methods:
+    - __init__
+    name: CudaProcessRegistrationError
+  utils/cuda/exceptions.py:CudaUnavailableError:
+    bases:
+    - CudaError
+    docstring: Raised when CUDA is requested but unavailable.
+    file: utils/cuda/exceptions.py
+    line: 17
+    methods:
+    - __init__
+    name: CudaUnavailableError
+  utils/cuda/exceptions.py:CudaVectorizationError:
+    bases:
+    - CudaError
+    docstring: Raised when vectorization operation fails.
+    file: utils/cuda/exceptions.py
+    line: 116
+    methods:
+    - __init__
+    name: CudaVectorizationError
   utils/cuda/grid_vectorizer.py:GridVectorizer:
     bases:
     - BaseVectorizer
@@ -1474,6 +1644,59 @@ classes:
     - _laplacian
     - _curvature
     name: GridVectorizer
+  utils/cuda/memory_safety.py:MemorySafetyGuard:
+    bases: []
+    docstring: 'Safety guard for CUDA memory operations.
+
+
+      Provides timeout protection and emergency cleanup to prevent system freeze.'
+    file: utils/cuda/memory_safety.py
+    line: 27
+    methods:
+    - __init__
+    - protect_operation
+    - emergency_cleanup
+    name: MemorySafetyGuard
+  utils/cuda/memory_watchdog.py:MemoryProcess:
+    bases: []
+    docstring: "Information about a process using GPU memory.\n\nAttributes:\n   \
+      \ process_id: Unique process identifier\n    memory_bytes: Memory used by this\
+      \ process in bytes\n    priority: Process priority (lower = higher priority)\n\
+      \    created_at: When process was registered\n    last_updated: Last memory\
+      \ update time\n    description: Human-readable description"
+    file: utils/cuda/memory_watchdog.py
+    line: 35
+    methods: []
+    name: MemoryProcess
+  utils/cuda/memory_watchdog.py:MemoryWatchdog:
+    bases: []
+    docstring: 'GPU memory watchdog for monitoring and managing memory usage.
+
+
+      Tracks all registered processes and kills memory-intensive processes
+
+      when total usage exceeds 80% limit.
+
+
+      Thread-safe singleton implementation.'
+    file: utils/cuda/memory_watchdog.py
+    line: 56
+    methods:
+    - __init__
+    - get_instance
+    - register_process
+    - unregister_process
+    - update_process_memory
+    - _check_memory_limit
+    - _kill_process
+    - _kill_memory_intensive_processes
+    - _force_cleanup
+    - _start_monitoring
+    - _monitor_loop
+    - stop_monitoring
+    - get_memory_usage
+    - get_registered_processes
+    name: MemoryWatchdog
   utils/cuda/reduction_vectorizer.py:ReductionVectorizer:
     bases:
     - BaseVectorizer
@@ -3877,69 +4100,258 @@ functions:
     file: tests/unit/test_config.py
     line: 45
     name: test_z_cmb_range
+  tests/unit/test_correlation_vectorizer.py:test_direct_correlation:
+    args:
+    - self
+    docstring: Test direct correlation.
+    file: tests/unit/test_correlation_vectorizer.py
+    line: 45
+    name: test_direct_correlation
+  tests/unit/test_correlation_vectorizer.py:test_fft_correlation:
+    args:
+    - self
+    docstring: Test FFT-based correlation.
+    file: tests/unit/test_correlation_vectorizer.py
+    line: 23
+    name: test_fft_correlation
+  tests/unit/test_correlation_vectorizer.py:test_fft_correlation_different_sizes:
+    args:
+    - self
+    docstring: Test FFT correlation with different array sizes.
+    file: tests/unit/test_correlation_vectorizer.py
+    line: 34
+    name: test_fft_correlation_different_sizes
+  tests/unit/test_correlation_vectorizer.py:test_init:
+    args:
+    - self
+    docstring: Test initialization.
+    file: tests/unit/test_correlation_vectorizer.py
+    line: 18
+    name: test_init
+  tests/unit/test_correlation_vectorizer.py:test_invalid_method:
+    args:
+    - self
+    docstring: Test invalid correlation method.
+    file: tests/unit/test_correlation_vectorizer.py
+    line: 56
+    name: test_invalid_method
+  tests/unit/test_correlation_vectorizer.py:test_process_whole_array_error:
+    args:
+    - self
+    docstring: Test that _process_whole_array raises NotImplementedError.
+    file: tests/unit/test_correlation_vectorizer.py
+    line: 66
+    name: test_process_whole_array_error
   tests/unit/test_cuda_array.py:double:
     args:
     - x
     docstring: null
     file: tests/unit/test_cuda_array.py
-    line: 80
+    line: 184
     name: double
+  tests/unit/test_cuda_array.py:identity:
+    args:
+    - x
+    docstring: null
+    file: tests/unit/test_cuda_array.py
+    line: 196
+    name: identity
+  tests/unit/test_cuda_array.py:square:
+    args:
+    - x
+    docstring: null
+    file: tests/unit/test_cuda_array.py
+    line: 207
+    name: square
+  tests/unit/test_cuda_array.py:test_array_conversion:
+    args:
+    - self
+    docstring: Test __array__ method.
+    file: tests/unit/test_cuda_array.py
+    line: 152
+    name: test_array_conversion
+  tests/unit/test_cuda_array.py:test_calculate_block_shape_1d:
+    args:
+    - self
+    docstring: Test block shape calculation for 1D array.
+    file: tests/unit/test_cuda_array.py
+    line: 214
+    name: test_calculate_block_shape_1d
+  tests/unit/test_cuda_array.py:test_calculate_block_shape_2d:
+    args:
+    - self
+    docstring: Test block shape calculation for 2D array.
+    file: tests/unit/test_cuda_array.py
+    line: 221
+    name: test_calculate_block_shape_2d
   tests/unit/test_cuda_array.py:test_get_block:
     args:
     - self
     docstring: Test getting blocks.
     file: tests/unit/test_cuda_array.py
-    line: 32
+    line: 71
     name: test_get_block
+  tests/unit/test_cuda_array.py:test_get_block_all_blocks:
+    args:
+    - self
+    docstring: Test getting all blocks.
+    file: tests/unit/test_cuda_array.py
+    line: 78
+    name: test_get_block_all_blocks
+  tests/unit/test_cuda_array.py:test_get_block_invalid_index:
+    args:
+    - self
+    docstring: Test getting block with invalid index.
+    file: tests/unit/test_cuda_array.py
+    line: 87
+    name: test_get_block_invalid_index
+  tests/unit/test_cuda_array.py:test_init_2d_array:
+    args:
+    - self
+    docstring: Test initialization with 2D array.
+    file: tests/unit/test_cuda_array.py
+    line: 54
+    name: test_init_2d_array
+  tests/unit/test_cuda_array.py:test_init_auto_block_size:
+    args:
+    - self
+    docstring: Test automatic block size calculation.
+    file: tests/unit/test_cuda_array.py
+    line: 42
+    name: test_init_auto_block_size
   tests/unit/test_cuda_array.py:test_init_cpu:
     args:
     - self
     docstring: Test initialization on CPU.
     file: tests/unit/test_cuda_array.py
-    line: 17
+    line: 22
     name: test_init_cpu
+  tests/unit/test_cuda_array.py:test_init_invalid_data:
+    args:
+    - self
+    docstring: Test initialization with invalid data type.
+    file: tests/unit/test_cuda_array.py
+    line: 30
+    name: test_init_invalid_data
+  tests/unit/test_cuda_array.py:test_init_small_array:
+    args:
+    - self
+    docstring: Test initialization with small array.
+    file: tests/unit/test_cuda_array.py
+    line: 48
+    name: test_init_small_array
   tests/unit/test_cuda_array.py:test_init_with_block_size:
     args:
     - self
     docstring: Test initialization with custom block size.
     file: tests/unit/test_cuda_array.py
-    line: 25
+    line: 35
     name: test_init_with_block_size
+  tests/unit/test_cuda_array.py:test_memory_limit_check:
+    args:
+    - self
+    docstring: Test GPU memory limit checking.
+    file: tests/unit/test_cuda_array.py
+    line: 235
+    name: test_memory_limit_check
   tests/unit/test_cuda_array.py:test_process_blocks:
     args:
     - self
     docstring: Test block processing.
     file: tests/unit/test_cuda_array.py
-    line: 75
+    line: 179
     name: test_process_blocks
+  tests/unit/test_cuda_array.py:test_process_blocks_identity:
+    args:
+    - self
+    docstring: Test block processing with identity function.
+    file: tests/unit/test_cuda_array.py
+    line: 191
+    name: test_process_blocks_identity
+  tests/unit/test_cuda_array.py:test_process_blocks_square:
+    args:
+    - self
+    docstring: Test block processing with square function.
+    file: tests/unit/test_cuda_array.py
+    line: 202
+    name: test_process_blocks_square
+  tests/unit/test_cuda_array.py:test_properties:
+    args:
+    - self
+    docstring: Test all properties.
+    file: tests/unit/test_cuda_array.py
+    line: 61
+    name: test_properties
   tests/unit/test_cuda_array.py:test_set_block:
     args:
     - self
     docstring: Test setting blocks.
     file: tests/unit/test_cuda_array.py
-    line: 39
+    line: 96
     name: test_set_block
+  tests/unit/test_cuda_array.py:test_set_block_invalid_index:
+    args:
+    - self
+    docstring: Test setting block with invalid index.
+    file: tests/unit/test_cuda_array.py
+    line: 105
+    name: test_set_block_invalid_index
+  tests/unit/test_cuda_array.py:test_set_block_invalid_size:
+    args:
+    - self
+    docstring: Test setting block with invalid size.
+    file: tests/unit/test_cuda_array.py
+    line: 114
+    name: test_set_block_invalid_size
+  tests/unit/test_cuda_array.py:test_single_block_array:
+    args:
+    - self
+    docstring: Test array that fits in single block.
+    file: tests/unit/test_cuda_array.py
+    line: 227
+    name: test_single_block_array
+  tests/unit/test_cuda_array.py:test_swap_to_cpu:
+    args:
+    - self
+    docstring: Test swap to CPU.
+    file: tests/unit/test_cuda_array.py
+    line: 171
+    name: test_swap_to_cpu
   tests/unit/test_cuda_array.py:test_swap_to_gpu_unavailable:
     args:
     - self
     docstring: Test swap to GPU when CUDA unavailable.
     file: tests/unit/test_cuda_array.py
-    line: 63
+    line: 159
     name: test_swap_to_gpu_unavailable
   tests/unit/test_cuda_array.py:test_to_numpy:
     args:
     - self
     docstring: Test conversion to numpy.
     file: tests/unit/test_cuda_array.py
-    line: 55
+    line: 136
     name: test_to_numpy
+  tests/unit/test_cuda_array.py:test_to_numpy_2d:
+    args:
+    - self
+    docstring: Test conversion to numpy for 2D array.
+    file: tests/unit/test_cuda_array.py
+    line: 145
+    name: test_to_numpy_2d
   tests/unit/test_cuda_array.py:test_use_whole_array:
     args:
     - self
     docstring: Test getting whole array.
     file: tests/unit/test_cuda_array.py
-    line: 48
+    line: 121
     name: test_use_whole_array
+  tests/unit/test_cuda_array.py:test_use_whole_array_2d:
+    args:
+    - self
+    docstring: Test getting whole 2D array.
+    file: tests/unit/test_cuda_array.py
+    line: 129
+    name: test_use_whole_array_2d
   tests/unit/test_data_index_loader_basic.py:test_get_file_path_invalid_category:
     args:
     - self
@@ -4255,48 +4667,160 @@ functions:
     file: tests/unit/test_data_saver.py
     line: 42
     name: test_save_without_overwrite
+  tests/unit/test_elementwise_vectorizer.py:test_2d_array_operations:
+    args:
+    - self
+    docstring: Test operations on 2D arrays.
+    file: tests/unit/test_elementwise_vectorizer.py
+    line: 188
+    name: test_2d_array_operations
+  tests/unit/test_elementwise_vectorizer.py:test_abs:
+    args:
+    - self
+    docstring: Test absolute value operation.
+    file: tests/unit/test_elementwise_vectorizer.py
+    line: 96
+    name: test_abs
   tests/unit/test_elementwise_vectorizer.py:test_add:
     args:
     - self
     docstring: Test addition operation.
     file: tests/unit/test_elementwise_vectorizer.py
-    line: 27
+    line: 51
     name: test_add
+  tests/unit/test_elementwise_vectorizer.py:test_batch_processing:
+    args:
+    - self
+    docstring: Test batch processing.
+    file: tests/unit/test_elementwise_vectorizer.py
+    line: 176
+    name: test_batch_processing
+  tests/unit/test_elementwise_vectorizer.py:test_cos:
+    args:
+    - self
+    docstring: Test cosine operation.
+    file: tests/unit/test_elementwise_vectorizer.py
+    line: 114
+    name: test_cos
+  tests/unit/test_elementwise_vectorizer.py:test_divide:
+    args:
+    - self
+    docstring: Test division operation.
+    file: tests/unit/test_elementwise_vectorizer.py
+    line: 69
+    name: test_divide
+  tests/unit/test_elementwise_vectorizer.py:test_exp:
+    args:
+    - self
+    docstring: Test exponential operation.
+    file: tests/unit/test_elementwise_vectorizer.py
+    line: 123
+    name: test_exp
+  tests/unit/test_elementwise_vectorizer.py:test_float_operations:
+    args:
+    - self
+    docstring: Test operations with float operands.
+    file: tests/unit/test_elementwise_vectorizer.py
+    line: 197
+    name: test_float_operations
+  tests/unit/test_elementwise_vectorizer.py:test_init:
+    args:
+    - self
+    docstring: Test initialization.
+    file: tests/unit/test_elementwise_vectorizer.py
+    line: 18
+    name: test_init
+  tests/unit/test_elementwise_vectorizer.py:test_init_with_options:
+    args:
+    - self
+    docstring: Test initialization with options.
+    file: tests/unit/test_elementwise_vectorizer.py
+    line: 24
+    name: test_init_with_options
+  tests/unit/test_elementwise_vectorizer.py:test_log:
+    args:
+    - self
+    docstring: Test natural logarithm operation.
+    file: tests/unit/test_elementwise_vectorizer.py
+    line: 132
+    name: test_log
   tests/unit/test_elementwise_vectorizer.py:test_multiply:
     args:
     - self
     docstring: Test multiplication operation.
     file: tests/unit/test_elementwise_vectorizer.py
-    line: 18
+    line: 31
     name: test_multiply
+  tests/unit/test_elementwise_vectorizer.py:test_multiply_with_array:
+    args:
+    - self
+    docstring: Test multiplication with array operand.
+    file: tests/unit/test_elementwise_vectorizer.py
+    line: 40
+    name: test_multiply_with_array
+  tests/unit/test_elementwise_vectorizer.py:test_operation_with_cuda_array_operand:
+    args:
+    - self
+    docstring: Test operation with CudaArray as operand.
+    file: tests/unit/test_elementwise_vectorizer.py
+    line: 206
+    name: test_operation_with_cuda_array_operand
   tests/unit/test_elementwise_vectorizer.py:test_power:
     args:
     - self
     docstring: Test power operation.
     file: tests/unit/test_elementwise_vectorizer.py
-    line: 45
+    line: 78
     name: test_power
   tests/unit/test_elementwise_vectorizer.py:test_sin:
     args:
     - self
     docstring: Test sine operation.
     file: tests/unit/test_elementwise_vectorizer.py
-    line: 63
+    line: 105
     name: test_sin
   tests/unit/test_elementwise_vectorizer.py:test_sqrt:
     args:
     - self
     docstring: Test square root operation.
     file: tests/unit/test_elementwise_vectorizer.py
-    line: 54
+    line: 87
     name: test_sqrt
   tests/unit/test_elementwise_vectorizer.py:test_subtract:
     args:
     - self
     docstring: Test subtraction operation.
     file: tests/unit/test_elementwise_vectorizer.py
-    line: 36
+    line: 60
     name: test_subtract
+  tests/unit/test_elementwise_vectorizer.py:test_vectorize_operation_binary:
+    args:
+    - self
+    docstring: Test binary operation via vectorize_operation.
+    file: tests/unit/test_elementwise_vectorizer.py
+    line: 158
+    name: test_vectorize_operation_binary
+  tests/unit/test_elementwise_vectorizer.py:test_vectorize_operation_invalid:
+    args:
+    - self
+    docstring: Test invalid operation.
+    file: tests/unit/test_elementwise_vectorizer.py
+    line: 141
+    name: test_vectorize_operation_invalid
+  tests/unit/test_elementwise_vectorizer.py:test_vectorize_operation_unary:
+    args:
+    - self
+    docstring: Test unary operation via vectorize_operation.
+    file: tests/unit/test_elementwise_vectorizer.py
+    line: 149
+    name: test_vectorize_operation_unary
+  tests/unit/test_elementwise_vectorizer.py:test_whole_array_mode:
+    args:
+    - self
+    docstring: Test whole array mode.
+    file: tests/unit/test_elementwise_vectorizer.py
+    line: 167
+    name: test_whole_array_mode
   tests/unit/test_frequency_conversion.py:test_convert_array_frequencies:
     args:
     - self
@@ -4395,6 +4919,153 @@ functions:
     file: tests/unit/test_frequency_conversion.py
     line: 97
     name: test_zero_multipole_raises_error
+  tests/unit/test_grid_vectorizer.py:test_1d_local_minima:
+    args:
+    - self
+    docstring: Test local minima on 1D array.
+    file: tests/unit/test_grid_vectorizer.py
+    line: 84
+    name: test_1d_local_minima
+  tests/unit/test_grid_vectorizer.py:test_curvature:
+    args:
+    - self
+    docstring: Test curvature calculation.
+    file: tests/unit/test_grid_vectorizer.py
+    line: 67
+    name: test_curvature
+  tests/unit/test_grid_vectorizer.py:test_gradient:
+    args:
+    - self
+    docstring: Test gradient calculation.
+    file: tests/unit/test_grid_vectorizer.py
+    line: 49
+    name: test_gradient
+  tests/unit/test_grid_vectorizer.py:test_init:
+    args:
+    - self
+    docstring: Test initialization.
+    file: tests/unit/test_grid_vectorizer.py
+    line: 18
+    name: test_init
+  tests/unit/test_grid_vectorizer.py:test_invalid_operation:
+    args:
+    - self
+    docstring: Test invalid grid operation.
+    file: tests/unit/test_grid_vectorizer.py
+    line: 76
+    name: test_invalid_operation
+  tests/unit/test_grid_vectorizer.py:test_laplacian:
+    args:
+    - self
+    docstring: Test Laplacian calculation.
+    file: tests/unit/test_grid_vectorizer.py
+    line: 58
+    name: test_laplacian
+  tests/unit/test_grid_vectorizer.py:test_local_maxima:
+    args:
+    - self
+    docstring: Test local maximum detection.
+    file: tests/unit/test_grid_vectorizer.py
+    line: 36
+    name: test_local_maxima
+  tests/unit/test_grid_vectorizer.py:test_local_minima:
+    args:
+    - self
+    docstring: Test local minimum detection.
+    file: tests/unit/test_grid_vectorizer.py
+    line: 23
+    name: test_local_minima
+  tests/unit/test_memory_watchdog.py:setup_method:
+    args:
+    - self
+    docstring: 'Setup: clear processes before each test.'
+    file: tests/unit/test_memory_watchdog.py
+    line: 22
+    name: setup_method
+  tests/unit/test_memory_watchdog.py:test_get_memory_usage:
+    args:
+    - self
+    docstring: Test getting memory usage statistics.
+    file: tests/unit/test_memory_watchdog.py
+    line: 80
+    name: test_get_memory_usage
+  tests/unit/test_memory_watchdog.py:test_get_registered_processes:
+    args:
+    - self
+    docstring: Test getting registered processes.
+    file: tests/unit/test_memory_watchdog.py
+    line: 91
+    name: test_get_registered_processes
+  tests/unit/test_memory_watchdog.py:test_memory_process_dataclass:
+    args:
+    - self
+    docstring: Test MemoryProcess dataclass.
+    file: tests/unit/test_memory_watchdog.py
+    line: 165
+    name: test_memory_process_dataclass
+  tests/unit/test_memory_watchdog.py:test_multiple_processes:
+    args:
+    - self
+    docstring: Test registering multiple processes.
+    file: tests/unit/test_memory_watchdog.py
+    line: 109
+    name: test_multiple_processes
+  tests/unit/test_memory_watchdog.py:test_process_priority:
+    args:
+    - self
+    docstring: Test process priority handling.
+    file: tests/unit/test_memory_watchdog.py
+    line: 133
+    name: test_process_priority
+  tests/unit/test_memory_watchdog.py:test_register_process:
+    args:
+    - self
+    docstring: Test process registration.
+    file: tests/unit/test_memory_watchdog.py
+    line: 36
+    name: test_register_process
+  tests/unit/test_memory_watchdog.py:test_register_process_with_id:
+    args:
+    - self
+    docstring: Test process registration with custom ID.
+    file: tests/unit/test_memory_watchdog.py
+    line: 45
+    name: test_register_process_with_id
+  tests/unit/test_memory_watchdog.py:test_singleton:
+    args:
+    - self
+    docstring: Test that MemoryWatchdog is a singleton.
+    file: tests/unit/test_memory_watchdog.py
+    line: 30
+    name: test_singleton
+  tests/unit/test_memory_watchdog.py:test_stop_monitoring:
+    args:
+    - self
+    docstring: Test stopping monitoring.
+    file: tests/unit/test_memory_watchdog.py
+    line: 155
+    name: test_stop_monitoring
+  tests/unit/test_memory_watchdog.py:test_unregister_process:
+    args:
+    - self
+    docstring: Test process unregistration.
+    file: tests/unit/test_memory_watchdog.py
+    line: 54
+    name: test_unregister_process
+  tests/unit/test_memory_watchdog.py:test_update_nonexistent_process:
+    args:
+    - self
+    docstring: Test updating memory for nonexistent process.
+    file: tests/unit/test_memory_watchdog.py
+    line: 149
+    name: test_update_nonexistent_process
+  tests/unit/test_memory_watchdog.py:test_update_process_memory:
+    args:
+    - self
+    docstring: Test updating process memory.
+    file: tests/unit/test_memory_watchdog.py
+    line: 62
+    name: test_update_process_memory
   tests/unit/test_reduction_vectorizer.py:test_max:
     args:
     - self
@@ -5214,13 +5885,130 @@ functions:
     file: tests/unit/test_theta_node_processor.py
     line: 375
     name: test_validate_node_data_valid
+  tests/unit/test_transform_vectorizer.py:test_2d_fft:
+    args:
+    - self
+    docstring: Test FFT on 2D array.
+    file: tests/unit/test_transform_vectorizer.py
+    line: 75
+    name: test_2d_fft
+  tests/unit/test_transform_vectorizer.py:test_fft:
+    args:
+    - self
+    docstring: Test FFT operation.
+    file: tests/unit/test_transform_vectorizer.py
+    line: 23
+    name: test_fft
+  tests/unit/test_transform_vectorizer.py:test_ifft:
+    args:
+    - self
+    docstring: Test inverse FFT operation.
+    file: tests/unit/test_transform_vectorizer.py
+    line: 32
+    name: test_ifft
+  tests/unit/test_transform_vectorizer.py:test_init:
+    args:
+    - self
+    docstring: Test initialization.
+    file: tests/unit/test_transform_vectorizer.py
+    line: 18
+    name: test_init
+  tests/unit/test_transform_vectorizer.py:test_invalid_transform:
+    args:
+    - self
+    docstring: Test invalid transform.
+    file: tests/unit/test_transform_vectorizer.py
+    line: 67
+    name: test_invalid_transform
+  tests/unit/test_transform_vectorizer.py:test_irfft:
+    args:
+    - self
+    docstring: Test inverse real FFT operation.
+    file: tests/unit/test_transform_vectorizer.py
+    line: 53
+    name: test_irfft
+  tests/unit/test_transform_vectorizer.py:test_rfft:
+    args:
+    - self
+    docstring: Test real FFT operation.
+    file: tests/unit/test_transform_vectorizer.py
+    line: 44
+    name: test_rfft
+  tests/unit/test_vectorizer.py:test_batch_processing:
+    args:
+    - self
+    docstring: Test batch processing.
+    file: tests/unit/test_vectorizer.py
+    line: 62
+    name: test_batch_processing
+  tests/unit/test_vectorizer.py:test_gpu_fallback:
+    args:
+    - self
+    docstring: Test GPU fallback to CPU.
+    file: tests/unit/test_vectorizer.py
+    line: 78
+    name: test_gpu_fallback
+  tests/unit/test_vectorizer.py:test_init:
+    args:
+    - self
+    docstring: Test initialization.
+    file: tests/unit/test_vectorizer.py
+    line: 19
+    name: test_init
+  tests/unit/test_vectorizer.py:test_init_with_options:
+    args:
+    - self
+    docstring: Test initialization with options.
+    file: tests/unit/test_vectorizer.py
+    line: 27
+    name: test_init_with_options
+  tests/unit/test_vectorizer.py:test_use_gpu_property:
+    args:
+    - self
+    docstring: Test use_gpu property.
+    file: tests/unit/test_vectorizer.py
+    line: 34
+    name: test_use_gpu_property
+  tests/unit/test_vectorizer.py:test_vectorize_block_mode:
+    args:
+    - self
+    docstring: Test vectorize in block mode.
+    file: tests/unit/test_vectorizer.py
+    line: 53
+    name: test_vectorize_block_mode
+  tests/unit/test_vectorizer.py:test_vectorize_whole_array_mode:
+    args:
+    - self
+    docstring: Test vectorize in whole array mode.
+    file: tests/unit/test_vectorizer.py
+    line: 44
+    name: test_vectorize_whole_array_mode
+  tests/unit/test_vectorizer.py:test_whole_array_property:
+    args:
+    - self
+    docstring: Test whole_array property.
+    file: tests/unit/test_vectorizer.py
+    line: 39
+    name: test_whole_array_property
   utils/cuda/array_model.py:__array__:
     args:
     - self
     docstring: Allow conversion to numpy array.
     file: utils/cuda/array_model.py
-    line: 367
+    line: 492
     name: __array__
+  utils/cuda/array_model.py:__del__:
+    args:
+    - self
+    docstring: 'Cleanup: unregister from watchdog and free GPU memory on deletion.
+
+
+      CRITICAL: Ensures GPU memory is freed even if object is deleted
+
+      without explicit swap_to_cpu() call.'
+    file: utils/cuda/array_model.py
+    line: 496
+    name: __del__
   utils/cuda/array_model.py:__init__:
     args:
     - self
@@ -5232,14 +6020,14 @@ functions:
       \ Initial device (\"cpu\" or \"cuda\")\n\nRaises:\n    ValueError: If data is\
       \ not a numpy array\n    CudaUnavailableError: If device=\"cuda\" but CUDA unavailable"
     file: utils/cuda/array_model.py
-    line: 57
+    line: 55
     name: __init__
   utils/cuda/array_model.py:_calculate_block_shape:
     args:
     - self
     docstring: "Calculate shape of each block.\n\nReturns:\n    Block shape tuple"
     file: utils/cuda/array_model.py
-    line: 143
+    line: 150
     name: _calculate_block_shape
   utils/cuda/array_model.py:_calculate_block_size:
     args:
@@ -5247,35 +6035,51 @@ functions:
     docstring: "Calculate optimal block size based on available memory.\n\nReturns:\n\
       \    Optimal block size in elements"
     file: utils/cuda/array_model.py
-    line: 98
+    line: 100
     name: _calculate_block_size
   utils/cuda/array_model.py:_calculate_num_blocks:
     args:
     - self
     docstring: "Calculate number of blocks needed.\n\nReturns:\n    Number of blocks"
     file: utils/cuda/array_model.py
-    line: 132
+    line: 139
     name: _calculate_num_blocks
+  utils/cuda/array_model.py:_check_gpu_memory_limit:
+    args:
+    - self
+    - required_bytes
+    docstring: "Check if GPU memory usage would exceed 80% limit via watchdog.\n\n\
+      Args:\n    required_bytes: Required memory in bytes\n\nRaises:\n    CudaMemoryLimitExceededError:\
+      \ If memory limit would be exceeded"
+    file: utils/cuda/array_model.py
+    line: 194
+    name: _check_gpu_memory_limit
   utils/cuda/array_model.py:block_size:
     args:
     - self
     docstring: Get block size.
     file: utils/cuda/array_model.py
-    line: 183
+    line: 190
     name: block_size
+  utils/cuda/array_model.py:cleanup_func:
+    args: []
+    docstring: Emergency cleanup function.
+    file: utils/cuda/array_model.py
+    line: 257
+    name: cleanup_func
   utils/cuda/array_model.py:device:
     args:
     - self
     docstring: Get current device.
     file: utils/cuda/array_model.py
-    line: 173
+    line: 180
     name: device
   utils/cuda/array_model.py:dtype:
     args:
     - self
     docstring: Get data type.
     file: utils/cuda/array_model.py
-    line: 168
+    line: 175
     name: dtype
   utils/cuda/array_model.py:get_block:
     args:
@@ -5285,14 +6089,14 @@ functions:
       \ index (0 to num_blocks-1)\n\nReturns:\n    Block data (on current device)\n\
       \nRaises:\n    IndexError: If block_idx out of range"
     file: utils/cuda/array_model.py
-    line: 222
+    line: 343
     name: get_block
   utils/cuda/array_model.py:num_blocks:
     args:
     - self
     docstring: Get number of blocks.
     file: utils/cuda/array_model.py
-    line: 178
+    line: 185
     name: num_blocks
   utils/cuda/array_model.py:process_blocks:
     args:
@@ -5303,7 +6107,7 @@ functions:
       \ Operation function (takes block, returns processed block)\n    use_gpu: Use\
       \ GPU if available\n\nReturns:\n    New CudaArray with processed data"
     file: utils/cuda/array_model.py
-    line: 310
+    line: 435
     name: process_blocks
   utils/cuda/array_model.py:set_block:
     args:
@@ -5314,14 +6118,14 @@ functions:
       \    block_data: Processed block data\n\nRaises:\n    IndexError: If block_idx\
       \ out of range\n    ValueError: If block_data shape doesn't match expected"
     file: utils/cuda/array_model.py
-    line: 264
+    line: 385
     name: set_block
   utils/cuda/array_model.py:shape:
     args:
     - self
     docstring: Get array shape.
     file: utils/cuda/array_model.py
-    line: 163
+    line: 170
     name: shape
   utils/cuda/array_model.py:swap_to_cpu:
     args:
@@ -5329,17 +6133,21 @@ functions:
     docstring: 'Move array to CPU memory.
 
 
-      Copies GPU data to CPU if on GPU.'
+      Copies GPU data to CPU if on GPU.
+
+      Unregisters from memory watchdog and forces cleanup.'
     file: utils/cuda/array_model.py
-    line: 207
+    line: 314
     name: swap_to_cpu
   utils/cuda/array_model.py:swap_to_gpu:
     args:
     - self
     docstring: "Move array to GPU memory.\n\nRaises:\n    CudaUnavailableError: If\
-      \ GPU unavailable\n    CudaMemoryError: If out of GPU memory"
+      \ GPU unavailable\n    CudaMemoryError: If out of GPU memory\n    CudaMemoryLimitExceededError:\
+      \ If memory usage would exceed 80%\n    CudaProcessKilledError: If process is\
+      \ killed by watchdog"
     file: utils/cuda/array_model.py
-    line: 187
+    line: 212
     name: swap_to_gpu
   utils/cuda/array_model.py:to_numpy:
     args:
@@ -5347,7 +6155,7 @@ functions:
     docstring: "Convert to numpy array (always on CPU).\n\nReturns:\n    Numpy array\
       \ on CPU"
     file: utils/cuda/array_model.py
-    line: 356
+    line: 481
     name: to_numpy
   utils/cuda/array_model.py:use_whole_array:
     args:
@@ -5356,7 +6164,7 @@ functions:
       \ array (on current device)\n\nNote:\n    This bypasses block processing - use\
       \ only for operations\n    requiring whole array (e.g., FFT)."
     file: utils/cuda/array_model.py
-    line: 339
+    line: 464
     name: use_whole_array
   utils/cuda/correlation_vectorizer.py:__init__:
     args:
@@ -5483,6 +6291,17 @@ functions:
     file: utils/cuda/elementwise_vectorizer.py
     line: 215
     name: add
+  utils/cuda/elementwise_vectorizer.py:batch:
+    args:
+    - self
+    - arrays
+    docstring: "Batch process multiple arrays.\n\nArgs:\n    arrays: List of input\
+      \ CudaArrays\n    *args: Operation-specific arguments (operation, operand)\n\
+      \    **kwargs: Operation-specific keyword arguments\n\nReturns:\n    List of\
+      \ result CudaArrays"
+    file: utils/cuda/elementwise_vectorizer.py
+    line: 279
+    name: batch
   utils/cuda/elementwise_vectorizer.py:cos:
     args:
     - self
@@ -5573,6 +6392,16 @@ functions:
     file: utils/cuda/elementwise_vectorizer.py
     line: 117
     name: vectorize_operation
+  utils/cuda/exceptions.py:__init__:
+    args:
+    - self
+    - block_index
+    - message
+    docstring: "Initialize exception.\n\nArgs:\n    block_index: Index of the failed\
+      \ block\n    message: Error message"
+    file: utils/cuda/exceptions.py
+    line: 137
+    name: __init__
   utils/cuda/grid_vectorizer.py:__init__:
     args:
     - self
@@ -5592,7 +6421,7 @@ functions:
     docstring: "Calculate curvature of grid.\n\nArgs:\n    grid: Input grid\n\nReturns:\n\
       \    Curvature array"
     file: utils/cuda/grid_vectorizer.py
-    line: 261
+    line: 258
     name: _curvature
   utils/cuda/grid_vectorizer.py:_gradient:
     args:
@@ -5667,6 +6496,182 @@ functions:
     file: utils/cuda/grid_vectorizer.py
     line: 67
     name: vectorize_grid_operation
+  utils/cuda/memory_safety.py:__init__:
+    args:
+    - self
+    - timeout_seconds
+    docstring: "Initialize safety guard.\n\nArgs:\n    timeout_seconds: Maximum time\
+      \ for operation before emergency cleanup"
+    file: utils/cuda/memory_safety.py
+    line: 34
+    name: __init__
+  utils/cuda/memory_safety.py:emergency_cleanup:
+    args:
+    - self
+    docstring: 'Perform emergency GPU memory cleanup.
+
+
+      CRITICAL: Called when system is about to freeze.'
+    file: utils/cuda/memory_safety.py
+    line: 104
+    name: emergency_cleanup
+  utils/cuda/memory_safety.py:get_safety_guard:
+    args: []
+    docstring: "Get global safety guard instance.\n\nReturns:\n    MemorySafetyGuard\
+      \ instance"
+    file: utils/cuda/memory_safety.py
+    line: 132
+    name: get_safety_guard
+  utils/cuda/memory_safety.py:protect_operation:
+    args:
+    - self
+    - operation_name
+    - cleanup_func
+    docstring: "Protect a CUDA operation with timeout and emergency cleanup.\n\nArgs:\n\
+      \    operation_name: Name of the operation\n    cleanup_func: Optional cleanup\
+      \ function to call on timeout\n\nYields:\n    None\n\nRaises:\n    CudaMemoryError:\
+      \ If operation times out"
+    file: utils/cuda/memory_safety.py
+    line: 46
+    name: protect_operation
+  utils/cuda/memory_safety.py:timeout_handler:
+    args: []
+    docstring: Handle timeout.
+    file: utils/cuda/memory_safety.py
+    line: 65
+    name: timeout_handler
+  utils/cuda/memory_watchdog.py:__init__:
+    args:
+    - self
+    docstring: Initialize memory watchdog.
+    file: utils/cuda/memory_watchdog.py
+    line: 69
+    name: __init__
+  utils/cuda/memory_watchdog.py:_check_memory_limit:
+    args:
+    - self
+    - additional_bytes
+    - exclude_process
+    docstring: "Check if memory usage would exceed 80% limit.\n\nCRITICAL: This method\
+      \ actively kills processes if limit would be exceeded\nto prevent system hang/freeze.\n\
+      \nArgs:\n    additional_bytes: Additional memory to check\n    exclude_process:\
+      \ Process ID to exclude from calculation\n\nRaises:\n    CudaMemoryLimitExceededError:\
+      \ If limit would be exceeded"
+    file: utils/cuda/memory_watchdog.py
+    line: 207
+    name: _check_memory_limit
+  utils/cuda/memory_watchdog.py:_force_cleanup:
+    args:
+    - self
+    docstring: 'Force cleanup of GPU memory.
+
+
+      CRITICAL: Called when memory limit is exceeded to prevent system freeze.'
+    file: utils/cuda/memory_watchdog.py
+    line: 361
+    name: _force_cleanup
+  utils/cuda/memory_watchdog.py:_kill_memory_intensive_processes:
+    args:
+    - self
+    docstring: "Kill memory-intensive processes when limit is exceeded.\n\nCRITICAL:\
+      \ Aggressively kills processes to prevent system freeze.\n\nReturns:\n    List\
+      \ of killed process IDs"
+    file: utils/cuda/memory_watchdog.py
+    line: 294
+    name: _kill_memory_intensive_processes
+  utils/cuda/memory_watchdog.py:_kill_process:
+    args:
+    - self
+    - process_id
+    docstring: "Kill a memory-intensive process.\n\nArgs:\n    process_id: Process\
+      \ ID to kill"
+    file: utils/cuda/memory_watchdog.py
+    line: 282
+    name: _kill_process
+  utils/cuda/memory_watchdog.py:_monitor_loop:
+    args:
+    - self
+    docstring: 'Background monitoring loop.
+
+
+      CRITICAL: Aggressively monitors and kills processes to prevent system freeze.'
+    file: utils/cuda/memory_watchdog.py
+    line: 400
+    name: _monitor_loop
+  utils/cuda/memory_watchdog.py:_start_monitoring:
+    args:
+    - self
+    docstring: Start background monitoring thread.
+    file: utils/cuda/memory_watchdog.py
+    line: 391
+    name: _start_monitoring
+  utils/cuda/memory_watchdog.py:get_instance:
+    args:
+    - cls
+    docstring: "Get singleton instance of MemoryWatchdog.\n\nReturns:\n    MemoryWatchdog\
+      \ instance"
+    file: utils/cuda/memory_watchdog.py
+    line: 82
+    name: get_instance
+  utils/cuda/memory_watchdog.py:get_memory_usage:
+    args:
+    - self
+    docstring: "Get current memory usage statistics.\n\nReturns:\n    Dictionary with\
+      \ memory statistics"
+    file: utils/cuda/memory_watchdog.py
+    line: 430
+    name: get_memory_usage
+  utils/cuda/memory_watchdog.py:get_registered_processes:
+    args:
+    - self
+    docstring: "Get list of all registered processes.\n\nReturns:\n    List of process\
+      \ information dictionaries"
+    file: utils/cuda/memory_watchdog.py
+    line: 470
+    name: get_registered_processes
+  utils/cuda/memory_watchdog.py:register_process:
+    args:
+    - self
+    - process_id
+    - memory_bytes
+    - priority
+    - description
+    docstring: "Register a process with the memory watchdog.\n\nArgs:\n    process_id:\
+      \ Optional process ID (generated if None)\n    memory_bytes: Initial memory\
+      \ usage in bytes\n    priority: Process priority (1-10, lower = higher)\n  \
+      \  description: Human-readable description\n\nReturns:\n    Process ID\n\nRaises:\n\
+      \    CudaProcessRegistrationError: If registration fails"
+    file: utils/cuda/memory_watchdog.py
+    line: 95
+    name: register_process
+  utils/cuda/memory_watchdog.py:stop_monitoring:
+    args:
+    - self
+    docstring: Stop background monitoring.
+    file: utils/cuda/memory_watchdog.py
+    line: 424
+    name: stop_monitoring
+  utils/cuda/memory_watchdog.py:unregister_process:
+    args:
+    - self
+    - process_id
+    docstring: "Unregister a process from the memory watchdog.\n\nArgs:\n    process_id:\
+      \ Process ID to unregister"
+    file: utils/cuda/memory_watchdog.py
+    line: 157
+    name: unregister_process
+  utils/cuda/memory_watchdog.py:update_process_memory:
+    args:
+    - self
+    - process_id
+    - memory_bytes
+    docstring: "Update memory usage for a registered process.\n\nCRITICAL: Checks\
+      \ memory limit and kills process if limit would be exceeded.\n\nArgs:\n    process_id:\
+      \ Process ID\n    memory_bytes: New memory usage in bytes\n\nRaises:\n    CudaProcessKilledError:\
+      \ If process is killed due to memory limit"
+    file: utils/cuda/memory_watchdog.py
+    line: 168
+    name: update_process_memory
   utils/cuda/reduction_vectorizer.py:__init__:
     args:
     - self
@@ -5873,7 +6878,7 @@ functions:
       \    block: Block data\n    *args: Operation-specific arguments\n    **kwargs:\
       \ Operation-specific keyword arguments\n\nReturns:\n    Processed block"
     file: utils/cuda/vectorizer.py
-    line: 185
+    line: 187
     name: _process_block
   utils/cuda/vectorizer.py:_process_blocks:
     args:
@@ -5883,7 +6888,7 @@ functions:
       \  *args: Operation-specific arguments\n    **kwargs: Operation-specific keyword\
       \ arguments\n\nReturns:\n    Processed CudaArray"
     file: utils/cuda/vectorizer.py
-    line: 142
+    line: 144
     name: _process_blocks
   utils/cuda/vectorizer.py:_process_whole_array:
     args:
@@ -5893,7 +6898,7 @@ functions:
       \ Whole array data\n    *args: Operation-specific arguments\n    **kwargs: Operation-specific\
       \ keyword arguments\n\nReturns:\n    Processed array"
     file: utils/cuda/vectorizer.py
-    line: 202
+    line: 204
     name: _process_whole_array
   utils/cuda/vectorizer.py:_to_numpy:
     args:
@@ -5902,7 +6907,7 @@ functions:
     docstring: "Convert data to numpy array (from CuPy if needed).\n\nArgs:\n    data:\
       \ Input data (numpy or CuPy array)\n\nReturns:\n    Numpy array"
     file: utils/cuda/vectorizer.py
-    line: 218
+    line: 220
     name: _to_numpy
   utils/cuda/vectorizer.py:batch:
     args:
@@ -5912,7 +6917,7 @@ functions:
       \ CudaArrays\n    *args: Operation-specific arguments\n    **kwargs: Operation-specific\
       \ keyword arguments\n\nReturns:\n    List of result CudaArrays"
     file: utils/cuda/vectorizer.py
-    line: 122
+    line: 124
     name: batch
   utils/cuda/vectorizer.py:use_gpu:
     args:
@@ -8281,18 +9286,57 @@ imports:
     line: 10
     name: yaml
     type: import
+  tests/unit/test_correlation_vectorizer.py:CorrelationVectorizer:
+    file: tests/unit/test_correlation_vectorizer.py
+    line: 12
+    module: utils.cuda.correlation_vectorizer
+    name: CorrelationVectorizer
+    type: import_from
+  tests/unit/test_correlation_vectorizer.py:CudaArray:
+    file: tests/unit/test_correlation_vectorizer.py
+    line: 11
+    module: utils.cuda.array_model
+    name: CudaArray
+    type: import_from
+  tests/unit/test_correlation_vectorizer.py:numpy:
+    file: tests/unit/test_correlation_vectorizer.py
+    line: 9
+    name: numpy
+    type: import
+  tests/unit/test_correlation_vectorizer.py:pytest:
+    file: tests/unit/test_correlation_vectorizer.py
+    line: 8
+    name: pytest
+    type: import
   tests/unit/test_cuda_array.py:CudaArray:
     file: tests/unit/test_cuda_array.py
     line: 11
     module: utils.cuda.array_model
     name: CudaArray
     type: import_from
+  tests/unit/test_cuda_array.py:CudaMemoryError:
+    file: tests/unit/test_cuda_array.py
+    line: 12
+    module: utils.cuda.exceptions
+    name: CudaMemoryError
+    type: import_from
+  tests/unit/test_cuda_array.py:CudaMemoryLimitExceededError:
+    file: tests/unit/test_cuda_array.py
+    line: 12
+    module: utils.cuda.exceptions
+    name: CudaMemoryLimitExceededError
+    type: import_from
   tests/unit/test_cuda_array.py:CudaUnavailableError:
     file: tests/unit/test_cuda_array.py
-    line: 11
-    module: utils.cuda.array_model
+    line: 12
+    module: utils.cuda.exceptions
     name: CudaUnavailableError
     type: import_from
+  tests/unit/test_cuda_array.py:cupy:
+    file: tests/unit/test_cuda_array.py
+    line: 239
+    name: cupy
+    type: import
   tests/unit/test_cuda_array.py:numpy:
     file: tests/unit/test_cuda_array.py
     line: 9
@@ -8527,6 +9571,74 @@ imports:
     file: tests/unit/test_frequency_conversion.py
     line: 8
     name: pytest
+    type: import
+  tests/unit/test_grid_vectorizer.py:CudaArray:
+    file: tests/unit/test_grid_vectorizer.py
+    line: 11
+    module: utils.cuda.array_model
+    name: CudaArray
+    type: import_from
+  tests/unit/test_grid_vectorizer.py:GridVectorizer:
+    file: tests/unit/test_grid_vectorizer.py
+    line: 12
+    module: utils.cuda.grid_vectorizer
+    name: GridVectorizer
+    type: import_from
+  tests/unit/test_grid_vectorizer.py:numpy:
+    file: tests/unit/test_grid_vectorizer.py
+    line: 9
+    name: numpy
+    type: import
+  tests/unit/test_grid_vectorizer.py:pytest:
+    file: tests/unit/test_grid_vectorizer.py
+    line: 8
+    name: pytest
+    type: import
+  tests/unit/test_memory_watchdog.py:CudaMemoryLimitExceededError:
+    file: tests/unit/test_memory_watchdog.py
+    line: 12
+    module: utils.cuda.exceptions
+    name: CudaMemoryLimitExceededError
+    type: import_from
+  tests/unit/test_memory_watchdog.py:CudaProcessKilledError:
+    file: tests/unit/test_memory_watchdog.py
+    line: 12
+    module: utils.cuda.exceptions
+    name: CudaProcessKilledError
+    type: import_from
+  tests/unit/test_memory_watchdog.py:CudaProcessRegistrationError:
+    file: tests/unit/test_memory_watchdog.py
+    line: 12
+    module: utils.cuda.exceptions
+    name: CudaProcessRegistrationError
+    type: import_from
+  tests/unit/test_memory_watchdog.py:MemoryProcess:
+    file: tests/unit/test_memory_watchdog.py
+    line: 11
+    module: utils.cuda.memory_watchdog
+    name: MemoryProcess
+    type: import_from
+  tests/unit/test_memory_watchdog.py:MemoryWatchdog:
+    file: tests/unit/test_memory_watchdog.py
+    line: 11
+    module: utils.cuda.memory_watchdog
+    name: MemoryWatchdog
+    type: import_from
+  tests/unit/test_memory_watchdog.py:datetime:
+    file: tests/unit/test_memory_watchdog.py
+    line: 167
+    module: datetime
+    name: datetime
+    type: import_from
+  tests/unit/test_memory_watchdog.py:pytest:
+    file: tests/unit/test_memory_watchdog.py
+    line: 8
+    name: pytest
+    type: import
+  tests/unit/test_memory_watchdog.py:time:
+    file: tests/unit/test_memory_watchdog.py
+    line: 68
+    name: time
     type: import
   tests/unit/test_reduction_vectorizer.py:CudaArray:
     file: tests/unit/test_reduction_vectorizer.py
@@ -8819,57 +9931,149 @@ imports:
     module: cmb.theta_node_processor
     name: validate_node_data
     type: import_from
+  tests/unit/test_transform_vectorizer.py:CudaArray:
+    file: tests/unit/test_transform_vectorizer.py
+    line: 11
+    module: utils.cuda.array_model
+    name: CudaArray
+    type: import_from
+  tests/unit/test_transform_vectorizer.py:TransformVectorizer:
+    file: tests/unit/test_transform_vectorizer.py
+    line: 12
+    module: utils.cuda.transform_vectorizer
+    name: TransformVectorizer
+    type: import_from
+  tests/unit/test_transform_vectorizer.py:numpy:
+    file: tests/unit/test_transform_vectorizer.py
+    line: 9
+    name: numpy
+    type: import
+  tests/unit/test_transform_vectorizer.py:pytest:
+    file: tests/unit/test_transform_vectorizer.py
+    line: 8
+    name: pytest
+    type: import
+  tests/unit/test_vectorizer.py:BaseVectorizer:
+    file: tests/unit/test_vectorizer.py
+    line: 12
+    module: utils.cuda.vectorizer
+    name: BaseVectorizer
+    type: import_from
+  tests/unit/test_vectorizer.py:CudaArray:
+    file: tests/unit/test_vectorizer.py
+    line: 11
+    module: utils.cuda.array_model
+    name: CudaArray
+    type: import_from
+  tests/unit/test_vectorizer.py:ElementWiseVectorizer:
+    file: tests/unit/test_vectorizer.py
+    line: 13
+    module: utils.cuda.elementwise_vectorizer
+    name: ElementWiseVectorizer
+    type: import_from
+  tests/unit/test_vectorizer.py:numpy:
+    file: tests/unit/test_vectorizer.py
+    line: 9
+    name: numpy
+    type: import
+  tests/unit/test_vectorizer.py:pytest:
+    file: tests/unit/test_vectorizer.py
+    line: 8
+    name: pytest
+    type: import
   utils/cuda/__init__.py:BaseVectorizer:
     file: utils/cuda/__init__.py
-    line: 12
+    line: 23
     module: utils.cuda.vectorizer
     name: BaseVectorizer
     type: import_from
   utils/cuda/__init__.py:CorrelationVectorizer:
     file: utils/cuda/__init__.py
-    line: 16
+    line: 27
     module: utils.cuda.correlation_vectorizer
     name: CorrelationVectorizer
     type: import_from
   utils/cuda/__init__.py:CudaArray:
     file: utils/cuda/__init__.py
-    line: 11
+    line: 21
     module: utils.cuda.array_model
     name: CudaArray
+    type: import_from
+  utils/cuda/__init__.py:CudaBlockProcessingError:
+    file: utils/cuda/__init__.py
+    line: 11
+    module: utils.cuda.exceptions
+    name: CudaBlockProcessingError
+    type: import_from
+  utils/cuda/__init__.py:CudaError:
+    file: utils/cuda/__init__.py
+    line: 11
+    module: utils.cuda.exceptions
+    name: CudaError
     type: import_from
   utils/cuda/__init__.py:CudaMemoryError:
     file: utils/cuda/__init__.py
     line: 11
-    module: utils.cuda.array_model
+    module: utils.cuda.exceptions
     name: CudaMemoryError
+    type: import_from
+  utils/cuda/__init__.py:CudaMemoryLimitExceededError:
+    file: utils/cuda/__init__.py
+    line: 11
+    module: utils.cuda.exceptions
+    name: CudaMemoryLimitExceededError
+    type: import_from
+  utils/cuda/__init__.py:CudaProcessKilledError:
+    file: utils/cuda/__init__.py
+    line: 11
+    module: utils.cuda.exceptions
+    name: CudaProcessKilledError
+    type: import_from
+  utils/cuda/__init__.py:CudaProcessRegistrationError:
+    file: utils/cuda/__init__.py
+    line: 11
+    module: utils.cuda.exceptions
+    name: CudaProcessRegistrationError
     type: import_from
   utils/cuda/__init__.py:CudaUnavailableError:
     file: utils/cuda/__init__.py
     line: 11
-    module: utils.cuda.array_model
+    module: utils.cuda.exceptions
     name: CudaUnavailableError
+    type: import_from
+  utils/cuda/__init__.py:CudaVectorizationError:
+    file: utils/cuda/__init__.py
+    line: 11
+    module: utils.cuda.exceptions
+    name: CudaVectorizationError
     type: import_from
   utils/cuda/__init__.py:ElementWiseVectorizer:
     file: utils/cuda/__init__.py
-    line: 13
+    line: 24
     module: utils.cuda.elementwise_vectorizer
     name: ElementWiseVectorizer
     type: import_from
   utils/cuda/__init__.py:GridVectorizer:
     file: utils/cuda/__init__.py
-    line: 17
+    line: 28
     module: utils.cuda.grid_vectorizer
     name: GridVectorizer
     type: import_from
+  utils/cuda/__init__.py:MemoryWatchdog:
+    file: utils/cuda/__init__.py
+    line: 22
+    module: utils.cuda.memory_watchdog
+    name: MemoryWatchdog
+    type: import_from
   utils/cuda/__init__.py:ReductionVectorizer:
     file: utils/cuda/__init__.py
-    line: 15
+    line: 26
     module: utils.cuda.reduction_vectorizer
     name: ReductionVectorizer
     type: import_from
   utils/cuda/__init__.py:TransformVectorizer:
     file: utils/cuda/__init__.py
-    line: 14
+    line: 25
     module: utils.cuda.transform_vectorizer
     name: TransformVectorizer
     type: import_from
@@ -8878,6 +10082,42 @@ imports:
     line: 11
     module: typing
     name: Callable
+    type: import_from
+  utils/cuda/array_model.py:CudaMemoryError:
+    file: utils/cuda/array_model.py
+    line: 14
+    module: utils.cuda.exceptions
+    name: CudaMemoryError
+    type: import_from
+  utils/cuda/array_model.py:CudaMemoryLimitExceededError:
+    file: utils/cuda/array_model.py
+    line: 14
+    module: utils.cuda.exceptions
+    name: CudaMemoryLimitExceededError
+    type: import_from
+  utils/cuda/array_model.py:CudaProcessKilledError:
+    file: utils/cuda/array_model.py
+    line: 14
+    module: utils.cuda.exceptions
+    name: CudaProcessKilledError
+    type: import_from
+  utils/cuda/array_model.py:CudaProcessRegistrationError:
+    file: utils/cuda/array_model.py
+    line: 14
+    module: utils.cuda.exceptions
+    name: CudaProcessRegistrationError
+    type: import_from
+  utils/cuda/array_model.py:CudaUnavailableError:
+    file: utils/cuda/array_model.py
+    line: 14
+    module: utils.cuda.exceptions
+    name: CudaUnavailableError
+    type: import_from
+  utils/cuda/array_model.py:MemoryWatchdog:
+    file: utils/cuda/array_model.py
+    line: 21
+    module: utils.cuda.memory_watchdog
+    name: MemoryWatchdog
     type: import_from
   utils/cuda/array_model.py:Optional:
     file: utils/cuda/array_model.py
@@ -8899,9 +10139,15 @@ imports:
     type: import_from
   utils/cuda/array_model.py:cupy:
     file: utils/cuda/array_model.py
-    line: 16
+    line: 26
     name: cupy
     type: import
+  utils/cuda/array_model.py:get_safety_guard:
+    file: utils/cuda/array_model.py
+    line: 22
+    module: utils.cuda.memory_safety
+    name: get_safety_guard
+    type: import_from
   utils/cuda/array_model.py:numpy:
     file: utils/cuda/array_model.py
     line: 12
@@ -8977,6 +10223,12 @@ imports:
     module: utils.cuda.array_model
     name: CudaArray
     type: import_from
+  utils/cuda/elementwise_vectorizer.py:List:
+    file: utils/cuda/elementwise_vectorizer.py
+    line: 10
+    module: typing
+    name: List
+    type: import_from
   utils/cuda/elementwise_vectorizer.py:Optional:
     file: utils/cuda/elementwise_vectorizer.py
     line: 10
@@ -9035,12 +10287,6 @@ imports:
     module: typing
     name: TYPE_CHECKING
     type: import_from
-  utils/cuda/grid_vectorizer.py:Tuple:
-    file: utils/cuda/grid_vectorizer.py
-    line: 10
-    module: typing
-    name: Tuple
-    type: import_from
   utils/cuda/grid_vectorizer.py:cupy:
     file: utils/cuda/grid_vectorizer.py
     line: 21
@@ -9068,6 +10314,131 @@ imports:
     file: utils/cuda/grid_vectorizer.py
     line: 15
     name: numpy
+    type: import
+  utils/cuda/memory_safety.py:Callable:
+    file: utils/cuda/memory_safety.py
+    line: 12
+    module: typing
+    name: Callable
+    type: import_from
+  utils/cuda/memory_safety.py:CudaMemoryError:
+    file: utils/cuda/memory_safety.py
+    line: 15
+    module: utils.cuda.exceptions
+    name: CudaMemoryError
+    type: import_from
+  utils/cuda/memory_safety.py:Dict:
+    file: utils/cuda/memory_safety.py
+    line: 12
+    module: typing
+    name: Dict
+    type: import_from
+  utils/cuda/memory_safety.py:Optional:
+    file: utils/cuda/memory_safety.py
+    line: 12
+    module: typing
+    name: Optional
+    type: import_from
+  utils/cuda/memory_safety.py:contextmanager:
+    file: utils/cuda/memory_safety.py
+    line: 13
+    module: contextlib
+    name: contextmanager
+    type: import_from
+  utils/cuda/memory_safety.py:cupy:
+    file: utils/cuda/memory_safety.py
+    line: 19
+    name: cupy
+    type: import
+  utils/cuda/memory_safety.py:threading:
+    file: utils/cuda/memory_safety.py
+    line: 10
+    name: threading
+    type: import
+  utils/cuda/memory_safety.py:time:
+    file: utils/cuda/memory_safety.py
+    line: 11
+    name: time
+    type: import
+  utils/cuda/memory_watchdog.py:Any:
+    file: utils/cuda/memory_watchdog.py
+    line: 14
+    module: typing
+    name: Any
+    type: import_from
+  utils/cuda/memory_watchdog.py:CudaMemoryLimitExceededError:
+    file: utils/cuda/memory_watchdog.py
+    line: 18
+    module: utils.cuda.exceptions
+    name: CudaMemoryLimitExceededError
+    type: import_from
+  utils/cuda/memory_watchdog.py:CudaProcessKilledError:
+    file: utils/cuda/memory_watchdog.py
+    line: 18
+    module: utils.cuda.exceptions
+    name: CudaProcessKilledError
+    type: import_from
+  utils/cuda/memory_watchdog.py:CudaProcessRegistrationError:
+    file: utils/cuda/memory_watchdog.py
+    line: 18
+    module: utils.cuda.exceptions
+    name: CudaProcessRegistrationError
+    type: import_from
+  utils/cuda/memory_watchdog.py:Dict:
+    file: utils/cuda/memory_watchdog.py
+    line: 14
+    module: typing
+    name: Dict
+    type: import_from
+  utils/cuda/memory_watchdog.py:List:
+    file: utils/cuda/memory_watchdog.py
+    line: 14
+    module: typing
+    name: List
+    type: import_from
+  utils/cuda/memory_watchdog.py:Optional:
+    file: utils/cuda/memory_watchdog.py
+    line: 14
+    module: typing
+    name: Optional
+    type: import_from
+  utils/cuda/memory_watchdog.py:cupy:
+    file: utils/cuda/memory_watchdog.py
+    line: 26
+    name: cupy
+    type: import
+  utils/cuda/memory_watchdog.py:dataclass:
+    file: utils/cuda/memory_watchdog.py
+    line: 15
+    module: dataclasses
+    name: dataclass
+    type: import_from
+  utils/cuda/memory_watchdog.py:datetime:
+    file: utils/cuda/memory_watchdog.py
+    line: 16
+    module: datetime
+    name: datetime
+    type: import_from
+  utils/cuda/memory_watchdog.py:field:
+    file: utils/cuda/memory_watchdog.py
+    line: 15
+    module: dataclasses
+    name: field
+    type: import_from
+  utils/cuda/memory_watchdog.py:threading:
+    file: utils/cuda/memory_watchdog.py
+    line: 11
+    name: threading
+    type: import
+  utils/cuda/memory_watchdog.py:time:
+    file: utils/cuda/memory_watchdog.py
+    line: 12
+    name: time
+    type: import
+  utils/cuda/memory_watchdog.py:uuid:
+    file: utils/cuda/memory_watchdog.py
+    line: 13
+    name: uuid
     type: import
   utils/cuda/reduction_vectorizer.py:Any:
     file: utils/cuda/reduction_vectorizer.py
@@ -9180,14 +10551,14 @@ imports:
     type: import_from
   utils/cuda/vectorizer.py:CudaArray:
     file: utils/cuda/vectorizer.py
-    line: 114
+    line: 116
     module: utils.cuda.array_model
     name: CudaArray
     type: import_from
   utils/cuda/vectorizer.py:CudaUnavailableError:
     file: utils/cuda/vectorizer.py
     line: 19
-    module: utils.cuda.array_model
+    module: utils.cuda.exceptions
     name: CudaUnavailableError
     type: import_from
   utils/cuda/vectorizer.py:List:
@@ -9226,7 +10597,7 @@ imports:
     type: import
   utils/cuda/vectorizer.py:warnings:
     file: utils/cuda/vectorizer.py
-    line: 101
+    line: 103
     name: warnings
     type: import
   utils/io/__init__.py:DataIndex:

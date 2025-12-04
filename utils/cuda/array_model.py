@@ -243,7 +243,7 @@ class CudaArray:
         # CRITICAL: Check memory limit BEFORE allocation to prevent system freeze
         try:
             self._check_gpu_memory_limit(required_bytes)
-        except CudaMemoryLimitExceededError as e:
+        except CudaMemoryLimitExceededError:
             # Memory limit exceeded - do NOT allocate
             # Unregister process to free resources
             if self._process_id is not None:
@@ -285,6 +285,7 @@ class CudaArray:
                 self._watchdog.update_process_memory(self._process_id, actual_bytes)
             except (CudaProcessKilledError, CudaMemoryLimitExceededError):
                 # Process was killed or limit exceeded - cleanup immediately
+                process_id_backup = self._process_id
                 if self._gpu_data is not None:
                     try:
                         del self._gpu_data
@@ -295,7 +296,7 @@ class CudaArray:
                 self._device = "cpu"
                 self._gpu_data = None
                 raise CudaProcessKilledError(
-                    self._process_id or "unknown",
+                    process_id_backup or "unknown",
                     "Memory limit exceeded during allocation",
                 )
         except cp.cuda.memory.OutOfMemoryError as e:

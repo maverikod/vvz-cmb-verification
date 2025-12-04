@@ -67,6 +67,7 @@ CudaArray:
 - device
 - num_blocks
 - block_size
+- _check_gpu_memory_limit
 - swap_to_gpu
 - swap_to_cpu
 - get_block
@@ -75,8 +76,22 @@ CudaArray:
 - use_whole_array
 - to_numpy
 - __array__
-CudaMemoryError: []
-CudaUnavailableError: []
+- __del__
+CudaBlockProcessingError:
+- __init__
+CudaError: []
+CudaMemoryError:
+- __init__
+CudaMemoryLimitExceededError:
+- __init__
+CudaProcessKilledError:
+- __init__
+CudaProcessRegistrationError:
+- __init__
+CudaUnavailableError:
+- __init__
+CudaVectorizationError:
+- __init__
 DataIndex:
 - __init__
 - load
@@ -112,6 +127,7 @@ ElementWiseVectorizer:
 - log
 - sqrt
 - abs
+- batch
 FrequencyInvarianceTester:
 - __init__
 - calculate_cross_spectra
@@ -151,6 +167,26 @@ MapValidator:
 - validate_arcmin_structures
 - validate_amplitude
 - generate_validation_report
+MemoryProcess: []
+MemorySafetyGuard:
+- __init__
+- protect_operation
+- emergency_cleanup
+MemoryWatchdog:
+- __init__
+- get_instance
+- register_process
+- unregister_process
+- update_process_memory
+- _check_memory_limit
+- _kill_process
+- _kill_memory_intensive_processes
+- _force_cleanup
+- _start_monitoring
+- _monitor_loop
+- stop_monitoring
+- get_memory_usage
+- get_registered_processes
 NodeClassification: []
 NodeCmbMapping: []
 NodeDirectionAnalysis: []
@@ -222,6 +258,15 @@ SubpeaksAnalyzer:
 - _find_subpeaks
 - _detect_high_l_peak
 - _match_beatings_to_peaks
+TestBaseVectorizer:
+- test_init
+- test_init_with_options
+- test_use_gpu_property
+- test_whole_array_property
+- test_vectorize_whole_array_mode
+- test_vectorize_block_mode
+- test_batch_processing
+- test_gpu_fallback
 TestCalculatePowerSpectrumFromAlm:
 - test_calculate_power_spectrum
 - test_calculate_with_l_max
@@ -248,15 +293,41 @@ TestConfigurationLoading:
 TestConvertHealpixToAlm:
 - test_convert_valid_map
 - test_round_trip_preserves_map
+TestCorrelationVectorizer:
+- test_init
+- test_fft_correlation
+- test_fft_correlation_different_sizes
+- test_direct_correlation
+- test_invalid_method
+- test_process_whole_array_error
 TestCudaArray:
 - test_init_cpu
+- test_init_invalid_data
 - test_init_with_block_size
+- test_init_auto_block_size
+- test_init_small_array
+- test_init_2d_array
+- test_properties
 - test_get_block
+- test_get_block_all_blocks
+- test_get_block_invalid_index
 - test_set_block
+- test_set_block_invalid_index
+- test_set_block_invalid_size
 - test_use_whole_array
+- test_use_whole_array_2d
 - test_to_numpy
+- test_to_numpy_2d
+- test_array_conversion
 - test_swap_to_gpu_unavailable
+- test_swap_to_cpu
 - test_process_blocks
+- test_process_blocks_identity
+- test_process_blocks_square
+- test_calculate_block_shape_1d
+- test_calculate_block_shape_2d
+- test_single_block_array
+- test_memory_limit_check
 TestDataIndexLoading:
 - test_load_valid_yaml
 - test_load_nonexistent_file
@@ -272,12 +343,28 @@ TestDecomposeMap:
 - test_decompose_invalid_size
 - test_decompose_negative_l_max
 TestElementWiseVectorizer:
+- test_init
+- test_init_with_options
 - test_multiply
+- test_multiply_with_array
 - test_add
 - test_subtract
+- test_divide
 - test_power
 - test_sqrt
+- test_abs
 - test_sin
+- test_cos
+- test_exp
+- test_log
+- test_vectorize_operation_invalid
+- test_vectorize_operation_unary
+- test_vectorize_operation_binary
+- test_whole_array_mode
+- test_batch_processing
+- test_2d_array_operations
+- test_float_operations
+- test_operation_with_cuda_array_operand
 TestEnsureOutputDirectory:
 - test_create_directory
 - test_existing_directory
@@ -308,6 +395,15 @@ TestGetUsageGuidelines:
 - test_get_usage_guidelines_from_section
 - test_get_usage_guidelines_from_category
 - test_get_usage_guidelines_nonexistent
+TestGridVectorizer:
+- test_init
+- test_local_minima
+- test_local_maxima
+- test_gradient
+- test_laplacian
+- test_curvature
+- test_invalid_operation
+- test_1d_local_minima
 TestLoadCsvData:
 - test_load_valid_csv
 - test_load_nonexistent_csv
@@ -357,6 +453,20 @@ TestMapDepthToTemperature:
 - test_map_depth_to_temperature_range
 - test_map_depth_to_temperature_negative
 - test_map_depth_to_temperature_custom_config
+TestMemoryWatchdog:
+- setup_method
+- test_singleton
+- test_register_process
+- test_register_process_with_id
+- test_unregister_process
+- test_update_process_memory
+- test_get_memory_usage
+- test_get_registered_processes
+- test_multiple_processes
+- test_process_priority
+- test_update_nonexistent_process
+- test_stop_monitoring
+- test_memory_process_dataclass
 TestMultipoleToFrequency:
 - test_convert_single_multipole
 - test_convert_array_multipoles
@@ -470,6 +580,14 @@ TestTimeCoverageGaps:
 - test_check_time_coverage_gaps_no_gaps
 - test_check_time_coverage_gaps_with_gaps
 - test_check_time_coverage_gaps_not_processed
+TestTransformVectorizer:
+- test_init
+- test_fft
+- test_ifft
+- test_rfft
+- test_irfft
+- test_invalid_transform
+- test_2d_fft
 TestValidateAgainstConfig:
 - test_validate_against_config_no_config_requirements
 - test_validate_against_config_with_valid_range

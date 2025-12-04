@@ -1,0 +1,48 @@
+# CMB-specific configuration
+# This file contains CMB verification specific settings
+
+# Frequency configuration
+frequency:
+  min: 90.0  # GHz
+  max: 350.0  # GHz
+  units: "GHz"
+  description: "Frequency range for frequency invariance tests"
+
+# Multipole configuration
+multipole:
+  min: 2
+  max: 10000
+  high_l_threshold: 2000
+  expected_peak_range:
+    min: 4500
+    max: 6000
+  description: "Multipole range for power spectrum analysis"
+
+# Node configuration
+node:
+  scale_pc: 300.0  # parsec
+  scale_arcmin_min: 2.0  # arcmin
+  scale_arcmin_max: 5.0  # arcmin
+  redshift: 1100.0
+  description: "Θ-node scale parameters at CMB epoch"
+
+# Temperature fluctuation configuration
+temperature:
+  min_microK: 20.0  # μK
+  max_microK: 30.0  # μK
+  units: "microKelvin"
+  description: "Expected temperature fluctuation amplitude"
+
+# Power spectrum configuration
+power_spectrum:
+  power_law_min: -3.0  # C_l ∝ l^-3
+  power_law_max: -2.0  # C_l ∝ l^-2
+  no_silk_damping: true
+  description: "Power spectrum behavior without Silk damping"
+
+# Correlation configuration
+correlation:
+  lss_scale_mpc_min: 10.0  # Mpc
+  lss_scale_mpc_max: 12.0  # Mpc
+  description: "CMB-LSS correlation scale"
+

@@ -347,4 +347,12 @@ def validate_evolution_data(evolution: ThetaEvolution) -> bool:
     if np.any(np.isinf(evolution.omega_macro)):
         raise ValueError("omega_macro array contains Inf values")
 
+    # Check that omega_min < omega_macro (physical constraint)
+    if np.any(evolution.omega_min >= evolution.omega_macro):
+        invalid_count = np.sum(evolution.omega_min >= evolution.omega_macro)
+        raise ValueError(
+            f"Physical constraint violated: omega_min must be < omega_macro. "
+            f"Found {invalid_count} invalid value(s)"
+        )
+
     return True

@@ -2,14 +2,18 @@ issues:
   any_type_usage: []
   classes_without_docstrings: []
   files_too_large:
-  - exceeds_limit: 26
+  - exceeds_limit: 160
+    file: cmb/theta_evolution_processor.py
+    limit: 400
+    lines: 560
+  - exceeds_limit: 214
     file: tests/unit/test_theta_evolution_processor.py
     limit: 400
-    lines: 426
-  - exceeds_limit: 43
+    lines: 614
+  - exceeds_limit: 62
     file: tests/unit/test_theta_data_loader.py
     limit: 400
-    lines: 443
+    lines: 462
   - exceeds_limit: 93
     file: tests/unit/test_theta_node_processor.py
     limit: 400
@@ -170,7 +174,7 @@ issues:
 summary:
   any_type_usage: 0
   classes_without_docstrings: 0
-  files_too_large: 3
+  files_too_large: 4
   files_without_docstrings: 0
   generic_exception_usage: 0
   imports_in_middle: 0
@@ -179,4 +183,4 @@ summary:
   methods_with_pass: 0
   methods_without_docstrings: 2
   not_implemented_in_non_abstract: 0
-  total_issues: 28
+  total_issues: 29

@@ -440,3 +440,22 @@ class TestValidateEvolutionData:
 
         with pytest.raises(ValueError, match="Time array contains NaN values"):
             validate_evolution_data(evol)
+
+    def test_validate_omega_min_greater_than_macro(self):
+        """Test validating evolution where omega_min >= omega_macro."""
+        times = np.array([0.0, 1.0, 2.0])
+        omega_min = np.array([1.0e10, 11.0e10, 1.2e10])  # Second > omega_macro
+        omega_macro = np.array([10.0e10, 10.1e10, 10.2e10])
+        metadata = {}
+
+        evol = ThetaEvolution(
+            times=times,
+            omega_min=omega_min,
+            omega_macro=omega_macro,
+            metadata=metadata,
+        )
+
+        with pytest.raises(
+            ValueError, match="omega_min must be < omega_macro"
+        ):
+            validate_evolution_data(evol)

@@ -423,3 +423,191 @@ class TestProcessEvolutionData:
 
         with pytest.raises(ValueError):
             process_evolution_data(evolution)
+
+
+class TestEvolutionStatistics:
+    """Tests for evolution statistics functionality."""
+
+    def test_get_evolution_statistics(self):
+        """Test get_evolution_statistics() returns correct statistics."""
+        times = np.array([0.0, 1.0, 2.0, 3.0, 4.0])
+        omega_min = np.array([1.0e10, 1.1e10, 1.2e10, 1.3e10, 1.4e10])
+        omega_macro = np.array(
+            [10.0e10, 10.1e10, 10.2e10, 10.3e10, 10.4e10]
+        )
+        metadata = {}
+
+        evolution = ThetaEvolution(
+            times=times,
+            omega_min=omega_min,
+            omega_macro=omega_macro,
+            metadata=metadata,
+        )
+
+        processor = ThetaEvolutionProcessor(evolution)
+        processor.process()
+
+        stats = processor.get_evolution_statistics()
+
+        assert "omega_min" in stats
+        assert "omega_macro" in stats
+        assert "evolution_rates" in stats
+        assert "time_coverage" in stats
+
+        # Check omega_min statistics
+        assert "mean" in stats["omega_min"]
+        assert "std" in stats["omega_min"]
+        assert "min" in stats["omega_min"]
+        assert "max" in stats["omega_min"]
+
+        # Check that mean is reasonable
+        assert 1.0e10 < stats["omega_min"]["mean"] < 1.5e10
+
+    def test_get_evolution_statistics_not_processed(self):
+        """Test get_evolution_statistics() raises error if not processed."""
+        times = np.array([0.0, 1.0, 2.0])
+        omega_min = np.array([1.0e10, 1.1e10, 1.2e10])
+        omega_macro = np.array([10.0e10, 10.1e10, 10.2e10])
+        metadata = {}
+
+        evolution = ThetaEvolution(
+            times=times,
+            omega_min=omega_min,
+            omega_macro=omega_macro,
+            metadata=metadata,
+        )
+
+        processor = ThetaEvolutionProcessor(evolution)
+
+        with pytest.raises(ValueError, match="Processor not initialized"):
+            processor.get_evolution_statistics()
+
+
+class TestTimeCoverageGaps:
+    """Tests for time coverage gap detection."""
+
+    def test_check_time_coverage_gaps_no_gaps(self):
+        """Test check_time_coverage_gaps() with no gaps."""
+        times = np.array([0.0, 1.0, 2.0, 3.0, 4.0])
+        omega_min = np.array([1.0e10, 1.1e10, 1.2e10, 1.3e10, 1.4e10])
+        omega_macro = np.array(
+            [10.0e10, 10.1e10, 10.2e10, 10.3e10, 10.4e10]
+        )
+        metadata = {}
+
+        evolution = ThetaEvolution(
+            times=times,
+            omega_min=omega_min,
+            omega_macro=omega_macro,
+            metadata=metadata,
+        )
+
+        processor = ThetaEvolutionProcessor(evolution)
+        processor.process()
+
+        gaps = processor.check_time_coverage_gaps()
+        assert len(gaps) == 0
+
+    def test_check_time_coverage_gaps_with_gaps(self):
+        """Test check_time_coverage_gaps() detects gaps."""
+        # Create data with a large gap
+        times = np.array([0.0, 1.0, 2.0, 10.0, 11.0])  # Gap between 2.0 and 10.0
+        omega_min = np.array([1.0e10, 1.1e10, 1.2e10, 1.3e10, 1.4e10])
+        omega_macro = np.array(
+            [10.0e10, 10.1e10, 10.2e10, 10.3e10, 10.4e10]
+        )
+        metadata = {}
+
+        evolution = ThetaEvolution(
+            times=times,
+            omega_min=omega_min,
+            omega_macro=omega_macro,
+            metadata=metadata,
+        )
+
+        processor = ThetaEvolutionProcessor(evolution)
+        processor.process()
+
+        gaps = processor.check_time_coverage_gaps()
+        assert len(gaps) > 0
+        # Check that gap is between 2.0 and 10.0
+        assert any(gap[0] == 2.0 and gap[1] == 10.0 for gap in gaps)
+
+    def test_check_time_coverage_gaps_not_processed(self):
+        """Test check_time_coverage_gaps() raises error if not processed."""
+        times = np.array([0.0, 1.0, 2.0])
+        omega_min = np.array([1.0e10, 1.1e10, 1.2e10])
+        omega_macro = np.array([10.0e10, 10.1e10, 10.2e10])
+        metadata = {}
+
+        evolution = ThetaEvolution(
+            times=times,
+            omega_min=omega_min,
+            omega_macro=omega_macro,
+            metadata=metadata,
+        )
+
+        processor = ThetaEvolutionProcessor(evolution)
+
+        with pytest.raises(ValueError, match="Processor not initialized"):
+            processor.check_time_coverage_gaps()
+
+
+class TestQualityReport:
+    """Tests for quality report generation."""
+
+    def test_generate_quality_report(self):
+        """Test generate_quality_report() creates report."""
+        times = np.array([0.0, 1.0, 2.0, 3.0, 4.0])
+        omega_min = np.array([1.0e10, 1.1e10, 1.2e10, 1.3e10, 1.4e10])
+        omega_macro = np.array(
+            [10.0e10, 10.1e10, 10.2e10, 10.3e10, 10.4e10]
+        )
+        metadata = {}
+
+        evolution = ThetaEvolution(
+            times=times,
+            omega_min=omega_min,
+            omega_macro=omega_macro,
+            metadata=metadata,
+        )
+
+        processor = ThetaEvolutionProcessor(evolution)
+        processor.process()
+
+        report = processor.generate_quality_report()
+
+        assert "quality_issues" in report
+        assert "statistics" in report
+        assert "time_coverage" in report
+        assert "gaps" in report
+        assert "warnings" in report
+
+        assert isinstance(report["quality_issues"], list)
+        assert isinstance(report["gaps"], list)
+        assert isinstance(report["warnings"], list)
+
+    def test_generate_quality_report_with_gaps(self):
+        """Test generate_quality_report() includes gap warnings."""
+        times = np.array([0.0, 1.0, 2.0, 10.0, 11.0])  # Has gap
+        omega_min = np.array([1.0e10, 1.1e10, 1.2e10, 1.3e10, 1.4e10])
+        omega_macro = np.array(
+            [10.0e10, 10.1e10, 10.2e10, 10.3e10, 10.4e10]
+        )
+        metadata = {}
+
+        evolution = ThetaEvolution(
+            times=times,
+            omega_min=omega_min,
+            omega_macro=omega_macro,
+            metadata=metadata,
+        )
+
+        processor = ThetaEvolutionProcessor(evolution)
+        processor.process()
+
+        report = processor.generate_quality_report()
+
+        # Should have warnings about gaps
+        assert len(report["gaps"]) > 0
+        assert len(report["warnings"]) > 0

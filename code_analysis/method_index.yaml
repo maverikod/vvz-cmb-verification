@@ -193,6 +193,9 @@ TestDecomposeMap:
 TestEnsureOutputDirectory:
 - test_create_directory
 - test_existing_directory
+TestEvolutionStatistics:
+- test_get_evolution_statistics
+- test_get_evolution_statistics_not_processed
 TestFrequencyToMultipole:
 - test_convert_single_frequency
 - test_convert_array_frequencies
@@ -312,6 +315,9 @@ TestProcessEvolutionData:
 TestProcessNodeData:
 - test_process_node_data
 - test_process_node_data_inconsistent
+TestQualityReport:
+- test_generate_quality_report
+- test_generate_quality_report_with_gaps
 TestSaveAnalysisResults:
 - test_save_results_json
 - test_save_results_invalid_format
@@ -360,12 +366,17 @@ TestThetaEvolutionProcessor:
 - test_validate_time_range_invalid
 TestThetaFrequencySpectrum:
 - test_create_frequency_spectrum
+TestTimeCoverageGaps:
+- test_check_time_coverage_gaps_no_gaps
+- test_check_time_coverage_gaps_with_gaps
+- test_check_time_coverage_gaps_not_processed
 TestValidateEvolutionData:
 - test_validate_valid_evolution
 - test_validate_empty_times
 - test_validate_length_mismatch
 - test_validate_negative_omega_min
 - test_validate_nan_times
+- test_validate_omega_min_greater_than_macro
 TestValidateFiles:
 - test_validate_existing_files
 - test_validate_missing_files
@@ -391,11 +402,18 @@ ThetaEvolution: []
 ThetaEvolutionProcessor:
 - __init__
 - process
+- _calculate_derivative_central
+- _check_time_coverage_gaps
+- _compute_statistics
 - get_omega_min
 - get_omega_macro
 - get_evolution_rate_min
 - get_evolution_rate_macro
 - validate_time_range
+- validate_against_config
+- get_evolution_statistics
+- check_time_coverage_gaps
+- generate_quality_report
 - __init__
 - process
 - get_omega_min

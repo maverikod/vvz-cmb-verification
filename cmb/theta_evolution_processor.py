@@ -433,10 +433,7 @@ class ThetaEvolutionProcessor:
             ValueError: If data does not meet requirements
         """
         # Check if cmb_config has time range requirements
-        if (
-            self.config.cmb_config
-            and "evolution" in self.config.cmb_config
-        ):
+        if self.config.cmb_config and "evolution" in self.config.cmb_config:
             evolution_config = self.config.cmb_config["evolution"]
             time_min_req = evolution_config.get("time_min")
             time_max_req = evolution_config.get("time_max")
@@ -494,18 +491,98 @@ class ThetaEvolutionProcessor:
 
         # Get sorted times from evolution data
         times = np.sort(self.evolution.times)
-        return self._check_time_coverage_gaps(
-            times, max_gap_ratio
-        )
+        return self._check_time_coverage_gaps(times, max_gap_ratio)
+
+    def verify_time_array_completeness(
+        self, expected_interval: Optional[float] = None
+    ) -> Dict[str, Any]:
+        """
+        Verify time array completeness.
+
+        Checks if time array has expected coverage and no missing points.
+
+        Args:
+            expected_interval: Expected time interval between points.
+                             If None, uses mean interval from data.
+
+        Returns:
+            Dictionary with completeness check results:
+            - is_complete: bool - Whether array appears complete
+            - missing_points: List[float] - List of expected but missing times
+            - coverage_ratio: float - Ratio of actual to expected points
+        """
+        if self._omega_min_interp is None:
+            raise ValueError(
+                "Processor not initialized. Call process() first."
+            )
+
+        times = np.sort(self.evolution.times)
+        n_points = len(times)
+
+        if n_points < 2:
+            return {
+                "is_complete": True,
+                "missing_points": [],
+                "coverage_ratio": 1.0,
+            }
+
+        # Calculate expected interval
+        if expected_interval is None:
+            intervals = np.diff(times)
+            expected_interval = float(np.median(intervals))
+
+        if expected_interval <= 0:
+            return {
+                "is_complete": False,
+                "missing_points": [],
+                "coverage_ratio": 0.0,
+            }
+
+        # Check for missing points
+        missing_points = []
+
+        for i in range(len(times) - 1):
+            interval = times[i + 1] - times[i]
+            # If interval is significantly larger than expected, check for gaps
+            if interval > expected_interval * 1.5:
+                # Calculate how many points might be missing
+                n_expected = int(round(interval / expected_interval))
+                if n_expected > 1:
+                    # Generate expected times in the gap
+                    for j in range(1, n_expected):
+                        expected_time = times[i] + j * expected_interval
+                        missing_points.append(float(expected_time))
+
+        # Calculate coverage ratio
+        time_span = times[-1] - times[0]
+        if time_span > 0:
+            expected_n_points = int(round(time_span / expected_interval)) + 1
+            coverage_ratio = (
+                n_points / expected_n_points if expected_n_points > 0 else 0.0
+            )
+        else:
+            coverage_ratio = 1.0
+
+        return {
+            "is_complete": len(missing_points) == 0,
+            "missing_points": missing_points,
+            "coverage_ratio": float(coverage_ratio),
+        }
 
     def generate_quality_report(self) -> Dict[str, Any]:
         """
         Generate data quality report.
 
+        Includes checks for:
+        - Time coverage gaps
+        - Time array completeness
+        - Physical constraints (ω_min < ω_macro)
+        - Data quality issues
+
         Returns:
             Dictionary with quality issues, warnings, and statistics
         """
-        report = {
+        report: Dict[str, Any] = {
             "quality_issues": self._quality_issues.copy(),
             "statistics": None,
             "time_coverage": {
@@ -514,6 +591,8 @@ class ThetaEvolutionProcessor:
                 "span": self._time_max - self._time_min,
             },
             "gaps": [],
+            "completeness": {},
+            "physical_constraints": {},
             "warnings": [],
         }
 
@@ -530,6 +609,42 @@ class ThetaEvolutionProcessor:
             )
 
         # Check time coverage completeness
+        completeness = self.verify_time_array_completeness()
+        report["completeness"] = completeness
+        if not completeness["is_complete"]:
+            n_missing = len(completeness["missing_points"])
+            report["warnings"].append(
+                f"Time array appears incomplete: {n_missing} expected "
+                f"points may be missing (coverage ratio: "
+                f"{completeness['coverage_ratio']:.2%})"
+            )
+
+        # Check physical constraints: ω_min < ω_macro
+        times_sorted = np.sort(self.evolution.times)
+        sort_indices = np.argsort(self.evolution.times)
+        omega_min_sorted = self.evolution.omega_min[sort_indices]
+        omega_macro_sorted = self.evolution.omega_macro[sort_indices]
+
+        violations = np.sum(omega_min_sorted >= omega_macro_sorted)
+        report["physical_constraints"] = {
+            "omega_min_lt_omega_macro": {
+                "valid": violations == 0,
+                "violations": int(violations),
+                "violation_ratio": (
+                    float(violations / len(times_sorted))
+                    if len(times_sorted) > 0
+                    else 0.0
+                ),
+            }
+        }
+
+        if violations > 0:
+            report["warnings"].append(
+                f"Physical constraint violation: ω_min >= ω_macro at "
+                f"{violations} point(s) ({violations/len(times_sorted):.2%})"
+            )
+
+        # Check time coverage completeness (interval validation)
         if self._statistics:
             mean_interval = self._statistics["time_coverage"]["mean_interval"]
             if mean_interval <= 0:

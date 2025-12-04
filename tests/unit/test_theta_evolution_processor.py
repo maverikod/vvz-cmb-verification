@@ -432,9 +432,7 @@ class TestEvolutionStatistics:
         """Test get_evolution_statistics() returns correct statistics."""
         times = np.array([0.0, 1.0, 2.0, 3.0, 4.0])
         omega_min = np.array([1.0e10, 1.1e10, 1.2e10, 1.3e10, 1.4e10])
-        omega_macro = np.array(
-            [10.0e10, 10.1e10, 10.2e10, 10.3e10, 10.4e10]
-        )
+        omega_macro = np.array([10.0e10, 10.1e10, 10.2e10, 10.3e10, 10.4e10])
         metadata = {}
 
         evolution = ThetaEvolution(
@@ -490,9 +488,7 @@ class TestTimeCoverageGaps:
         """Test check_time_coverage_gaps() with no gaps."""
         times = np.array([0.0, 1.0, 2.0, 3.0, 4.0])
         omega_min = np.array([1.0e10, 1.1e10, 1.2e10, 1.3e10, 1.4e10])
-        omega_macro = np.array(
-            [10.0e10, 10.1e10, 10.2e10, 10.3e10, 10.4e10]
-        )
+        omega_macro = np.array([10.0e10, 10.1e10, 10.2e10, 10.3e10, 10.4e10])
         metadata = {}
 
         evolution = ThetaEvolution(
@@ -511,11 +507,10 @@ class TestTimeCoverageGaps:
     def test_check_time_coverage_gaps_with_gaps(self):
         """Test check_time_coverage_gaps() detects gaps."""
         # Create data with a large gap
-        times = np.array([0.0, 1.0, 2.0, 10.0, 11.0])  # Gap between 2.0 and 10.0
+        # Gap between 2.0 and 10.0
+        times = np.array([0.0, 1.0, 2.0, 10.0, 11.0])
         omega_min = np.array([1.0e10, 1.1e10, 1.2e10, 1.3e10, 1.4e10])
-        omega_macro = np.array(
-            [10.0e10, 10.1e10, 10.2e10, 10.3e10, 10.4e10]
-        )
+        omega_macro = np.array([10.0e10, 10.1e10, 10.2e10, 10.3e10, 10.4e10])
         metadata = {}
 
         evolution = ThetaEvolution(
@@ -560,9 +555,7 @@ class TestQualityReport:
         """Test generate_quality_report() creates report."""
         times = np.array([0.0, 1.0, 2.0, 3.0, 4.0])
         omega_min = np.array([1.0e10, 1.1e10, 1.2e10, 1.3e10, 1.4e10])
-        omega_macro = np.array(
-            [10.0e10, 10.1e10, 10.2e10, 10.3e10, 10.4e10]
-        )
+        omega_macro = np.array([10.0e10, 10.1e10, 10.2e10, 10.3e10, 10.4e10])
         metadata = {}
 
         evolution = ThetaEvolution(
@@ -591,9 +584,7 @@ class TestQualityReport:
         """Test generate_quality_report() includes gap warnings."""
         times = np.array([0.0, 1.0, 2.0, 10.0, 11.0])  # Has gap
         omega_min = np.array([1.0e10, 1.1e10, 1.2e10, 1.3e10, 1.4e10])
-        omega_macro = np.array(
-            [10.0e10, 10.1e10, 10.2e10, 10.3e10, 10.4e10]
-        )
+        omega_macro = np.array([10.0e10, 10.1e10, 10.2e10, 10.3e10, 10.4e10])
         metadata = {}
 
         evolution = ThetaEvolution(
@@ -611,3 +602,270 @@ class TestQualityReport:
         # Should have warnings about gaps
         assert len(report["gaps"]) > 0
         assert len(report["warnings"]) > 0
+
+    def test_generate_quality_report_includes_completeness(self):
+        """Test generate_quality_report() includes completeness check."""
+        times = np.array([0.0, 1.0, 2.0, 3.0, 4.0])
+        omega_min = np.array([1.0e10, 1.1e10, 1.2e10, 1.3e10, 1.4e10])
+        omega_macro = np.array([10.0e10, 10.1e10, 10.2e10, 10.3e10, 10.4e10])
+        metadata = {}
+
+        evolution = ThetaEvolution(
+            times=times,
+            omega_min=omega_min,
+            omega_macro=omega_macro,
+            metadata=metadata,
+        )
+
+        processor = ThetaEvolutionProcessor(evolution)
+        processor.process()
+
+        report = processor.generate_quality_report()
+
+        assert "completeness" in report
+        assert "is_complete" in report["completeness"]
+        assert "coverage_ratio" in report["completeness"]
+
+    def test_generate_quality_report_includes_physical_constraints(self):
+        """Test generate_quality_report() includes physical constraints."""
+        times = np.array([0.0, 1.0, 2.0, 3.0, 4.0])
+        omega_min = np.array([1.0e10, 1.1e10, 1.2e10, 1.3e10, 1.4e10])
+        omega_macro = np.array([10.0e10, 10.1e10, 10.2e10, 10.3e10, 10.4e10])
+        metadata = {}
+
+        evolution = ThetaEvolution(
+            times=times,
+            omega_min=omega_min,
+            omega_macro=omega_macro,
+            metadata=metadata,
+        )
+
+        processor = ThetaEvolutionProcessor(evolution)
+        processor.process()
+
+        report = processor.generate_quality_report()
+
+        assert "physical_constraints" in report
+        assert "omega_min_lt_omega_macro" in report["physical_constraints"]
+        constraint = report["physical_constraints"]["omega_min_lt_omega_macro"]
+        assert "valid" in constraint
+        assert "violations" in constraint
+        assert constraint["valid"] == True  # Use == instead of is for NumPy bool
+        assert constraint["violations"] == 0
+
+
+class TestTimeArrayCompleteness:
+    """Tests for time array completeness verification."""
+
+    def test_verify_time_array_completeness_complete(self):
+        """Test verify_time_array_completeness() with complete array."""
+        times = np.array([0.0, 1.0, 2.0, 3.0, 4.0])
+        omega_min = np.array([1.0e10, 1.1e10, 1.2e10, 1.3e10, 1.4e10])
+        omega_macro = np.array([10.0e10, 10.1e10, 10.2e10, 10.3e10, 10.4e10])
+        metadata = {}
+
+        evolution = ThetaEvolution(
+            times=times,
+            omega_min=omega_min,
+            omega_macro=omega_macro,
+            metadata=metadata,
+        )
+
+        processor = ThetaEvolutionProcessor(evolution)
+        processor.process()
+
+        completeness = processor.verify_time_array_completeness()
+
+        assert completeness["is_complete"] is True
+        assert len(completeness["missing_points"]) == 0
+        assert completeness["coverage_ratio"] > 0.9
+
+    def test_verify_time_array_completeness_incomplete(self):
+        """Test verify_time_array_completeness() with incomplete array."""
+        # Create data with missing points (gap between 2.0 and 5.0)
+        times = np.array([0.0, 1.0, 2.0, 5.0, 6.0])
+        omega_min = np.array([1.0e10, 1.1e10, 1.2e10, 1.3e10, 1.4e10])
+        omega_macro = np.array([10.0e10, 10.1e10, 10.2e10, 10.3e10, 10.4e10])
+        metadata = {}
+
+        evolution = ThetaEvolution(
+            times=times,
+            omega_min=omega_min,
+            omega_macro=omega_macro,
+            metadata=metadata,
+        )
+
+        processor = ThetaEvolutionProcessor(evolution)
+        processor.process()
+
+        completeness = processor.verify_time_array_completeness()
+
+        # Should detect missing points
+        assert completeness["is_complete"] is False
+        assert len(completeness["missing_points"]) > 0
+        assert completeness["coverage_ratio"] < 1.0
+
+    def test_verify_time_array_completeness_with_expected_interval(self):
+        """Test verify_time_array_completeness() with specified interval."""
+        times = np.array([0.0, 1.0, 2.0, 3.0, 4.0])
+        omega_min = np.array([1.0e10, 1.1e10, 1.2e10, 1.3e10, 1.4e10])
+        omega_macro = np.array([10.0e10, 10.1e10, 10.2e10, 10.3e10, 10.4e10])
+        metadata = {}
+
+        evolution = ThetaEvolution(
+            times=times,
+            omega_min=omega_min,
+            omega_macro=omega_macro,
+            metadata=metadata,
+        )
+
+        processor = ThetaEvolutionProcessor(evolution)
+        processor.process()
+
+        completeness = processor.verify_time_array_completeness(expected_interval=1.0)
+
+        assert completeness["is_complete"] is True
+        assert completeness["coverage_ratio"] > 0.9
+
+    def test_verify_time_array_completeness_not_processed(self):
+        """Test verify_time_array_completeness() raises error."""
+        times = np.array([0.0, 1.0, 2.0])
+        omega_min = np.array([1.0e10, 1.1e10, 1.2e10])
+        omega_macro = np.array([10.0e10, 10.1e10, 10.2e10])
+        metadata = {}
+
+        evolution = ThetaEvolution(
+            times=times,
+            omega_min=omega_min,
+            omega_macro=omega_macro,
+            metadata=metadata,
+        )
+
+        processor = ThetaEvolutionProcessor(evolution)
+
+        with pytest.raises(ValueError, match="Processor not initialized"):
+            processor.verify_time_array_completeness()
+
+
+class TestValidateAgainstConfig:
+    """Tests for validate_against_config functionality."""
+
+    def test_validate_against_config_no_config_requirements(self):
+        """Test validate_against_config() with no config requirements."""
+        times = np.array([0.0, 1.0, 2.0, 3.0, 4.0])
+        omega_min = np.array([1.0e10, 1.1e10, 1.2e10, 1.3e10, 1.4e10])
+        omega_macro = np.array([10.0e10, 10.1e10, 10.2e10, 10.3e10, 10.4e10])
+        metadata = {}
+
+        evolution = ThetaEvolution(
+            times=times,
+            omega_min=omega_min,
+            omega_macro=omega_macro,
+            metadata=metadata,
+        )
+
+        processor = ThetaEvolutionProcessor(evolution)
+
+        # Should pass if no config requirements
+        result = processor.validate_against_config()
+        assert result is True
+
+    def test_validate_against_config_with_valid_range(self):
+        """Test validate_against_config() with valid time range."""
+        from config.settings import Config
+
+        # Create data that fully covers the required range
+        times = np.array([-1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0])
+        omega_min = np.array([1.0e10, 1.1e10, 1.2e10, 1.3e10, 1.4e10, 1.5e10, 1.6e10])
+        omega_macro = np.array(
+            [10.0e10, 10.1e10, 10.2e10, 10.3e10, 10.4e10, 10.5e10, 10.6e10]
+        )
+        metadata = {}
+
+        evolution = ThetaEvolution(
+            times=times,
+            omega_min=omega_min,
+            omega_macro=omega_macro,
+            metadata=metadata,
+        )
+
+        # Create config with evolution requirements
+        config = Config._load_defaults()
+        if config.cmb_config is None:
+            config.cmb_config = {}
+        config.cmb_config["evolution"] = {
+            "time_min": -1.0,  # Data starts at -1.0, requirement is -1.0
+            "time_max": 5.0,  # Data ends at 5.0, requirement is 5.0
+        }
+
+        processor = ThetaEvolutionProcessor(evolution, config=config)
+
+        # Should pass: data fully covers required range
+        result = processor.validate_against_config()
+        assert result is True
+
+    def test_validate_against_config_with_invalid_min(self):
+        """Test validate_against_config() raises error for invalid min time."""
+        from config.settings import Config
+
+        times = np.array([0.0, 1.0, 2.0, 3.0, 4.0])
+        omega_min = np.array([1.0e10, 1.1e10, 1.2e10, 1.3e10, 1.4e10])
+        omega_macro = np.array([10.0e10, 10.1e10, 10.2e10, 10.3e10, 10.4e10])
+        metadata = {}
+
+        evolution = ThetaEvolution(
+            times=times,
+            omega_min=omega_min,
+            omega_macro=omega_macro,
+            metadata=metadata,
+        )
+
+        # Create config with evolution requirements
+        # Set time_max to None or a value covered by data to test only time_min
+        config = Config._load_defaults()
+        if config.cmb_config is None:
+            config.cmb_config = {}
+        config.cmb_config["evolution"] = {
+            "time_min": -1.0,  # Data starts at 0.0, but requirement is -1.0
+            "time_max": None,  # No max requirement to isolate min test
+        }
+
+        processor = ThetaEvolutionProcessor(evolution, config=config)
+
+        # Should raise error: data doesn't start early enough
+        with pytest.raises(
+            ValueError, match="Time coverage starts at 0.0, but config requires -1.0"
+        ):
+            processor.validate_against_config()
+
+    def test_validate_against_config_with_invalid_max(self):
+        """Test validate_against_config() raises error for invalid max time."""
+        from config.settings import Config
+
+        times = np.array([0.0, 1.0, 2.0, 3.0, 4.0])
+        omega_min = np.array([1.0e10, 1.1e10, 1.2e10, 1.3e10, 1.4e10])
+        omega_macro = np.array([10.0e10, 10.1e10, 10.2e10, 10.3e10, 10.4e10])
+        metadata = {}
+
+        evolution = ThetaEvolution(
+            times=times,
+            omega_min=omega_min,
+            omega_macro=omega_macro,
+            metadata=metadata,
+        )
+
+        # Create config with evolution requirements
+        # Set time_min to None or a value covered by data to test only time_max
+        config = Config._load_defaults()
+        if config.cmb_config is None:
+            config.cmb_config = {}
+        config.cmb_config["evolution"] = {
+            "time_min": None,  # No min requirement to isolate max test
+            "time_max": 5.0,  # Data ends at 4.0, but requirement is 5.0
+        }
+
+        processor = ThetaEvolutionProcessor(evolution, config=config)
+
+        # Should raise error: data doesn't extend far enough
+        with pytest.raises(ValueError, match="Time coverage ends at"):
+            processor.validate_against_config()

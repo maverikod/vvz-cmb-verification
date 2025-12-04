@@ -1,3 +1,13 @@
+BaseVectorizer:
+- __init__
+- use_gpu
+- whole_array
+- vectorize
+- batch
+- _process_blocks
+- _process_block
+- _process_whole_array
+- _to_numpy
 ChainComponent: []
 ChainVerificationReport: []
 ChainVerifier:
@@ -39,7 +49,34 @@ Config:
 - validate
 - setup_logging
 CorrelationFunction: []
+CorrelationVectorizer:
+- __init__
+- vectorize_correlation
+- _fft_correlation
+- _direct_correlation
+- _process_block
+- _process_whole_array
 CrossSpectrum: []
+CudaArray:
+- __init__
+- _calculate_block_size
+- _calculate_num_blocks
+- _calculate_block_shape
+- shape
+- dtype
+- device
+- num_blocks
+- block_size
+- swap_to_gpu
+- swap_to_cpu
+- get_block
+- set_block
+- process_blocks
+- use_whole_array
+- to_numpy
+- __array__
+CudaMemoryError: []
+CudaUnavailableError: []
 DataIndex:
 - __init__
 - load
@@ -58,6 +95,23 @@ DataIndex:
 - search_by_name
 - _resolve_path
 DataPaths: []
+ElementWiseVectorizer:
+- __init__
+- _build_operation_map
+- vectorize_operation
+- _process_block
+- _process_whole_array
+- add
+- subtract
+- multiply
+- divide
+- power
+- sin
+- cos
+- exp
+- log
+- sqrt
+- abs
 FrequencyInvarianceTester:
 - __init__
 - calculate_cross_spectra
@@ -72,6 +126,16 @@ GalaxyDistributionAnalyzer:
 - calculate_chi6_by_direction
 - analyze_u_distributions
 - verify_chain_connection
+GridVectorizer:
+- __init__
+- vectorize_grid_operation
+- _process_block
+- _process_whole_array
+- _local_minima
+- _local_maxima
+- _gradient
+- _laplacian
+- _curvature
 HighlPeakPredictor:
 - __init__
 - predict_peak
@@ -134,6 +198,14 @@ PredictionsReportGenerator:
 - generate_report
 - validate_framework
 - create_visualizations
+ReductionVectorizer:
+- __init__
+- _build_operation_map
+- vectorize_reduction
+- _reduce_all_axes
+- _reduce_along_axis
+- _process_block
+- _process_whole_array
 SpectrumComparator:
 - __init__
 - load_observed_spectrum
@@ -318,6 +390,8 @@ TestProcessNodeData:
 TestQualityReport:
 - test_generate_quality_report
 - test_generate_quality_report_with_gaps
+- test_generate_quality_report_includes_completeness
+- test_generate_quality_report_includes_physical_constraints
 TestSaveAnalysisResults:
 - test_save_results_json
 - test_save_results_invalid_format
@@ -366,10 +440,20 @@ TestThetaEvolutionProcessor:
 - test_validate_time_range_invalid
 TestThetaFrequencySpectrum:
 - test_create_frequency_spectrum
+TestTimeArrayCompleteness:
+- test_verify_time_array_completeness_complete
+- test_verify_time_array_completeness_incomplete
+- test_verify_time_array_completeness_with_expected_interval
+- test_verify_time_array_completeness_not_processed
 TestTimeCoverageGaps:
 - test_check_time_coverage_gaps_no_gaps
 - test_check_time_coverage_gaps_with_gaps
 - test_check_time_coverage_gaps_not_processed
+TestValidateAgainstConfig:
+- test_validate_against_config_no_config_requirements
+- test_validate_against_config_with_valid_range
+- test_validate_against_config_with_invalid_min
+- test_validate_against_config_with_invalid_max
 TestValidateEvolutionData:
 - test_validate_valid_evolution
 - test_validate_empty_times
@@ -413,6 +497,7 @@ ThetaEvolutionProcessor:
 - validate_against_config
 - get_evolution_statistics
 - check_time_coverage_gaps
+- verify_time_array_completeness
 - generate_quality_report
 - __init__
 - process
@@ -435,3 +520,14 @@ ThetaNodeMapGenerator:
 - create_omega_min_map
 - create_node_mask
 - validate_node_map
+TransformVectorizer:
+- __init__
+- vectorize_transform
+- _process_block
+- _process_whole_array
+- _fft
+- _ifft
+- _rfft
+- _irfft
+- _sph_harm_synthesis
+- _sph_harm_analysis

@@ -1,15 +1,11 @@
-"""
-Data index for input files in data/in directory.
-
-This file provides a comprehensive index of all input data files,
-their contents, purpose, and usage in the CMB verification project.
-
-Author: Vasiliy Zdanovskiy
-Email: vasilyvz@gmail.com
-"""
-
 # Data Index for data/in directory
 # Generated: 2024-12-03
+# 
+# This file provides a comprehensive index of all input data files,
+# their contents, purpose, and usage in the CMB verification project.
+#
+# Author: Vasiliy Zdanovskiy
+# Email: vasilyvz@gmail.com
 
 data_index:
   description: "Index of all input data files for CMB verification project"
@@ -280,34 +276,56 @@ data_index:
           - "Methodology"
         usage: "Reference for ACT DR6 power spectra analysis"
 
+# Θ-Field Model Data (data/theta/)
+# Note: This directory contains Θ-field model data files
+# These are NOT code modules - they are data files for processing
+theta_field_data:
+  description: "Θ-field model data directory (data/theta/)"
+  directory: "../theta/"
+  note: "This directory contains Θ-field model data files, not code modules"
+  expected_data:
+    - "Frequency spectrum data: ρ_Θ(ω,t)"
+    - "Temporal evolution data: ω_min(t), ω_macro(t)"
+    - "Node geometry data"
+    - "Field configuration files"
+  usage: "Data for Θ-field model processing (Step 1.1 and subsequent steps)"
+  status: "Directory exists but data files will be added during project execution"
+
 # Data Categories Summary
 categories:
   cmb_data:
-    - "act_dr6_02"
-    - "act_dr6_lenslike"
-    - "cmb_microcells"
+    items:
+      - "act_dr6_02"
+      - "act_dr6_lenslike"
+      - "cmb_microcells"
     description: "CMB observation and analysis data"
     
   lss_data:
-    - "lss_correlation"
+    items:
+      - "lss_correlation"
     description: "Large Scale Structure correlation data"
     
   galaxy_data:
-    - "sparc_resonator"
-    - "galaxy_core"
+    items:
+      - "sparc_resonator"
+      - "galaxy_core"
     description: "Galaxy rotation curves and core models"
     
   theta_field:
-    - "theta_background"
-    description: "Θ-field model background data"
+    items:
+      - "theta_background"
+      - "theta_field_data"
+    description: "Θ-field model background data and model data files"
     
   analysis_tools:
-    - "quench"
-    - "vbp"
+    items:
+      - "quench"
+      - "vbp"
     description: "Analysis tools and results"
     
   documentation:
-    - "documentation"
+    items:
+      - "documentation"
     description: "Theoretical and observational documentation"
 
 # Usage Guidelines

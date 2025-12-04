@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 import numpy as np
 
-from utils.cuda.array_model import CudaUnavailableError
+from utils.cuda.exceptions import CudaUnavailableError
 
 # Try to import CuPy
 try:
@@ -79,7 +79,9 @@ class BaseVectorizer(ABC):
         """Check if whole array mode is enabled."""
         return self._whole_array
 
-    def vectorize(self, array: "CudaArray", *args: Any, **kwargs: Any) -> "CudaArray":  # noqa: F821
+    def vectorize(
+        self, array: "CudaArray", *args: Any, **kwargs: Any
+    ) -> "CudaArray":  # noqa: F821
         """
         Vectorize operation on array.
 

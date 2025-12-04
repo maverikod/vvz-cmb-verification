@@ -7,7 +7,7 @@ Author: Vasiliy Zdanovskiy
 Email: vasilyvz@gmail.com
 """
 
-from typing import Optional, Any, Tuple, TYPE_CHECKING
+from typing import Optional, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from utils.cuda.array_model import CudaArray
@@ -237,24 +237,21 @@ class GridVectorizer(BaseVectorizer):
         Returns:
             Laplacian array
         """
-        # Laplacian = sum of second derivatives
-        gradients = self._gradient(grid)
-        laplacian = np.zeros_like(grid)
-
-        if self.use_gpu and CUPY_AVAILABLE:
-            for grad in gradients:
-                grad_grad = cp.gradient(grad)
-                if isinstance(grad_grad, tuple):
-                    laplacian += grad_grad[0]
-                else:
-                    laplacian += grad_grad
+        # Simplified Laplacian calculation
+        # For 2D: use second-order finite differences
+        if len(grid.shape) == 1:
+            # 1D: second derivative
+            laplacian = np.zeros_like(grid)
+            laplacian[1:-1] = grid[2:] - 2 * grid[1:-1] + grid[:-2]
         else:
-            for grad in gradients:
-                grad_grad = np.gradient(grad)
-                if isinstance(grad_grad, tuple):
-                    laplacian += grad_grad[0]
-                else:
-                    laplacian += grad_grad
+            # 2D: sum of second derivatives in each direction
+            laplacian = np.zeros_like(grid)
+            # Second derivative in first dimension
+            if grid.shape[0] > 2:
+                laplacian[1:-1, :] += grid[2:, :] - 2 * grid[1:-1, :] + grid[:-2, :]
+            # Second derivative in second dimension
+            if grid.shape[1] > 2:
+                laplacian[:, 1:-1] += grid[:, 2:] - 2 * grid[:, 1:-1] + grid[:, :-2]
 
         return laplacian
 
@@ -268,15 +265,28 @@ class GridVectorizer(BaseVectorizer):
         Returns:
             Curvature array
         """
-        # Curvature calculation (simplified)
-        # For 2D: curvature = |gradient|^2 / (1 + |gradient|^2)^(3/2)
-        gradients = self._gradient(grid)
+        # Simplified curvature calculation
+        # Use gradient magnitude squared
+        if len(grid.shape) == 1:
+            # 1D: use first derivative squared
+            grad = np.gradient(grid)
+            if isinstance(grad, tuple):
+                grad = grad[0]
+            grad_mag_sq = grad**2
+        else:
+            # 2D: use gradient magnitude
+            grad_x = np.gradient(grid, axis=0)
+            if isinstance(grad_x, tuple):
+                grad_x = grad_x[0]
+            grad_y = np.gradient(grid, axis=1)
+            if isinstance(grad_y, tuple):
+                grad_y = grad_y[0]
+            grad_mag_sq = grad_x**2 + grad_y**2
 
+        # Curvature = grad_mag_sq / (1 + grad_mag_sq)^(3/2)
         if self.use_gpu and CUPY_AVAILABLE:
-            grad_mag_sq = sum(g * g for g in gradients)
             curvature = grad_mag_sq / cp.power(1 + grad_mag_sq, 1.5)
         else:
-            grad_mag_sq = sum(g * g for g in gradients)
             curvature = grad_mag_sq / np.power(1 + grad_mag_sq, 1.5)
 
         return curvature

@@ -7,7 +7,7 @@ Author: Vasiliy Zdanovskiy
 Email: vasilyvz@gmail.com
 """
 
-from typing import Optional, Union, Any, TYPE_CHECKING
+from typing import Optional, Union, Any, TYPE_CHECKING, List
 
 if TYPE_CHECKING:
     from utils.cuda.array_model import CudaArray
@@ -275,3 +275,30 @@ class ElementWiseVectorizer(BaseVectorizer):
     def abs(self, array: "CudaArray") -> "CudaArray":  # noqa: F821
         """Apply absolute value."""
         return self.vectorize_operation(array, "abs", None)
+
+    def batch(
+        self, arrays: List["CudaArray"], *args: Any, **kwargs: Any  # noqa: F821
+    ) -> List["CudaArray"]:  # noqa: F821
+        """
+        Batch process multiple arrays.
+
+        Args:
+            arrays: List of input CudaArrays
+            *args: Operation-specific arguments (operation, operand)
+            **kwargs: Operation-specific keyword arguments
+
+        Returns:
+            List of result CudaArrays
+        """
+        # Extract operation and operand from args if provided
+        if len(args) >= 2:
+            operation = args[0]
+            operand = args[1] if len(args) > 1 else None
+            results = []
+            for array in arrays:
+                result = self.vectorize_operation(array, operation, operand)
+                results.append(result)
+            return results
+        else:
+            # Fallback to base implementation
+            return super().batch(arrays, *args, **kwargs)

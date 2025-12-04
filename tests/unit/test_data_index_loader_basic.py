@@ -65,9 +65,7 @@ class TestDataIndexLoading:
         except (FileNotFoundError, yaml.YAMLError):
             # If file doesn't exist or is invalid, that's expected
             # in test environment
-            pytest.skip(
-                "data_index.yaml not found or invalid in test environment"
-            )
+            pytest.skip("data_index.yaml not found or invalid in test environment")
 
 
 class TestGetFilePath:

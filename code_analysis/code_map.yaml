@@ -17,6 +17,16 @@ classes:
     line: 30
     methods: []
     name: ThetaFrequencySpectrum
+  cmb/theta_node_processor.py:ThetaNodeData:
+    bases: []
+    docstring: "Θ-node structure data.\n\nAttributes:\n    positions: Node sky positions\
+      \ (theta, phi) in radians\n    scales: Node scales in parsec (~300 pc at z≈1100)\n\
+      \    depths: Node depths (Δω/ω)\n    temperatures: Temperature fluctuations\
+      \ (ΔT in μK)\n    metadata: Additional metadata"
+    file: cmb/theta_node_processor.py
+    line: 23
+    methods: []
+    name: ThetaNodeData
   config/settings.py:Config:
     bases: []
     docstring: "Main configuration class for CMB verification project.\n\nProvides\
@@ -798,7 +808,7 @@ classes:
     bases: []
     docstring: Tests for get_file_path() method.
     file: tests/unit/test_data_index_loader_basic.py
-    line: 73
+    line: 71
     methods:
     - test_get_file_path_single_file
     - test_get_file_path_with_directory
@@ -809,7 +819,7 @@ classes:
     bases: []
     docstring: Tests for get_files_by_category() method.
     file: tests/unit/test_data_index_loader_basic.py
-    line: 164
+    line: 162
     methods:
     - test_get_files_single_file
     - test_get_files_list
@@ -1050,7 +1060,7 @@ classes:
     bases: []
     docstring: Tests for load_evolution_data function.
     file: tests/unit/test_theta_data_loader.py
-    line: 175
+    line: 169
     methods:
     - test_load_csv_evolution_data
     - test_load_json_evolution_data
@@ -1089,7 +1099,7 @@ classes:
     bases: []
     docstring: Tests for validate_evolution_data function.
     file: tests/unit/test_theta_data_loader.py
-    line: 367
+    line: 357
     methods:
     - test_validate_valid_evolution
     - test_validate_empty_times
@@ -1101,7 +1111,7 @@ classes:
     bases: []
     docstring: Tests for validate_frequency_spectrum function.
     file: tests/unit/test_theta_data_loader.py
-    line: 256
+    line: 250
     methods:
     - test_validate_valid_spectrum
     - test_validate_empty_frequencies
@@ -1110,6 +1120,64 @@ classes:
     - test_validate_shape_mismatch
     - test_validate_nan_frequencies
     name: TestValidateFrequencySpectrum
+  tests/unit/test_theta_node_processor.py:TestLoadNodeDepths:
+    bases: []
+    docstring: Test node depth loading.
+    file: tests/unit/test_theta_node_processor.py
+    line: 237
+    methods:
+    - test_load_csv_depths
+    - test_load_json_depths
+    - test_load_depths_missing_file
+    - test_load_depths_negative
+    name: TestLoadNodeDepths
+  tests/unit/test_theta_node_processor.py:TestLoadNodeGeometry:
+    bases: []
+    docstring: Test node geometry loading.
+    file: tests/unit/test_theta_node_processor.py
+    line: 121
+    methods:
+    - test_load_csv_geometry
+    - test_load_json_geometry
+    - test_load_geometry_degrees
+    - test_load_geometry_arcmin_scales
+    - test_load_geometry_missing_file
+    - test_load_geometry_invalid_format
+    - test_load_geometry_missing_columns
+    - test_load_geometry_invalid_ranges
+    name: TestLoadNodeGeometry
+  tests/unit/test_theta_node_processor.py:TestMapDepthToTemperature:
+    bases: []
+    docstring: Test depth to temperature mapping.
+    file: tests/unit/test_theta_node_processor.py
+    line: 273
+    methods:
+    - test_map_depth_to_temperature
+    - test_map_depth_to_temperature_range
+    - test_map_depth_to_temperature_negative
+    - test_map_depth_to_temperature_custom_config
+    name: TestMapDepthToTemperature
+  tests/unit/test_theta_node_processor.py:TestProcessNodeData:
+    bases: []
+    docstring: Test complete node data processing.
+    file: tests/unit/test_theta_node_processor.py
+    line: 328
+    methods:
+    - test_process_node_data
+    - test_process_node_data_inconsistent
+    name: TestProcessNodeData
+  tests/unit/test_theta_node_processor.py:TestValidateNodeData:
+    bases: []
+    docstring: Test node data validation.
+    file: tests/unit/test_theta_node_processor.py
+    line: 372
+    methods:
+    - test_validate_node_data_valid
+    - test_validate_node_data_invalid_shape
+    - test_validate_node_data_invalid_positions
+    - test_validate_node_data_negative_scales
+    - test_validate_node_data_negative_depths
+    name: TestValidateNodeData
   utils/io/data_index_loader.py:DataIndex:
     bases: []
     docstring: 'Data index manager for querying input data files.
@@ -1146,7 +1214,7 @@ functions:
       \ FileNotFoundError: If data file doesn't exist\n    ValueError: If data format\
       \ is invalid"
     file: cmb/theta_data_loader.py
-    line: 148
+    line: 142
     name: load_evolution_data
   cmb/theta_data_loader.py:load_frequency_spectrum:
     args:
@@ -1171,7 +1239,7 @@ functions:
       \ have same length)\n\nArgs:\n    evolution: ThetaEvolution to validate\n\n\
       Returns:\n    True if valid\n\nRaises:\n    ValueError: If data is invalid"
     file: cmb/theta_data_loader.py
-    line: 292
+    line: 284
     name: validate_evolution_data
   cmb/theta_data_loader.py:validate_frequency_spectrum:
     args:
@@ -1182,7 +1250,7 @@ functions:
       \nArgs:\n    spectrum: ThetaFrequencySpectrum to validate\n\nReturns:\n    True\
       \ if valid\n\nRaises:\n    ValueError: If data is invalid"
     file: cmb/theta_data_loader.py
-    line: 225
+    line: 217
     name: validate_frequency_spectrum
   cmb/theta_data_parser.py:parse_csv_evolution_data:
     args:
@@ -1193,7 +1261,7 @@ functions:
       \nReturns:\n    ThetaEvolution instance\n\nRaises:\n    ValueError: If required\
       \ columns are missing or data format is invalid"
     file: cmb/theta_data_parser.py
-    line: 215
+    line: 218
     name: parse_csv_evolution_data
   cmb/theta_data_parser.py:parse_csv_frequency_spectrum:
     args:
@@ -1204,7 +1272,7 @@ functions:
       \nReturns:\n    ThetaFrequencySpectrum instance\n\nRaises:\n    ValueError:\
       \ If required columns are missing or data format is invalid"
     file: cmb/theta_data_parser.py
-    line: 15
+    line: 18
     name: parse_csv_frequency_spectrum
   cmb/theta_data_parser.py:parse_json_evolution_data:
     args:
@@ -1215,7 +1283,7 @@ functions:
       Returns:\n    ThetaEvolution instance\n\nRaises:\n    ValueError: If required\
       \ keys are missing or data format is invalid"
     file: cmb/theta_data_parser.py
-    line: 297
+    line: 300
     name: parse_json_evolution_data
   cmb/theta_data_parser.py:parse_json_frequency_spectrum:
     args:
@@ -1226,8 +1294,66 @@ functions:
       Returns:\n    ThetaFrequencySpectrum instance\n\nRaises:\n    ValueError: If\
       \ required keys are missing or data format is invalid"
     file: cmb/theta_data_parser.py
-    line: 139
+    line: 142
     name: parse_json_frequency_spectrum
+  cmb/theta_node_loader.py:load_node_depths:
+    args:
+    - data_path
+    docstring: "Load Θ-node depth data (Δω/ω).\n\nArgs:\n    data_path: Path to node\
+      \ depth data file.\n               If None, uses path from data index or default\
+      \ location.\n\nReturns:\n    Array of node depths (Δω/ω)\n\nRaises:\n    FileNotFoundError:\
+      \ If data file doesn't exist\n    ValueError: If data format is invalid"
+    file: cmb/theta_node_loader.py
+    line: 222
+    name: load_node_depths
+  cmb/theta_node_loader.py:load_node_geometry:
+    args:
+    - data_path
+    docstring: "Load Θ-node geometry data.\n\nArgs:\n    data_path: Path to node geometry\
+      \ data file.\n               If None, uses path from data index or default location.\n\
+      \nReturns:\n    Tuple of (positions, scales)\n    - positions: (N, 2) array\
+      \ of (theta, phi) in radians\n    - scales: (N,) array of scales in parsec\n\
+      \nRaises:\n    FileNotFoundError: If data file doesn't exist\n    ValueError:\
+      \ If data format is invalid"
+    file: cmb/theta_node_loader.py
+    line: 20
+    name: load_node_geometry
+  cmb/theta_node_processor.py:map_depth_to_temperature:
+    args:
+    - depths
+    - config
+    docstring: "Map node depth (Δω/ω) to temperature fluctuation (ΔT).\n\nFormula\
+      \ (from tech_spec-new.md 2.1): ΔT = (Δω/ω_CMB) T_0\nWhere:\n    T_0 = 2.725\
+      \ K (CMB temperature)\n    ω_CMB ~ 10^11 Hz\n    Δω = ω - ω_min (depth of node)\n\
+      Result: ΔT ≈ 20-30 μK\n\nThis is direct conversion from node depth, NOT linear\
+      \ approximation\nor classical thermodynamic formula.\n\nSee ALL.md JW-CMB.6\
+      \ and JW-CMB2.6 for derivation.\n\nArgs:\n    depths: Node depths (Δω/ω) - dimensionless\
+      \ relative depth\n    config: Configuration instance (uses global if None)\n\
+      \nReturns:\n    Array of temperature fluctuations in μK\n\nRaises:\n    ValueError:\
+      \ If depths are invalid"
+    file: cmb/theta_node_processor.py
+    line: 42
+    name: map_depth_to_temperature
+  cmb/theta_node_processor.py:process_node_data:
+    args:
+    - geometry_path
+    - depth_path
+    docstring: "Process complete Θ-node data.\n\nLoads geometry and depth, maps to\
+      \ temperature, and creates\nThetaNodeData structure.\n\nArgs:\n    geometry_path:\
+      \ Path to geometry data file\n    depth_path: Path to depth data file\n\nReturns:\n\
+      \    ThetaNodeData instance with all processed data\n\nRaises:\n    FileNotFoundError:\
+      \ If data files don't exist\n    ValueError: If data processing fails"
+    file: cmb/theta_node_processor.py
+    line: 88
+    name: process_node_data
+  cmb/theta_node_processor.py:validate_node_data:
+    args:
+    - node_data
+    docstring: "Validate Θ-node data.\n\nArgs:\n    node_data: ThetaNodeData to validate\n\
+      \nReturns:\n    True if valid\n\nRaises:\n    ValueError: If data is invalid"
+    file: cmb/theta_node_processor.py
+    line: 149
+    name: validate_node_data
   config/settings.py:__init__:
     args:
     - self
@@ -1247,14 +1373,14 @@ functions:
     docstring: "Create configuration with default values.\n\nReturns:\n    Config\
       \ instance with default settings"
     file: config/settings.py
-    line: 211
+    line: 206
     name: _load_defaults
   config/settings.py:get_config:
     args: []
     docstring: "Get global configuration instance.\n\nReturns:\n    Global Config\
       \ instance\n\nRaises:\n    RuntimeError: If configuration has not been initialized"
     file: config/settings.py
-    line: 361
+    line: 348
     name: get_config
   config/settings.py:initialize_config:
     args:
@@ -1262,7 +1388,7 @@ functions:
     docstring: "Initialize global configuration.\n\nArgs:\n    config_file: Path to\
       \ configuration YAML file\n\nReturns:\n    Initialized Config instance"
     file: config/settings.py
-    line: 379
+    line: 365
     name: initialize_config
   config/settings.py:load:
     args:
@@ -1286,7 +1412,7 @@ functions:
 
       logging_config.'
     file: config/settings.py
-    line: 312
+    line: 303
     name: setup_logging
   config/settings.py:validate:
     args:
@@ -1294,7 +1420,7 @@ functions:
     docstring: "Validate configuration values.\n\nRaises:\n    ValueError: If any\
       \ configuration value is invalid"
     file: config/settings.py
-    line: 269
+    line: 264
     name: validate
   docs/implementation_plan/phase_0_foundation/step_0.1_configuration/settings.py:__init__:
     args:
@@ -3162,49 +3288,49 @@ functions:
     - self
     docstring: Test getting path for invalid category returns None.
     file: tests/unit/test_data_index_loader_basic.py
-    line: 149
+    line: 147
     name: test_get_file_path_invalid_category
   tests/unit/test_data_index_loader_basic.py:test_get_file_path_nonexistent:
     args:
     - self
     docstring: Test getting path for non-existent file returns None.
     file: tests/unit/test_data_index_loader_basic.py
-    line: 129
+    line: 127
     name: test_get_file_path_nonexistent
   tests/unit/test_data_index_loader_basic.py:test_get_file_path_single_file:
     args:
     - self
     docstring: Test getting path for category with single file.
     file: tests/unit/test_data_index_loader_basic.py
-    line: 76
+    line: 74
     name: test_get_file_path_single_file
   tests/unit/test_data_index_loader_basic.py:test_get_file_path_with_directory:
     args:
     - self
     docstring: Test getting path for file in directory.
     file: tests/unit/test_data_index_loader_basic.py
-    line: 101
+    line: 99
     name: test_get_file_path_with_directory
   tests/unit/test_data_index_loader_basic.py:test_get_files_invalid_category:
     args:
     - self
     docstring: Test getting files for invalid category returns empty list.
     file: tests/unit/test_data_index_loader_basic.py
-    line: 217
+    line: 215
     name: test_get_files_invalid_category
   tests/unit/test_data_index_loader_basic.py:test_get_files_list:
     args:
     - self
     docstring: Test getting files for category with files list.
     file: tests/unit/test_data_index_loader_basic.py
-    line: 192
+    line: 190
     name: test_get_files_list
   tests/unit/test_data_index_loader_basic.py:test_get_files_single_file:
     args:
     - self
     docstring: Test getting files for category with single file.
     file: tests/unit/test_data_index_loader_basic.py
-    line: 167
+    line: 165
     name: test_get_files_single_file
   tests/unit/test_data_index_loader_basic.py:test_load_invalid_yaml:
     args:
@@ -3267,7 +3393,7 @@ functions:
     - self
     docstring: Test searching with pattern that matches nothing.
     file: tests/unit/test_data_index_loader_validation.py
-    line: 189
+    line: 188
     name: test_search_no_matches
   tests/unit/test_data_index_loader_validation.py:test_search_wildcard:
     args:
@@ -3743,7 +3869,7 @@ functions:
     - self
     docstring: Test loading evolution data from CSV file.
     file: tests/unit/test_theta_data_loader.py
-    line: 178
+    line: 172
     name: test_load_csv_evolution_data
   tests/unit/test_theta_data_loader.py:test_load_csv_frequency_spectrum:
     args:
@@ -3757,113 +3883,351 @@ functions:
     - self
     docstring: Test loading CSV with missing column raises ValueError.
     file: tests/unit/test_theta_data_loader.py
-    line: 241
+    line: 235
     name: test_load_csv_missing_column
   tests/unit/test_theta_data_loader.py:test_load_json_evolution_data:
     args:
     - self
     docstring: Test loading evolution data from JSON file.
     file: tests/unit/test_theta_data_loader.py
-    line: 204
+    line: 198
     name: test_load_json_evolution_data
   tests/unit/test_theta_data_loader.py:test_load_json_frequency_spectrum:
     args:
     - self
     docstring: Test loading frequency spectrum from JSON file.
     file: tests/unit/test_theta_data_loader.py
-    line: 105
+    line: 103
     name: test_load_json_frequency_spectrum
   tests/unit/test_theta_data_loader.py:test_load_json_missing_key:
     args:
     - self
     docstring: Test loading JSON with missing key raises ValueError.
     file: tests/unit/test_theta_data_loader.py
-    line: 158
+    line: 154
     name: test_load_json_missing_key
   tests/unit/test_theta_data_loader.py:test_load_nonexistent_file:
     args:
     - self
     docstring: Test loading non-existent file raises FileNotFoundError.
     file: tests/unit/test_theta_data_loader.py
-    line: 234
+    line: 228
     name: test_load_nonexistent_file
   tests/unit/test_theta_data_loader.py:test_validate_empty_frequencies:
     args:
     - self
     docstring: Test validating spectrum with empty frequencies.
     file: tests/unit/test_theta_data_loader.py
-    line: 275
+    line: 269
     name: test_validate_empty_frequencies
   tests/unit/test_theta_data_loader.py:test_validate_empty_times:
     args:
     - self
     docstring: Test validating evolution with empty times raises ValueError.
     file: tests/unit/test_theta_data_loader.py
-    line: 386
+    line: 376
     name: test_validate_empty_times
   tests/unit/test_theta_data_loader.py:test_validate_length_mismatch:
     args:
     - self
     docstring: Test validating evolution with length mismatch raises ValueError.
     file: tests/unit/test_theta_data_loader.py
-    line: 403
+    line: 393
     name: test_validate_length_mismatch
   tests/unit/test_theta_data_loader.py:test_validate_nan_frequencies:
     args:
     - self
     docstring: Test validating spectrum with NaN frequencies raises ValueError.
     file: tests/unit/test_theta_data_loader.py
-    line: 347
+    line: 339
     name: test_validate_nan_frequencies
   tests/unit/test_theta_data_loader.py:test_validate_nan_times:
     args:
     - self
     docstring: Test validating evolution with NaN times raises ValueError.
     file: tests/unit/test_theta_data_loader.py
-    line: 441
+    line: 427
     name: test_validate_nan_times
   tests/unit/test_theta_data_loader.py:test_validate_negative_frequencies:
     args:
     - self
     docstring: Test validating spectrum with negative frequencies.
     file: tests/unit/test_theta_data_loader.py
-    line: 292
+    line: 286
     name: test_validate_negative_frequencies
   tests/unit/test_theta_data_loader.py:test_validate_negative_omega_min:
     args:
     - self
     docstring: Test validating evolution with negative omega_min.
     file: tests/unit/test_theta_data_loader.py
-    line: 420
+    line: 410
     name: test_validate_negative_omega_min
   tests/unit/test_theta_data_loader.py:test_validate_negative_spectrum:
     args:
     - self
     docstring: Test validating spectrum with negative values raises ValueError.
     file: tests/unit/test_theta_data_loader.py
-    line: 311
+    line: 303
     name: test_validate_negative_spectrum
   tests/unit/test_theta_data_loader.py:test_validate_shape_mismatch:
     args:
     - self
     docstring: Test validating spectrum with shape mismatch raises ValueError.
     file: tests/unit/test_theta_data_loader.py
-    line: 330
+    line: 322
     name: test_validate_shape_mismatch
   tests/unit/test_theta_data_loader.py:test_validate_valid_evolution:
     args:
     - self
     docstring: Test validating valid evolution data.
     file: tests/unit/test_theta_data_loader.py
-    line: 370
+    line: 360
     name: test_validate_valid_evolution
   tests/unit/test_theta_data_loader.py:test_validate_valid_spectrum:
     args:
     - self
     docstring: Test validating valid frequency spectrum.
     file: tests/unit/test_theta_data_loader.py
-    line: 259
+    line: 253
     name: test_validate_valid_spectrum
+  tests/unit/test_theta_node_processor.py:sample_config:
+    args: []
+    docstring: Create sample configuration for tests.
+    file: tests/unit/test_theta_node_processor.py
+    line: 32
+    name: sample_config
+  tests/unit/test_theta_node_processor.py:sample_node_depths_csv:
+    args:
+    - temp_dir
+    docstring: Create sample node depths CSV file.
+    file: tests/unit/test_theta_node_processor.py
+    line: 88
+    name: sample_node_depths_csv
+  tests/unit/test_theta_node_processor.py:sample_node_depths_json:
+    args:
+    - temp_dir
+    docstring: Create sample node depths JSON file.
+    file: tests/unit/test_theta_node_processor.py
+    line: 106
+    name: sample_node_depths_json
+  tests/unit/test_theta_node_processor.py:sample_node_geometry_csv:
+    args:
+    - temp_dir
+    docstring: Create sample node geometry CSV file.
+    file: tests/unit/test_theta_node_processor.py
+    line: 40
+    name: sample_node_geometry_csv
+  tests/unit/test_theta_node_processor.py:sample_node_geometry_json:
+    args:
+    - temp_dir
+    docstring: Create sample node geometry JSON file.
+    file: tests/unit/test_theta_node_processor.py
+    line: 66
+    name: sample_node_geometry_json
+  tests/unit/test_theta_node_processor.py:temp_dir:
+    args: []
+    docstring: Create temporary directory for test data files.
+    file: tests/unit/test_theta_node_processor.py
+    line: 25
+    name: temp_dir
+  tests/unit/test_theta_node_processor.py:test_load_csv_depths:
+    args:
+    - self
+    - sample_node_depths_csv
+    - sample_config
+    docstring: Test loading depths from CSV file.
+    file: tests/unit/test_theta_node_processor.py
+    line: 240
+    name: test_load_csv_depths
+  tests/unit/test_theta_node_processor.py:test_load_csv_geometry:
+    args:
+    - self
+    - sample_node_geometry_csv
+    - sample_config
+    docstring: Test loading geometry from CSV file.
+    file: tests/unit/test_theta_node_processor.py
+    line: 124
+    name: test_load_csv_geometry
+  tests/unit/test_theta_node_processor.py:test_load_depths_missing_file:
+    args:
+    - self
+    - sample_config
+    docstring: Test loading depths with missing file.
+    file: tests/unit/test_theta_node_processor.py
+    line: 255
+    name: test_load_depths_missing_file
+  tests/unit/test_theta_node_processor.py:test_load_depths_negative:
+    args:
+    - self
+    - temp_dir
+    - sample_config
+    docstring: Test loading depths with negative values.
+    file: tests/unit/test_theta_node_processor.py
+    line: 260
+    name: test_load_depths_negative
+  tests/unit/test_theta_node_processor.py:test_load_geometry_arcmin_scales:
+    args:
+    - self
+    - temp_dir
+    - sample_config
+    docstring: Test loading geometry with scales in arcmin (should convert to pc).
+    file: tests/unit/test_theta_node_processor.py
+    line: 173
+    name: test_load_geometry_arcmin_scales
+  tests/unit/test_theta_node_processor.py:test_load_geometry_degrees:
+    args:
+    - self
+    - temp_dir
+    - sample_config
+    docstring: Test loading geometry with degrees (should convert to radians).
+    file: tests/unit/test_theta_node_processor.py
+    line: 145
+    name: test_load_geometry_degrees
+  tests/unit/test_theta_node_processor.py:test_load_geometry_invalid_format:
+    args:
+    - self
+    - temp_dir
+    - sample_config
+    docstring: Test loading geometry with invalid format.
+    file: tests/unit/test_theta_node_processor.py
+    line: 204
+    name: test_load_geometry_invalid_format
+  tests/unit/test_theta_node_processor.py:test_load_geometry_invalid_ranges:
+    args:
+    - self
+    - temp_dir
+    - sample_config
+    docstring: Test loading geometry with invalid position ranges.
+    file: tests/unit/test_theta_node_processor.py
+    line: 224
+    name: test_load_geometry_invalid_ranges
+  tests/unit/test_theta_node_processor.py:test_load_geometry_missing_columns:
+    args:
+    - self
+    - temp_dir
+    - sample_config
+    docstring: Test loading geometry with missing columns.
+    file: tests/unit/test_theta_node_processor.py
+    line: 212
+    name: test_load_geometry_missing_columns
+  tests/unit/test_theta_node_processor.py:test_load_geometry_missing_file:
+    args:
+    - self
+    - sample_config
+    docstring: Test loading geometry with missing file.
+    file: tests/unit/test_theta_node_processor.py
+    line: 199
+    name: test_load_geometry_missing_file
+  tests/unit/test_theta_node_processor.py:test_load_json_depths:
+    args:
+    - self
+    - sample_node_depths_json
+    - sample_config
+    docstring: Test loading depths from JSON file.
+    file: tests/unit/test_theta_node_processor.py
+    line: 248
+    name: test_load_json_depths
+  tests/unit/test_theta_node_processor.py:test_load_json_geometry:
+    args:
+    - self
+    - sample_node_geometry_json
+    - sample_config
+    docstring: Test loading geometry from JSON file.
+    file: tests/unit/test_theta_node_processor.py
+    line: 135
+    name: test_load_json_geometry
+  tests/unit/test_theta_node_processor.py:test_map_depth_to_temperature:
+    args:
+    - self
+    - sample_config
+    docstring: Test mapping depths to temperatures.
+    file: tests/unit/test_theta_node_processor.py
+    line: 276
+    name: test_map_depth_to_temperature
+  tests/unit/test_theta_node_processor.py:test_map_depth_to_temperature_custom_config:
+    args:
+    - self
+    - sample_config
+    docstring: Test mapping with custom config.
+    file: tests/unit/test_theta_node_processor.py
+    line: 305
+    name: test_map_depth_to_temperature_custom_config
+  tests/unit/test_theta_node_processor.py:test_map_depth_to_temperature_negative:
+    args:
+    - self
+    - sample_config
+    docstring: Test mapping with negative depths.
+    file: tests/unit/test_theta_node_processor.py
+    line: 298
+    name: test_map_depth_to_temperature_negative
+  tests/unit/test_theta_node_processor.py:test_map_depth_to_temperature_range:
+    args:
+    - self
+    - sample_config
+    docstring: Test that temperatures are in expected range (20-30 μK).
+    file: tests/unit/test_theta_node_processor.py
+    line: 289
+    name: test_map_depth_to_temperature_range
+  tests/unit/test_theta_node_processor.py:test_process_node_data:
+    args:
+    - self
+    - sample_node_geometry_csv
+    - sample_node_depths_csv
+    - sample_config
+    docstring: Test processing complete node data.
+    file: tests/unit/test_theta_node_processor.py
+    line: 331
+    name: test_process_node_data
+  tests/unit/test_theta_node_processor.py:test_process_node_data_inconsistent:
+    args:
+    - self
+    - sample_node_geometry_csv
+    - temp_dir
+    - sample_config
+    docstring: Test processing with inconsistent data sizes.
+    file: tests/unit/test_theta_node_processor.py
+    line: 351
+    name: test_process_node_data_inconsistent
+  tests/unit/test_theta_node_processor.py:test_validate_node_data_invalid_positions:
+    args:
+    - self
+    - sample_config
+    docstring: Test validation with invalid position ranges.
+    file: tests/unit/test_theta_node_processor.py
+    line: 419
+    name: test_validate_node_data_invalid_positions
+  tests/unit/test_theta_node_processor.py:test_validate_node_data_invalid_shape:
+    args:
+    - self
+    - sample_config
+    docstring: Test validation with invalid array shapes.
+    file: tests/unit/test_theta_node_processor.py
+    line: 399
+    name: test_validate_node_data_invalid_shape
+  tests/unit/test_theta_node_processor.py:test_validate_node_data_negative_depths:
+    args:
+    - self
+    - sample_config
+    docstring: Test validation with negative depths.
+    file: tests/unit/test_theta_node_processor.py
+    line: 469
+    name: test_validate_node_data_negative_depths
+  tests/unit/test_theta_node_processor.py:test_validate_node_data_negative_scales:
+    args:
+    - self
+    - sample_config
+    docstring: Test validation with negative scales.
+    file: tests/unit/test_theta_node_processor.py
+    line: 444
+    name: test_validate_node_data_negative_scales
+  tests/unit/test_theta_node_processor.py:test_validate_node_data_valid:
+    args:
+    - self
+    - sample_config
+    docstring: Test validation of valid node data.
+    file: tests/unit/test_theta_node_processor.py
+    line: 375
+    name: test_validate_node_data_valid
   utils/io/data_index_loader.py:__init__:
     args:
     - self
@@ -4345,21 +4709,125 @@ imports:
     module: pathlib
     name: Path
     type: import_from
+  cmb/theta_data_parser.py:TYPE_CHECKING:
+    file: cmb/theta_data_parser.py
+    line: 11
+    module: typing
+    name: TYPE_CHECKING
+    type: import_from
   cmb/theta_data_parser.py:ThetaEvolution:
     file: cmb/theta_data_parser.py
-    line: 343
+    line: 346
     module: cmb.theta_data_loader
     name: ThetaEvolution
     type: import_from
   cmb/theta_data_parser.py:ThetaFrequencySpectrum:
     file: cmb/theta_data_parser.py
-    line: 205
+    line: 208
     module: cmb.theta_data_loader
     name: ThetaFrequencySpectrum
     type: import_from
   cmb/theta_data_parser.py:numpy:
     file: cmb/theta_data_parser.py
     line: 12
+    name: numpy
+    type: import
+  cmb/theta_node_loader.py:Optional:
+    file: cmb/theta_node_loader.py
+    line: 11
+    module: typing
+    name: Optional
+    type: import_from
+  cmb/theta_node_loader.py:Path:
+    file: cmb/theta_node_loader.py
+    line: 10
+    module: pathlib
+    name: Path
+    type: import_from
+  cmb/theta_node_loader.py:Tuple:
+    file: cmb/theta_node_loader.py
+    line: 11
+    module: typing
+    name: Tuple
+    type: import_from
+  cmb/theta_node_loader.py:get_config:
+    file: cmb/theta_node_loader.py
+    line: 14
+    module: config.settings
+    name: get_config
+    type: import_from
+  cmb/theta_node_loader.py:load_csv_data:
+    file: cmb/theta_node_loader.py
+    line: 15
+    module: utils.io.data_loader
+    name: load_csv_data
+    type: import_from
+  cmb/theta_node_loader.py:load_json_data:
+    file: cmb/theta_node_loader.py
+    line: 15
+    module: utils.io.data_loader
+    name: load_json_data
+    type: import_from
+  cmb/theta_node_loader.py:logging:
+    file: cmb/theta_node_loader.py
+    line: 13
+    name: logging
+    type: import
+  cmb/theta_node_loader.py:numpy:
+    file: cmb/theta_node_loader.py
+    line: 12
+    name: numpy
+    type: import
+  cmb/theta_node_processor.py:Config:
+    file: cmb/theta_node_processor.py
+    line: 16
+    module: config.settings
+    name: Config
+    type: import_from
+  cmb/theta_node_processor.py:Optional:
+    file: cmb/theta_node_processor.py
+    line: 12
+    module: typing
+    name: Optional
+    type: import_from
+  cmb/theta_node_processor.py:Path:
+    file: cmb/theta_node_processor.py
+    line: 11
+    module: pathlib
+    name: Path
+    type: import_from
+  cmb/theta_node_processor.py:dataclass:
+    file: cmb/theta_node_processor.py
+    line: 14
+    module: dataclasses
+    name: dataclass
+    type: import_from
+  cmb/theta_node_processor.py:get_config:
+    file: cmb/theta_node_processor.py
+    line: 16
+    module: config.settings
+    name: get_config
+    type: import_from
+  cmb/theta_node_processor.py:load_node_depths:
+    file: cmb/theta_node_processor.py
+    line: 17
+    module: cmb.theta_node_loader
+    name: load_node_depths
+    type: import_from
+  cmb/theta_node_processor.py:load_node_geometry:
+    file: cmb/theta_node_processor.py
+    line: 17
+    module: cmb.theta_node_loader
+    name: load_node_geometry
+    type: import_from
+  cmb/theta_node_processor.py:logging:
+    file: cmb/theta_node_processor.py
+    line: 15
+    name: logging
+    type: import
+  cmb/theta_node_processor.py:numpy:
+    file: cmb/theta_node_processor.py
+    line: 13
     name: numpy
     type: import
   config/__init__.py:Config:
@@ -6345,6 +6813,85 @@ imports:
     line: 15
     module: cmb.theta_data_loader
     name: validate_frequency_spectrum
+    type: import_from
+  tests/unit/test_theta_node_processor.py:Config:
+    file: tests/unit/test_theta_node_processor.py
+    line: 21
+    module: config.settings
+    name: Config
+    type: import_from
+  tests/unit/test_theta_node_processor.py:Path:
+    file: tests/unit/test_theta_node_processor.py
+    line: 10
+    module: pathlib
+    name: Path
+    type: import_from
+  tests/unit/test_theta_node_processor.py:ThetaNodeData:
+    file: tests/unit/test_theta_node_processor.py
+    line: 14
+    module: cmb.theta_node_processor
+    name: ThetaNodeData
+    type: import_from
+  tests/unit/test_theta_node_processor.py:csv:
+    file: tests/unit/test_theta_node_processor.py
+    line: 13
+    name: csv
+    type: import
+  tests/unit/test_theta_node_processor.py:initialize_config:
+    file: tests/unit/test_theta_node_processor.py
+    line: 21
+    module: config.settings
+    name: initialize_config
+    type: import_from
+  tests/unit/test_theta_node_processor.py:json:
+    file: tests/unit/test_theta_node_processor.py
+    line: 12
+    name: json
+    type: import
+  tests/unit/test_theta_node_processor.py:load_node_depths:
+    file: tests/unit/test_theta_node_processor.py
+    line: 20
+    module: cmb.theta_node_loader
+    name: load_node_depths
+    type: import_from
+  tests/unit/test_theta_node_processor.py:load_node_geometry:
+    file: tests/unit/test_theta_node_processor.py
+    line: 20
+    module: cmb.theta_node_loader
+    name: load_node_geometry
+    type: import_from
+  tests/unit/test_theta_node_processor.py:map_depth_to_temperature:
+    file: tests/unit/test_theta_node_processor.py
+    line: 14
+    module: cmb.theta_node_processor
+    name: map_depth_to_temperature
+    type: import_from
+  tests/unit/test_theta_node_processor.py:numpy:
+    file: tests/unit/test_theta_node_processor.py
+    line: 9
+    name: numpy
+    type: import
+  tests/unit/test_theta_node_processor.py:process_node_data:
+    file: tests/unit/test_theta_node_processor.py
+    line: 14
+    module: cmb.theta_node_processor
+    name: process_node_data
+    type: import_from
+  tests/unit/test_theta_node_processor.py:pytest:
+    file: tests/unit/test_theta_node_processor.py
+    line: 8
+    name: pytest
+    type: import
+  tests/unit/test_theta_node_processor.py:tempfile:
+    file: tests/unit/test_theta_node_processor.py
+    line: 11
+    name: tempfile
+    type: import
+  tests/unit/test_theta_node_processor.py:validate_node_data:
+    file: tests/unit/test_theta_node_processor.py
+    line: 14
+    module: cmb.theta_node_processor
+    name: validate_node_data
     type: import_from
   utils/io/__init__.py:DataIndex:
     file: utils/io/__init__.py

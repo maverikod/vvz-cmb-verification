@@ -139,9 +139,7 @@ class Config:
             return cls._load_defaults()
 
         if not config_file.exists():
-            raise FileNotFoundError(
-                f"Configuration file not found: {config_file}"
-            )
+            raise FileNotFoundError(f"Configuration file not found: {config_file}")
 
         try:
             with open(config_file, "r", encoding="utf-8") as f:
@@ -171,9 +169,7 @@ class Config:
             z_CMB=constants_data.get("z_CMB", 1100.0),
             T_0=constants_data.get("T_0", 2.725),
             omega_CMB=constants_data.get("omega_CMB", 1.0e11),
-            arcmin_to_pc_at_z1100=constants_data.get(
-                "arcmin_to_pc_at_z1100", 60.0
-            ),
+            arcmin_to_pc_at_z1100=constants_data.get("arcmin_to_pc_at_z1100", 60.0),
             delta_T_min=constants_data.get("delta_T_min", 20.0),
             delta_T_max=constants_data.get("delta_T_max", 30.0),
         )
@@ -183,8 +179,7 @@ class Config:
         paths = DataPaths(
             project_root=project_root,
             data_in=project_root / paths_data.get("data_in", "data/in"),
-            data_theta=project_root
-            / paths_data.get("data_theta", "data/theta"),
+            data_theta=project_root / paths_data.get("data_theta", "data/theta"),
             data_out=project_root / paths_data.get("data_out", "data/out"),
             data_tmp=project_root / paths_data.get("data_tmp", "data/tmp"),
             data_index=project_root
@@ -277,9 +272,7 @@ class Config:
         if self.constants.D <= 0:
             raise ValueError("D must be positive")
         if not (1000 <= self.constants.z_CMB <= 1200):
-            raise ValueError(
-                f"z_CMB should be around 1100, got {self.constants.z_CMB}"
-            )
+            raise ValueError(f"z_CMB should be around 1100, got {self.constants.z_CMB}")
         if self.constants.T_0 <= 0:
             raise ValueError("T_0 must be positive")
         if self.constants.omega_CMB <= 0:
@@ -293,9 +286,7 @@ class Config:
 
         # Validate paths
         if not self.paths.project_root.exists():
-            raise ValueError(
-                f"Project root does not exist: {self.paths.project_root}"
-            )
+            raise ValueError(f"Project root does not exist: {self.paths.project_root}")
 
         # Validate logging
         valid_levels = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
@@ -317,9 +308,7 @@ class Config:
         logging_config.
         """
         # Get logging level
-        level = getattr(
-            logging, self.logging_config.level.upper(), logging.INFO
-        )
+        level = getattr(logging, self.logging_config.level.upper(), logging.INFO)
 
         # Configure root logger
         root_logger = logging.getLogger()
@@ -343,9 +332,7 @@ class Config:
         # File handler with rotation
         if self.logging_config.log_file:
             # Create log directory if it doesn't exist
-            self.logging_config.log_file.parent.mkdir(
-                parents=True, exist_ok=True
-            )
+            self.logging_config.log_file.parent.mkdir(parents=True, exist_ok=True)
 
             file_handler = RotatingFileHandler(
                 self.logging_config.log_file,
@@ -370,8 +357,7 @@ def get_config() -> Config:
     """
     if Config._instance is None:
         raise RuntimeError(
-            "Configuration has not been initialized. "
-            "Call initialize_config() first."
+            "Configuration has not been initialized. " "Call initialize_config() first."
         )
     return Config._instance
 

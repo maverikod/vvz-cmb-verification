@@ -182,8 +182,7 @@ class TestSearchByName:
 
             assert len(matches) == 2
             assert all(
-                "file" in m["name"] and m["name"].endswith(".txt")
-                for m in matches
+                "file" in m["name"] and m["name"].endswith(".txt") for m in matches
             )
 
     def test_search_no_matches(self):

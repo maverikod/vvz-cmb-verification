@@ -2,10 +2,14 @@ issues:
   any_type_usage: []
   classes_without_docstrings: []
   files_too_large:
-  - exceeds_limit: 57
+  - exceeds_limit: 43
     file: tests/unit/test_theta_data_loader.py
     limit: 400
-    lines: 457
+    lines: 443
+  - exceeds_limit: 93
+    file: tests/unit/test_theta_node_processor.py
+    limit: 400
+    lines: 493
   files_without_docstrings: []
   generic_exception_usage: []
   imports_in_middle: []
@@ -58,23 +62,11 @@ issues:
     line: 17
     module: cmb.correlation.phi_split_analyzer
     type: import_from
-  - description: Module 'cmb.theta_node_processor' cannot be imported
-    file: docs/implementation_plan/phase_2_cmb_reconstruction/step_2.3_node_mapping/node_to_cmb_mapper.py
-    imported: ThetaNodeData
-    line: 15
-    module: cmb.theta_node_processor
-    type: import_from
   - description: Module 'cmb.reconstruction.cmb_map_reconstructor' cannot be imported
     file: docs/implementation_plan/phase_2_cmb_reconstruction/step_2.3_node_mapping/node_to_cmb_mapper.py
     imported: CmbMapReconstructor
     line: 16
     module: cmb.reconstruction.cmb_map_reconstructor
-    type: import_from
-  - description: Module 'cmb.theta_node_processor' cannot be imported
-    file: docs/implementation_plan/phase_2_cmb_reconstruction/step_2.1_reconstruction_core/cmb_map_reconstructor.py
-    imported: ThetaNodeData
-    line: 21
-    module: cmb.theta_node_processor
     type: import_from
   - description: Module 'cmb.reconstruction.cmb_map_reconstructor' cannot be imported
     file: docs/implementation_plan/phase_2_cmb_reconstruction/step_2.2_map_validation/map_validator.py
@@ -210,13 +202,13 @@ issues:
 summary:
   any_type_usage: 0
   classes_without_docstrings: 0
-  files_too_large: 1
+  files_too_large: 2
   files_without_docstrings: 0
   generic_exception_usage: 0
   imports_in_middle: 0
-  invalid_imports: 31
+  invalid_imports: 29
   max_lines_limit: 400
   methods_with_pass: 0
   methods_without_docstrings: 2
   not_implemented_in_non_abstract: 0
-  total_issues: 34
+  total_issues: 33

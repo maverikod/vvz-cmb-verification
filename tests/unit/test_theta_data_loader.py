@@ -75,9 +75,7 @@ class TestLoadFrequencySpectrum:
         """Test loading frequency spectrum from CSV file."""
         frequencies = np.array([1.0e10, 2.0e10, 3.0e10])
         times = np.array([0.0, 1.0, 2.0])
-        spectrum_2d = np.array(
-            [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]
-        )
+        spectrum_2d = np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]])
 
         with tempfile.TemporaryDirectory() as tmpdir:
             csv_path = Path(tmpdir) / "frequency_spectrum.csv"
@@ -106,9 +104,7 @@ class TestLoadFrequencySpectrum:
         """Test loading frequency spectrum from JSON file."""
         frequencies = np.array([1.0e10, 2.0e10, 3.0e10])
         times = np.array([0.0, 1.0, 2.0])
-        spectrum_2d = np.array(
-            [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]
-        )
+        spectrum_2d = np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]])
 
         with tempfile.TemporaryDirectory() as tmpdir:
             json_path = Path(tmpdir) / "frequency_spectrum.json"
@@ -166,9 +162,7 @@ class TestLoadFrequencySpectrum:
             with open(json_path, "w") as f:
                 json.dump(data, f)
 
-            with pytest.raises(
-                ValueError, match="'frequencies' key not found"
-            ):
+            with pytest.raises(ValueError, match="'frequencies' key not found"):
                 load_frequency_spectrum(json_path)
 
 
@@ -303,9 +297,7 @@ class TestValidateFrequencySpectrum:
             metadata=metadata,
         )
 
-        with pytest.raises(
-            ValueError, match="All frequencies must be positive"
-        ):
+        with pytest.raises(ValueError, match="All frequencies must be positive"):
             validate_frequency_spectrum(spec)
 
     def test_validate_negative_spectrum(self):
@@ -358,9 +350,7 @@ class TestValidateFrequencySpectrum:
             metadata=metadata,
         )
 
-        with pytest.raises(
-            ValueError, match="Frequency array contains NaN values"
-        ):
+        with pytest.raises(ValueError, match="Frequency array contains NaN values"):
             validate_frequency_spectrum(spec)
 
 
@@ -420,9 +410,7 @@ class TestValidateEvolutionData:
     def test_validate_negative_omega_min(self):
         """Test validating evolution with negative omega_min."""
         times = np.array([0.0, 1.0, 2.0])
-        omega_min = np.array(
-            [-1.0e10, 1.1e10, 1.2e10]
-        )
+        omega_min = np.array([-1.0e10, 1.1e10, 1.2e10])
         omega_macro = np.array([10.0e10, 10.1e10, 10.2e10])
         metadata = {}
 
@@ -433,9 +421,7 @@ class TestValidateEvolutionData:
             metadata=metadata,
         )
 
-        with pytest.raises(
-            ValueError, match="All omega_min values must be positive"
-        ):
+        with pytest.raises(ValueError, match="All omega_min values must be positive"):
             validate_evolution_data(evol)
 
     def test_validate_nan_times(self):

@@ -239,6 +239,20 @@ TestLoadJsonData:
 - test_load_valid_json
 - test_load_nonexistent_json
 - test_load_invalid_json
+TestLoadNodeDepths:
+- test_load_csv_depths
+- test_load_json_depths
+- test_load_depths_missing_file
+- test_load_depths_negative
+TestLoadNodeGeometry:
+- test_load_csv_geometry
+- test_load_json_geometry
+- test_load_geometry_degrees
+- test_load_geometry_arcmin_scales
+- test_load_geometry_missing_file
+- test_load_geometry_invalid_format
+- test_load_geometry_missing_columns
+- test_load_geometry_invalid_ranges
 TestLoadPowerSpectrumFromTar:
 - test_load_spectrum_from_tar
 - test_load_nonexistent_tar
@@ -247,6 +261,11 @@ TestLoggingConfig:
 - test_logging_setup
 - test_logging_levels
 - test_invalid_logging_level
+TestMapDepthToTemperature:
+- test_map_depth_to_temperature
+- test_map_depth_to_temperature_range
+- test_map_depth_to_temperature_negative
+- test_map_depth_to_temperature_custom_config
 TestMultipoleToFrequency:
 - test_convert_single_multipole
 - test_convert_array_multipoles
@@ -287,6 +306,9 @@ TestPlotSubpeaks:
 TestPlotTemperatureFluctuations:
 - test_plot_fluctuations
 - test_plot_invalid_data_raises_error
+TestProcessNodeData:
+- test_process_node_data
+- test_process_node_data_inconsistent
 TestSaveAnalysisResults:
 - test_save_results_json
 - test_save_results_invalid_format
@@ -332,6 +354,12 @@ TestValidateHealpixMap:
 - test_validate_invalid_size
 - test_validate_nside_mismatch
 - test_validate_empty_map
+TestValidateNodeData:
+- test_validate_node_data_valid
+- test_validate_node_data_invalid_shape
+- test_validate_node_data_invalid_positions
+- test_validate_node_data_negative_scales
+- test_validate_node_data_negative_depths
 ThetaEvolution: []
 ThetaEvolutionProcessor:
 - __init__

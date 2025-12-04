@@ -8,13 +8,16 @@ Email: vasilyvz@gmail.com
 """
 
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, TYPE_CHECKING
 import numpy as np
+
+if TYPE_CHECKING:
+    from cmb.theta_data_loader import ThetaFrequencySpectrum, ThetaEvolution
 
 
 def parse_csv_frequency_spectrum(
     data: Dict[str, np.ndarray], file_path: Path
-) -> "ThetaFrequencySpectrum":
+) -> "ThetaFrequencySpectrum":  # noqa: F821
     """
     Parse frequency spectrum from CSV data.
 
@@ -138,7 +141,7 @@ def parse_csv_frequency_spectrum(
 
 def parse_json_frequency_spectrum(
     data: Dict[str, Any], file_path: Path
-) -> "ThetaFrequencySpectrum":
+) -> "ThetaFrequencySpectrum":  # noqa: F821
     """
     Parse frequency spectrum from JSON data.
 
@@ -214,7 +217,7 @@ def parse_json_frequency_spectrum(
 
 def parse_csv_evolution_data(
     data: Dict[str, np.ndarray], file_path: Path
-) -> "ThetaEvolution":
+) -> "ThetaEvolution":  # noqa: F821
     """
     Parse evolution data from CSV data.
 
@@ -296,7 +299,7 @@ def parse_csv_evolution_data(
 
 def parse_json_evolution_data(
     data: Dict[str, Any], file_path: Path
-) -> "ThetaEvolution":
+) -> "ThetaEvolution":  # noqa: F821
     """
     Parse evolution data from JSON data.
 

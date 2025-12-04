@@ -1,1 +1,198 @@
-{}
+ChainComponent: []
+ChainVerificationReport: []
+ChainVerifier:
+- __init__
+- verify_chain_components
+- validate_end_to_end_chain
+- analyze_chain_consistency
+- validate_framework
+- generate_report
+ClusterPlateau: []
+ClusterPlateauAnalyzer:
+- __init__
+- load_cluster_data
+- analyze_plateau_slopes
+- correlate_with_node_directions
+- validate_chain_connection
+CmbLssCorrelator:
+- __init__
+- load_lss_data
+- calculate_correlation_function
+- test_correlation_significance
+- analyze_scale_dependence
+- create_correlation_map
+CmbMapReconstructor:
+- __init__
+- reconstruct_map
+- _convert_nodes_to_temperature
+- _project_nodes_to_sky
+- _integrate_frequency_spectrum
+Config:
+- __init__
+- load
+- _load_defaults
+- validate
+- setup_logging
+- __init__
+- load
+- _load_defaults
+- validate
+- setup_logging
+CorrelationFunction: []
+CrossSpectrum: []
+DataIndex:
+- __init__
+- load
+- get_file_path
+- get_files_by_category
+- validate_files
+- get_usage_guidelines
+- search_by_name
+DataPaths: []
+FrequencyInvarianceTester:
+- __init__
+- calculate_cross_spectra
+- test_invariance
+- calculate_invariance_metrics
+- validate_achromaticity
+GalaxyDistribution: []
+GalaxyDistributionAnalyzer:
+- __init__
+- load_galaxy_data
+- calculate_swi_by_direction
+- calculate_chi6_by_direction
+- analyze_u_distributions
+- verify_chain_connection
+HighlPeakPredictor:
+- __init__
+- predict_peak
+- compare_with_observations
+- calculate_agreement_metrics
+InvarianceTestResult: []
+LoggingConfig: []
+LssStructure: []
+MapValidator:
+- __init__
+- load_observed_map
+- compare_maps
+- validate_arcmin_structures
+- validate_amplitude
+- generate_validation_report
+NodeClassification: []
+NodeCmbMapping: []
+NodeDirectionAnalysis: []
+NodeLssMapper:
+- __init__
+- load_lss_structures
+- maximize_filament_overlap
+- predict_galaxy_types_by_node_strength
+- match_nodes_to_structures
+- create_correlation_map
+- create_displacement_map
+- analyze_node_lss_relationships
+NodeLssMapping: []
+NodeToCmbMapper:
+- __init__
+- map_nodes_to_sky
+- create_node_catalog
+- get_nodes_at_position
+- get_cmb_value_at_node
+PeakPrediction: []
+PeakValidation: []
+PhiSplitAnalyzer:
+- __init__
+- split_by_phi
+- analyze_phi_split
+- measure_signal_enhancement
+- validate_enhancement
+PhiSplitResult: []
+PhysicalConstants: []
+PlateauNodeCorrelation: []
+PowerSpectrum: []
+PowerSpectrumCalculator:
+- __init__
+- calculate_spectrum
+- _convert_frequencies_to_multipoles
+- _calculate_cl_from_spectrum
+- _integrate_temporal_evolution
+- _calculate_errors
+- validate_power_law
+PredictionSummary: []
+PredictionsReport: []
+PredictionsReportGenerator:
+- __init__
+- compile_predictions
+- generate_report
+- validate_framework
+- create_visualizations
+SpectrumComparator:
+- __init__
+- load_observed_spectrum
+- compare_spectra
+- validate_high_l_tail
+- calculate_chi_squared
+- generate_comparison_report
+SubPeak: []
+SubPeakAnalysis: []
+SubpeaksAnalyzer:
+- __init__
+- analyze_subpeaks
+- _calculate_beatings
+- _find_subpeaks
+- _detect_high_l_peak
+- _match_beatings_to_peaks
+TestConfigurationAccess:
+- test_get_config_before_initialization
+- test_initialize_config
+- test_config_methods_accessible
+- test_type_safety
+- test_cmb_config_loading
+TestConfigurationIntegration:
+- test_import_and_use_config
+- test_global_config_access
+- test_configuration_consistency
+- test_config_with_actual_paths
+- test_cmb_config_available
+TestConfigurationLoading:
+- test_load_defaults
+- test_load_from_valid_yaml
+- test_load_invalid_yaml
+- test_load_missing_file
+- test_load_with_missing_fields
+- test_validation
+TestDataPaths:
+- test_all_paths_defined
+- test_paths_can_be_created
+- test_path_resolution
+TestLoggingConfig:
+- test_logging_setup
+- test_logging_levels
+- test_invalid_logging_level
+TestPhysicalConstants:
+- test_all_constants_defined
+- test_z_cmb_range
+- test_temperature_range
+- test_constants_immutable
+ThetaEvolution: []
+ThetaEvolutionProcessor:
+- __init__
+- process
+- get_omega_min
+- get_omega_macro
+- get_evolution_rate_min
+- get_evolution_rate_macro
+- validate_time_range
+ThetaFrequencySpectrum: []
+ThetaNodeData: []
+ThetaNodeMap: []
+ThetaNodeMapGenerator:
+- __init__
+- find_nodes
+- classify_nodes
+- calculate_node_depth
+- calculate_node_area
+- calculate_local_curvature
+- generate_node_map
+- create_omega_min_map
+- create_node_mask
+- validate_node_map

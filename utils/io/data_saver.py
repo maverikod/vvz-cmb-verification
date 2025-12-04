@@ -135,7 +135,7 @@ def save_power_spectrum(
 
     elif format_lower == "npy":
         # Save as numpy archive
-        np.savez(file_path, **spectrum_data)
+        np.savez(str(file_path), **spectrum_data)  # type: ignore[arg-type]
 
     else:
         raise ValueError(f"Unsupported format: {format}. Use 'json', 'csv', or 'npy'.")
@@ -162,6 +162,15 @@ def save_analysis_results(
     if format_lower == "json":
         # Convert numpy arrays and other non-serializable types
         def convert_to_serializable(obj: Any) -> Any:
+            """
+            Convert object to JSON-serializable format.
+
+            Args:
+                obj: Object to convert (can be numpy array, dict, list, etc.)
+
+            Returns:
+                JSON-serializable representation of the object
+            """
             if isinstance(obj, np.ndarray):
                 return obj.tolist()
             elif isinstance(obj, (np.integer, np.floating)):
@@ -190,6 +199,15 @@ def save_analysis_results(
             )
 
         def convert_to_yaml_serializable(obj: Any) -> Any:
+            """
+            Convert object to YAML-serializable format.
+
+            Args:
+                obj: Object to convert (can be numpy array, dict, list, etc.)
+
+            Returns:
+                YAML-serializable representation of the object
+            """
             if isinstance(obj, np.ndarray):
                 return obj.tolist()
             elif isinstance(obj, (np.integer, np.floating)):

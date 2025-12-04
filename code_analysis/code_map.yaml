@@ -712,7 +712,7 @@ classes:
     bases: []
     docstring: Test configuration access methods.
     file: tests/unit/test_config.py
-    line: 276
+    line: 268
     methods:
     - test_get_config_before_initialization
     - test_initialize_config
@@ -747,7 +747,7 @@ classes:
     bases: []
     docstring: Test logging configuration.
     file: tests/unit/test_config.py
-    line: 318
+    line: 310
     methods:
     - test_logging_setup
     - test_logging_levels
@@ -768,7 +768,7 @@ classes:
     bases: []
     docstring: Tests for load_csv_data function.
     file: tests/unit/test_data_loader.py
-    line: 116
+    line: 115
     methods:
     - test_load_valid_csv
     - test_load_nonexistent_csv
@@ -777,7 +777,7 @@ classes:
     bases: []
     docstring: Tests for load_healpix_map function.
     file: tests/unit/test_data_loader.py
-    line: 27
+    line: 26
     methods:
     - test_load_valid_healpix_map
     - test_load_nonexistent_file
@@ -787,7 +787,7 @@ classes:
     bases: []
     docstring: Tests for load_json_data function.
     file: tests/unit/test_data_loader.py
-    line: 145
+    line: 144
     methods:
     - test_load_valid_json
     - test_load_nonexistent_json
@@ -797,7 +797,7 @@ classes:
     bases: []
     docstring: Tests for load_power_spectrum_from_tar function.
     file: tests/unit/test_data_loader.py
-    line: 67
+    line: 66
     methods:
     - test_load_spectrum_from_tar
     - test_load_nonexistent_tar
@@ -807,7 +807,7 @@ classes:
     bases: []
     docstring: Tests for validate_healpix_map function.
     file: tests/unit/test_data_loader.py
-    line: 179
+    line: 178
     methods:
     - test_validate_valid_map
     - test_validate_invalid_size
@@ -1142,7 +1142,7 @@ functions:
       \ in radians (0 to π)\n        phi: azimuth in radians (0 to 2π)\n    title:\
       \ Plot title\n    output_path: Path to save plot (optional)"
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/cmb_plots.py
-    line: 168
+    line: 166
     name: plot_node_overlay
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/cmb_plots.py:plot_temperature_fluctuations:
     args:
@@ -1163,7 +1163,7 @@ functions:
       Raises:\n    FileNotFoundError: If file doesn't exist\n    ValueError: If CSV\
       \ format is invalid"
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_loader.py
-    line: 159
+    line: 155
     name: load_csv_data
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_loader.py:load_healpix_map:
     args:
@@ -1185,7 +1185,7 @@ functions:
       Returns:\n    Dictionary with JSON data\n\nRaises:\n    FileNotFoundError: If\
       \ file doesn't exist\n    json.JSONDecodeError: If JSON is invalid"
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_loader.py
-    line: 222
+    line: 218
     name: load_json_data
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_loader.py:load_power_spectrum_from_tar:
     args:
@@ -1197,7 +1197,7 @@ functions:
       \nRaises:\n    FileNotFoundError: If archive or file doesn't exist\n    ValueError:\
       \ If data format is invalid"
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_loader.py
-    line: 53
+    line: 51
     name: load_power_spectrum_from_tar
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_loader.py:validate_healpix_map:
     args:
@@ -1207,21 +1207,21 @@ functions:
       \    nside: Expected NSIDE value (optional)\n\nReturns:\n    True if map is\
       \ valid\n\nRaises:\n    ValueError: If map is invalid"
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_loader.py
-    line: 251
+    line: 247
     name: validate_healpix_map
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py:convert_to_serializable:
     args:
     - obj
     docstring: null
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py
-    line: 157
+    line: 164
     name: convert_to_serializable
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py:convert_to_yaml_serializable:
     args:
     - obj
     docstring: null
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py
-    line: 184
+    line: 192
     name: convert_to_yaml_serializable
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py:ensure_output_directory:
     args:
@@ -1230,7 +1230,7 @@ functions:
       \ Path to output file or directory\n\nRaises:\n    PermissionError: If directory\
       \ cannot be created"
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py
-    line: 207
+    line: 215
     name: ensure_output_directory
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py:save_analysis_results:
     args:
@@ -1241,7 +1241,7 @@ functions:
       \ analysis results\n    file_path: Path to output file\n    format: Output format\
       \ ('json', 'yaml')\n\nRaises:\n    ValueError: If format is invalid"
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py
-    line: 137
+    line: 144
     name: save_analysis_results
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py:save_healpix_map:
     args:
@@ -1254,7 +1254,7 @@ functions:
       \    overwrite: Whether to overwrite existing file\n\nRaises:\n    FileExistsError:\
       \ If file exists and overwrite=False\n    ValueError: If map data is invalid"
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py
-    line: 19
+    line: 18
     name: save_healpix_map
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py:save_power_spectrum:
     args:
@@ -1266,7 +1266,7 @@ functions:
       \ file\n    format: Output format ('json', 'csv', 'npy')\n\nRaises:\n    ValueError:\
       \ If format is invalid or data is missing"
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py
-    line: 69
+    line: 68
     name: save_power_spectrum
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/frequency_conversion.py:frequency_to_multipole:
     args:
@@ -1315,7 +1315,7 @@ functions:
       \ l_max) for peak region\n    title: Plot title\n    output_path: Path to save\
       \ plot (optional)"
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/spectrum_plots.py
-    line: 154
+    line: 147
     name: plot_high_l_peak
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/spectrum_plots.py:plot_power_spectrum:
     args:
@@ -2759,14 +2759,14 @@ functions:
     - self
     docstring: Test that CMB config is loaded if available.
     file: tests/unit/test_config.py
-    line: 310
+    line: 302
     name: test_cmb_config_loading
   tests/unit/test_config.py:test_config_methods_accessible:
     args:
     - self
     docstring: Test Config class interface (all methods accessible).
     file: tests/unit/test_config.py
-    line: 294
+    line: 286
     name: test_config_methods_accessible
   tests/unit/test_config.py:test_constants_immutable:
     args:
@@ -2780,21 +2780,21 @@ functions:
     - self
     docstring: Test get_config() raises error before initialization.
     file: tests/unit/test_config.py
-    line: 279
+    line: 271
     name: test_get_config_before_initialization
   tests/unit/test_config.py:test_initialize_config:
     args:
     - self
     docstring: Test initialize_config() sets global config.
     file: tests/unit/test_config.py
-    line: 286
+    line: 278
     name: test_initialize_config
   tests/unit/test_config.py:test_invalid_logging_level:
     args:
     - self
     docstring: Test validation of invalid logging level.
     file: tests/unit/test_config.py
-    line: 338
+    line: 330
     name: test_invalid_logging_level
   tests/unit/test_config.py:test_load_defaults:
     args:
@@ -2815,35 +2815,35 @@ functions:
     - self
     docstring: Test error handling for invalid YAML syntax.
     file: tests/unit/test_config.py
-    line: 202
+    line: 200
     name: test_load_invalid_yaml
   tests/unit/test_config.py:test_load_missing_file:
     args:
     - self
     docstring: Test error handling for missing config file.
     file: tests/unit/test_config.py
-    line: 216
+    line: 212
     name: test_load_missing_file
   tests/unit/test_config.py:test_load_with_missing_fields:
     args:
     - self
     docstring: Test loading with missing required fields (uses defaults).
     file: tests/unit/test_config.py
-    line: 222
+    line: 218
     name: test_load_with_missing_fields
   tests/unit/test_config.py:test_logging_levels:
     args:
     - self
     docstring: Test different logging levels.
     file: tests/unit/test_config.py
-    line: 327
+    line: 319
     name: test_logging_levels
   tests/unit/test_config.py:test_logging_setup:
     args:
     - self
     docstring: Test logging setup.
     file: tests/unit/test_config.py
-    line: 321
+    line: 313
     name: test_logging_setup
   tests/unit/test_config.py:test_path_resolution:
     args:
@@ -2871,14 +2871,14 @@ functions:
     - self
     docstring: Verify type hints work correctly.
     file: tests/unit/test_config.py
-    line: 303
+    line: 295
     name: test_type_safety
   tests/unit/test_config.py:test_validation:
     args:
     - self
     docstring: Test configuration validation.
     file: tests/unit/test_config.py
-    line: 239
+    line: 233
     name: test_validation
   tests/unit/test_config.py:test_z_cmb_range:
     args:
@@ -2892,105 +2892,105 @@ functions:
     - self
     docstring: Test loading with invalid HDU number.
     file: tests/unit/test_data_loader.py
-    line: 53
+    line: 52
     name: test_load_invalid_hdu
   tests/unit/test_data_loader.py:test_load_invalid_json:
     args:
     - self
     docstring: Test loading invalid JSON raises JSONDecodeError.
     file: tests/unit/test_data_loader.py
-    line: 168
+    line: 167
     name: test_load_invalid_json
   tests/unit/test_data_loader.py:test_load_nonexistent_csv:
     args:
     - self
     docstring: Test loading non-existent CSV raises FileNotFoundError.
     file: tests/unit/test_data_loader.py
-    line: 137
+    line: 136
     name: test_load_nonexistent_csv
   tests/unit/test_data_loader.py:test_load_nonexistent_file:
     args:
     - self
     docstring: Test loading non-existent file raises FileNotFoundError.
     file: tests/unit/test_data_loader.py
-    line: 46
+    line: 45
     name: test_load_nonexistent_file
   tests/unit/test_data_loader.py:test_load_nonexistent_file_in_tar:
     args:
     - self
     docstring: Test loading non-existent file from tar raises ValueError.
     file: tests/unit/test_data_loader.py
-    line: 105
+    line: 104
     name: test_load_nonexistent_file_in_tar
   tests/unit/test_data_loader.py:test_load_nonexistent_json:
     args:
     - self
     docstring: Test loading non-existent JSON raises FileNotFoundError.
     file: tests/unit/test_data_loader.py
-    line: 161
+    line: 160
     name: test_load_nonexistent_json
   tests/unit/test_data_loader.py:test_load_nonexistent_tar:
     args:
     - self
     docstring: Test loading from non-existent tar raises FileNotFoundError.
     file: tests/unit/test_data_loader.py
-    line: 98
+    line: 97
     name: test_load_nonexistent_tar
   tests/unit/test_data_loader.py:test_load_spectrum_from_tar:
     args:
     - self
     docstring: Test loading power spectrum from tar archive.
     file: tests/unit/test_data_loader.py
-    line: 70
+    line: 69
     name: test_load_spectrum_from_tar
   tests/unit/test_data_loader.py:test_load_valid_csv:
     args:
     - self
     docstring: Test loading valid CSV file.
     file: tests/unit/test_data_loader.py
-    line: 119
+    line: 118
     name: test_load_valid_csv
   tests/unit/test_data_loader.py:test_load_valid_healpix_map:
     args:
     - self
     docstring: Test loading a valid HEALPix map.
     file: tests/unit/test_data_loader.py
-    line: 30
+    line: 29
     name: test_load_valid_healpix_map
   tests/unit/test_data_loader.py:test_load_valid_json:
     args:
     - self
     docstring: Test loading valid JSON file.
     file: tests/unit/test_data_loader.py
-    line: 148
+    line: 147
     name: test_load_valid_json
   tests/unit/test_data_loader.py:test_validate_empty_map:
     args:
     - self
     docstring: Test validating empty map raises ValueError.
     file: tests/unit/test_data_loader.py
-    line: 207
+    line: 206
     name: test_validate_empty_map
   tests/unit/test_data_loader.py:test_validate_invalid_size:
     args:
     - self
     docstring: Test validating map with invalid size raises ValueError.
     file: tests/unit/test_data_loader.py
-    line: 191
+    line: 190
     name: test_validate_invalid_size
   tests/unit/test_data_loader.py:test_validate_nside_mismatch:
     args:
     - self
     docstring: Test validating map with wrong NSIDE raises ValueError.
     file: tests/unit/test_data_loader.py
-    line: 198
+    line: 197
     name: test_validate_nside_mismatch
   tests/unit/test_data_loader.py:test_validate_valid_map:
     args:
     - self
     docstring: Test validating a valid HEALPix map.
     file: tests/unit/test_data_loader.py
-    line: 182
+    line: 181
     name: test_validate_valid_map
   tests/unit/test_data_saver.py:test_create_directory:
     args:
@@ -3329,7 +3329,7 @@ functions:
       Raises:\n    FileNotFoundError: If file doesn't exist\n    ValueError: If CSV\
       \ format is invalid"
     file: utils/io/data_loader.py
-    line: 159
+    line: 155
     name: load_csv_data
   utils/io/data_loader.py:load_healpix_map:
     args:
@@ -3351,7 +3351,7 @@ functions:
       Returns:\n    Dictionary with JSON data\n\nRaises:\n    FileNotFoundError: If\
       \ file doesn't exist\n    json.JSONDecodeError: If JSON is invalid"
     file: utils/io/data_loader.py
-    line: 222
+    line: 218
     name: load_json_data
   utils/io/data_loader.py:load_power_spectrum_from_tar:
     args:
@@ -3363,7 +3363,7 @@ functions:
       \nRaises:\n    FileNotFoundError: If archive or file doesn't exist\n    ValueError:\
       \ If data format is invalid"
     file: utils/io/data_loader.py
-    line: 53
+    line: 51
     name: load_power_spectrum_from_tar
   utils/io/data_loader.py:validate_healpix_map:
     args:
@@ -3373,21 +3373,25 @@ functions:
       \    nside: Expected NSIDE value (optional)\n\nReturns:\n    True if map is\
       \ valid\n\nRaises:\n    ValueError: If map is invalid"
     file: utils/io/data_loader.py
-    line: 251
+    line: 247
     name: validate_healpix_map
   utils/io/data_saver.py:convert_to_serializable:
     args:
     - obj
-    docstring: null
+    docstring: "Convert object to JSON-serializable format.\n\nArgs:\n    obj: Object\
+      \ to convert (can be numpy array, dict, list, etc.)\n\nReturns:\n    JSON-serializable\
+      \ representation of the object"
     file: utils/io/data_saver.py
-    line: 157
+    line: 164
     name: convert_to_serializable
   utils/io/data_saver.py:convert_to_yaml_serializable:
     args:
     - obj
-    docstring: null
+    docstring: "Convert object to YAML-serializable format.\n\nArgs:\n    obj: Object\
+      \ to convert (can be numpy array, dict, list, etc.)\n\nReturns:\n    YAML-serializable\
+      \ representation of the object"
     file: utils/io/data_saver.py
-    line: 184
+    line: 201
     name: convert_to_yaml_serializable
   utils/io/data_saver.py:ensure_output_directory:
     args:
@@ -3396,7 +3400,7 @@ functions:
       \ Path to output file or directory\n\nRaises:\n    PermissionError: If directory\
       \ cannot be created"
     file: utils/io/data_saver.py
-    line: 207
+    line: 233
     name: ensure_output_directory
   utils/io/data_saver.py:save_analysis_results:
     args:
@@ -3407,7 +3411,7 @@ functions:
       \ analysis results\n    file_path: Path to output file\n    format: Output format\
       \ ('json', 'yaml')\n\nRaises:\n    ValueError: If format is invalid"
     file: utils/io/data_saver.py
-    line: 137
+    line: 144
     name: save_analysis_results
   utils/io/data_saver.py:save_healpix_map:
     args:
@@ -3420,7 +3424,7 @@ functions:
       \    overwrite: Whether to overwrite existing file\n\nRaises:\n    FileExistsError:\
       \ If file exists and overwrite=False\n    ValueError: If map data is invalid"
     file: utils/io/data_saver.py
-    line: 19
+    line: 18
     name: save_healpix_map
   utils/io/data_saver.py:save_power_spectrum:
     args:
@@ -3432,7 +3436,7 @@ functions:
       \ file\n    format: Output format ('json', 'csv', 'npy')\n\nRaises:\n    ValueError:\
       \ If format is invalid or data is missing"
     file: utils/io/data_saver.py
-    line: 69
+    line: 68
     name: save_power_spectrum
   utils/math/frequency_conversion.py:frequency_to_multipole:
     args:
@@ -3551,7 +3555,7 @@ functions:
       \ in radians (0 to π)\n        phi: azimuth in radians (0 to 2π)\n    title:\
       \ Plot title\n    output_path: Path to save plot (optional)"
     file: utils/visualization/cmb_plots.py
-    line: 168
+    line: 166
     name: plot_node_overlay
   utils/visualization/cmb_plots.py:plot_temperature_fluctuations:
     args:
@@ -3576,7 +3580,7 @@ functions:
       \ l_max) for peak region\n    title: Plot title\n    output_path: Path to save\
       \ plot (optional)"
     file: utils/visualization/spectrum_plots.py
-    line: 154
+    line: 147
     name: plot_high_l_peak
   utils/visualization/spectrum_plots.py:plot_power_spectrum:
     args:
@@ -3747,12 +3751,6 @@ imports:
     module: pathlib
     name: Path
     type: import_from
-  docs/implementation_plan/phase_0_foundation/step_0.2_utilities/cmb_plots.py:Tuple:
-    file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/cmb_plots.py
-    line: 11
-    module: typing
-    name: Tuple
-    type: import_from
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/cmb_plots.py:healpy:
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/cmb_plots.py
     line: 14
@@ -3791,12 +3789,6 @@ imports:
     line: 10
     module: pathlib
     name: Path
-    type: import_from
-  docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_loader.py:Union:
-    file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_loader.py
-    line: 11
-    module: typing
-    name: Union
     type: import_from
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_loader.py:csv:
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_loader.py
@@ -3841,35 +3833,17 @@ imports:
     module: typing
     name: Dict
     type: import_from
-  docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py:Optional:
-    file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py
-    line: 11
-    module: typing
-    name: Optional
-    type: import_from
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py:Path:
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py
     line: 10
     module: pathlib
     name: Path
     type: import_from
-  docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py:Union:
-    file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py
-    line: 11
-    module: typing
-    name: Union
-    type: import_from
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py:csv:
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py
-    line: 16
+    line: 15
     name: csv
     type: import
-  docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py:fits:
-    file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py
-    line: 14
-    module: astropy.io
-    name: fits
-    type: import_from
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py:healpy:
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py
     line: 13
@@ -3877,7 +3851,7 @@ imports:
     type: import
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py:json:
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py
-    line: 15
+    line: 14
     name: json
     type: import
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py:numpy:
@@ -3887,7 +3861,7 @@ imports:
     type: import
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py:yaml:
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py
-    line: 178
+    line: 185
     name: yaml
     type: import
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/frequency_conversion.py:Config:
@@ -5265,15 +5239,9 @@ imports:
     type: import_from
   tests/unit/test_data_loader.py:csv:
     file: tests/unit/test_data_loader.py
-    line: 16
+    line: 15
     name: csv
     type: import
-  tests/unit/test_data_loader.py:fits:
-    file: tests/unit/test_data_loader.py
-    line: 13
-    module: astropy.io
-    name: fits
-    type: import_from
   tests/unit/test_data_loader.py:healpy:
     file: tests/unit/test_data_loader.py
     line: 12
@@ -5281,30 +5249,30 @@ imports:
     type: import
   tests/unit/test_data_loader.py:json:
     file: tests/unit/test_data_loader.py
-    line: 15
+    line: 14
     name: json
     type: import
   tests/unit/test_data_loader.py:load_csv_data:
     file: tests/unit/test_data_loader.py
-    line: 18
+    line: 17
     module: utils.io.data_loader
     name: load_csv_data
     type: import_from
   tests/unit/test_data_loader.py:load_healpix_map:
     file: tests/unit/test_data_loader.py
-    line: 18
+    line: 17
     module: utils.io.data_loader
     name: load_healpix_map
     type: import_from
   tests/unit/test_data_loader.py:load_json_data:
     file: tests/unit/test_data_loader.py
-    line: 18
+    line: 17
     module: utils.io.data_loader
     name: load_json_data
     type: import_from
   tests/unit/test_data_loader.py:load_power_spectrum_from_tar:
     file: tests/unit/test_data_loader.py
-    line: 18
+    line: 17
     module: utils.io.data_loader
     name: load_power_spectrum_from_tar
     type: import_from
@@ -5320,7 +5288,7 @@ imports:
     type: import
   tests/unit/test_data_loader.py:tarfile:
     file: tests/unit/test_data_loader.py
-    line: 14
+    line: 13
     name: tarfile
     type: import
   tests/unit/test_data_loader.py:tempfile:
@@ -5330,7 +5298,7 @@ imports:
     type: import
   tests/unit/test_data_loader.py:validate_healpix_map:
     file: tests/unit/test_data_loader.py
-    line: 18
+    line: 17
     module: utils.io.data_loader
     name: validate_healpix_map
     type: import_from
@@ -5584,12 +5552,6 @@ imports:
     module: pathlib
     name: Path
     type: import_from
-  utils/io/data_loader.py:Union:
-    file: utils/io/data_loader.py
-    line: 11
-    module: typing
-    name: Union
-    type: import_from
   utils/io/data_loader.py:csv:
     file: utils/io/data_loader.py
     line: 17
@@ -5633,35 +5595,17 @@ imports:
     module: typing
     name: Dict
     type: import_from
-  utils/io/data_saver.py:Optional:
-    file: utils/io/data_saver.py
-    line: 11
-    module: typing
-    name: Optional
-    type: import_from
   utils/io/data_saver.py:Path:
     file: utils/io/data_saver.py
     line: 10
     module: pathlib
     name: Path
     type: import_from
-  utils/io/data_saver.py:Union:
-    file: utils/io/data_saver.py
-    line: 11
-    module: typing
-    name: Union
-    type: import_from
   utils/io/data_saver.py:csv:
     file: utils/io/data_saver.py
-    line: 16
+    line: 15
     name: csv
     type: import
-  utils/io/data_saver.py:fits:
-    file: utils/io/data_saver.py
-    line: 14
-    module: astropy.io
-    name: fits
-    type: import_from
   utils/io/data_saver.py:healpy:
     file: utils/io/data_saver.py
     line: 13
@@ -5669,7 +5613,7 @@ imports:
     type: import
   utils/io/data_saver.py:json:
     file: utils/io/data_saver.py
-    line: 15
+    line: 14
     name: json
     type: import
   utils/io/data_saver.py:numpy:
@@ -5679,7 +5623,7 @@ imports:
     type: import
   utils/io/data_saver.py:yaml:
     file: utils/io/data_saver.py
-    line: 178
+    line: 194
     name: yaml
     type: import
   utils/math/__init__.py:calculate_power_spectrum_from_alm:
@@ -5834,12 +5778,6 @@ imports:
     line: 10
     module: pathlib
     name: Path
-    type: import_from
-  utils/visualization/cmb_plots.py:Tuple:
-    file: utils/visualization/cmb_plots.py
-    line: 11
-    module: typing
-    name: Tuple
     type: import_from
   utils/visualization/cmb_plots.py:healpy:
     file: utils/visualization/cmb_plots.py

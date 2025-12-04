@@ -243,20 +243,12 @@ issues:
   methods_with_pass: []
   methods_without_docstrings:
   - class: null
-    file: utils/io/data_saver.py
-    line: 157
-    method: convert_to_serializable
-  - class: null
-    file: utils/io/data_saver.py
-    line: 184
-    method: convert_to_yaml_serializable
-  - class: null
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py
-    line: 157
+    line: 164
     method: convert_to_serializable
   - class: null
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py
-    line: 184
+    line: 192
     method: convert_to_yaml_serializable
   not_implemented_in_non_abstract: []
 summary:
@@ -269,6 +261,6 @@ summary:
   invalid_imports: 39
   max_lines_limit: 400
   methods_with_pass: 0
-  methods_without_docstrings: 4
+  methods_without_docstrings: 2
   not_implemented_in_non_abstract: 0
-  total_issues: 43
+  total_issues: 41

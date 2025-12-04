@@ -56,6 +56,7 @@ DataIndex:
 - validate_files
 - get_usage_guidelines
 - search_by_name
+- _resolve_path
 DataPaths: []
 FrequencyInvarianceTester:
 - __init__
@@ -219,6 +220,17 @@ TestGetUsageGuidelines:
 TestLoadCsvData:
 - test_load_valid_csv
 - test_load_nonexistent_csv
+TestLoadEvolutionData:
+- test_load_csv_evolution_data
+- test_load_json_evolution_data
+- test_load_nonexistent_file
+- test_load_csv_missing_column
+TestLoadFrequencySpectrum:
+- test_load_csv_frequency_spectrum
+- test_load_json_frequency_spectrum
+- test_load_nonexistent_file
+- test_load_csv_missing_column
+- test_load_json_missing_key
 TestLoadHealpixMap:
 - test_load_valid_healpix_map
 - test_load_nonexistent_file
@@ -295,9 +307,26 @@ TestSynthesizeMap:
 - test_synthesize_valid_alm
 - test_synthesize_empty_alm
 - test_synthesize_invalid_nside
+TestThetaEvolution:
+- test_create_evolution
+TestThetaFrequencySpectrum:
+- test_create_frequency_spectrum
+TestValidateEvolutionData:
+- test_validate_valid_evolution
+- test_validate_empty_times
+- test_validate_length_mismatch
+- test_validate_negative_omega_min
+- test_validate_nan_times
 TestValidateFiles:
 - test_validate_existing_files
 - test_validate_missing_files
+TestValidateFrequencySpectrum:
+- test_validate_valid_spectrum
+- test_validate_empty_frequencies
+- test_validate_negative_frequencies
+- test_validate_negative_spectrum
+- test_validate_shape_mismatch
+- test_validate_nan_frequencies
 TestValidateHealpixMap:
 - test_validate_valid_map
 - test_validate_invalid_size

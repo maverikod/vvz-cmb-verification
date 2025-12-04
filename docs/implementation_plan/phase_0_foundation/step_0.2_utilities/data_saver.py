@@ -135,7 +135,14 @@ def save_power_spectrum(
 
     elif format_lower == "npy":
         # Save as numpy archive
-        np.savez(file_path, **spectrum_data)
+        # Convert dict values to ensure they are numpy arrays
+        np_data: Dict[str, np.ndarray] = {}
+        for k, v in spectrum_data.items():
+            if isinstance(v, np.ndarray):
+                np_data[k] = v
+            else:
+                np_data[k] = np.asarray(v)
+        np.savez(str(file_path), **np_data)  # type: ignore
 
     else:
         raise ValueError(f"Unsupported format: {format}. Use 'json', 'csv', or 'npy'.")

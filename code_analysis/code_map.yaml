@@ -1,4 +1,22 @@
 classes:
+  cmb/theta_data_loader.py:ThetaEvolution:
+    bases: []
+    docstring: "Θ-field temporal evolution data.\n\nAttributes:\n    times: Time array\
+      \ t\n    omega_min: ω_min(t) values\n    omega_macro: ω_macro(t) values\n  \
+      \  metadata: Additional metadata"
+    file: cmb/theta_data_loader.py
+    line: 48
+    methods: []
+    name: ThetaEvolution
+  cmb/theta_data_loader.py:ThetaFrequencySpectrum:
+    bases: []
+    docstring: "Θ-field frequency spectrum data.\n\nAttributes:\n    frequencies:\
+      \ Frequency array ω in Hz\n    times: Time array t\n    spectrum: Spectrum values\
+      \ ρ_Θ(ω,t) as 2D array\n    metadata: Additional metadata (units, ranges, etc.)"
+    file: cmb/theta_data_loader.py
+    line: 30
+    methods: []
+    name: ThetaFrequencySpectrum
   config/settings.py:Config:
     bases: []
     docstring: "Main configuration class for CMB verification project.\n\nProvides\
@@ -53,7 +71,7 @@ classes:
       \ data paths, and logging configuration.\n\nUsage:\n    config = Config.load()\n\
       \    print(config.constants.z_CMB)\n    print(config.paths.data_in)"
     file: docs/implementation_plan/phase_0_foundation/step_0.1_configuration/settings.py
-    line: 78
+    line: 79
     methods:
     - __init__
     - load
@@ -68,7 +86,7 @@ classes:
       \ Θ-field data directory\n    data_out: Output data directory\n    data_tmp:\
       \ Temporary data directory\n    data_index: Path to data index YAML file"
     file: docs/implementation_plan/phase_0_foundation/step_0.1_configuration/settings.py
-    line: 39
+    line: 40
     methods: []
     name: DataPaths
   docs/implementation_plan/phase_0_foundation/step_0.1_configuration/settings.py:LoggingConfig:
@@ -77,7 +95,7 @@ classes:
       \ INFO, WARNING, ERROR)\n    log_file: Path to log file\n    max_bytes: Maximum\
       \ log file size in bytes\n    backup_count: Number of backup log files to keep"
     file: docs/implementation_plan/phase_0_foundation/step_0.1_configuration/settings.py
-    line: 61
+    line: 62
     methods: []
     name: LoggingConfig
   docs/implementation_plan/phase_0_foundation/step_0.1_configuration/settings.py:PhysicalConstants:
@@ -88,7 +106,7 @@ classes:
       \ factor from arcmin to parsec at z≈1100\n    delta_T_min: Minimum temperature\
       \ fluctuation in μK\n    delta_T_max: Maximum temperature fluctuation in μK"
     file: docs/implementation_plan/phase_0_foundation/step_0.1_configuration/settings.py
-    line: 19
+    line: 20
     methods: []
     name: PhysicalConstants
   docs/implementation_plan/phase_0_foundation/step_0.3_data_index/data_index_loader.py:DataIndex:
@@ -100,7 +118,7 @@ classes:
 
       the comprehensive index in data/in/data_index.yaml.'
     file: docs/implementation_plan/phase_0_foundation/step_0.3_data_index/data_index_loader.py
-    line: 17
+    line: 18
     methods:
     - __init__
     - load
@@ -109,6 +127,7 @@ classes:
     - validate_files
     - get_usage_guidelines
     - search_by_name
+    - _resolve_path
     name: DataIndex
   docs/implementation_plan/phase_1_theta_data/step_1.1_data_loader/theta_data_loader.py:ThetaEvolution:
     bases: []
@@ -779,7 +798,7 @@ classes:
     bases: []
     docstring: Tests for get_file_path() method.
     file: tests/unit/test_data_index_loader_basic.py
-    line: 71
+    line: 73
     methods:
     - test_get_file_path_single_file
     - test_get_file_path_with_directory
@@ -790,7 +809,7 @@ classes:
     bases: []
     docstring: Tests for get_files_by_category() method.
     file: tests/unit/test_data_index_loader_basic.py
-    line: 162
+    line: 164
     methods:
     - test_get_files_single_file
     - test_get_files_list
@@ -800,7 +819,7 @@ classes:
     bases: []
     docstring: Tests for get_usage_guidelines() method.
     file: tests/unit/test_data_index_loader_validation.py
-    line: 72
+    line: 71
     methods:
     - test_get_usage_guidelines_from_section
     - test_get_usage_guidelines_from_category
@@ -810,7 +829,7 @@ classes:
     bases: []
     docstring: Tests for search_by_name() method.
     file: tests/unit/test_data_index_loader_validation.py
-    line: 138
+    line: 137
     methods:
     - test_search_exact_match
     - test_search_wildcard
@@ -820,7 +839,7 @@ classes:
     bases: []
     docstring: Tests for validate_files() method.
     file: tests/unit/test_data_index_loader_validation.py
-    line: 16
+    line: 15
     methods:
     - test_validate_existing_files
     - test_validate_missing_files
@@ -1027,6 +1046,70 @@ classes:
     - test_synthesize_empty_alm
     - test_synthesize_invalid_nside
     name: TestSynthesizeMap
+  tests/unit/test_theta_data_loader.py:TestLoadEvolutionData:
+    bases: []
+    docstring: Tests for load_evolution_data function.
+    file: tests/unit/test_theta_data_loader.py
+    line: 175
+    methods:
+    - test_load_csv_evolution_data
+    - test_load_json_evolution_data
+    - test_load_nonexistent_file
+    - test_load_csv_missing_column
+    name: TestLoadEvolutionData
+  tests/unit/test_theta_data_loader.py:TestLoadFrequencySpectrum:
+    bases: []
+    docstring: Tests for load_frequency_spectrum function.
+    file: tests/unit/test_theta_data_loader.py
+    line: 71
+    methods:
+    - test_load_csv_frequency_spectrum
+    - test_load_json_frequency_spectrum
+    - test_load_nonexistent_file
+    - test_load_csv_missing_column
+    - test_load_json_missing_key
+    name: TestLoadFrequencySpectrum
+  tests/unit/test_theta_data_loader.py:TestThetaEvolution:
+    bases: []
+    docstring: Tests for ThetaEvolution dataclass.
+    file: tests/unit/test_theta_data_loader.py
+    line: 48
+    methods:
+    - test_create_evolution
+    name: TestThetaEvolution
+  tests/unit/test_theta_data_loader.py:TestThetaFrequencySpectrum:
+    bases: []
+    docstring: Tests for ThetaFrequencySpectrum dataclass.
+    file: tests/unit/test_theta_data_loader.py
+    line: 25
+    methods:
+    - test_create_frequency_spectrum
+    name: TestThetaFrequencySpectrum
+  tests/unit/test_theta_data_loader.py:TestValidateEvolutionData:
+    bases: []
+    docstring: Tests for validate_evolution_data function.
+    file: tests/unit/test_theta_data_loader.py
+    line: 367
+    methods:
+    - test_validate_valid_evolution
+    - test_validate_empty_times
+    - test_validate_length_mismatch
+    - test_validate_negative_omega_min
+    - test_validate_nan_times
+    name: TestValidateEvolutionData
+  tests/unit/test_theta_data_loader.py:TestValidateFrequencySpectrum:
+    bases: []
+    docstring: Tests for validate_frequency_spectrum function.
+    file: tests/unit/test_theta_data_loader.py
+    line: 256
+    methods:
+    - test_validate_valid_spectrum
+    - test_validate_empty_frequencies
+    - test_validate_negative_frequencies
+    - test_validate_negative_spectrum
+    - test_validate_shape_mismatch
+    - test_validate_nan_frequencies
+    name: TestValidateFrequencySpectrum
   utils/io/data_index_loader.py:DataIndex:
     bases: []
     docstring: 'Data index manager for querying input data files.
@@ -1050,6 +1133,101 @@ classes:
 dependencies: {}
 files: {}
 functions:
+  cmb/theta_data_loader.py:load_evolution_data:
+    args:
+    - data_path
+    docstring: "Load Θ-field temporal evolution data (ω_min(t), ω_macro(t)).\n\nSupports\
+      \ CSV and JSON formats. For CSV, expects columns:\n- 'time' or 't': time values\n\
+      - 'omega_min' or 'ω_min': ω_min(t) values\n- 'omega_macro' or 'ω_macro': ω_macro(t)\
+      \ values\n\nFor JSON, expects structure:\n{\n    \"times\": [...],\n    \"omega_min\"\
+      : [...],\n    \"omega_macro\": [...],\n    \"metadata\": {...}\n}\n\nArgs:\n\
+      \    data_path: Path to evolution data file.\n               If None, uses path\
+      \ from data index.\n\nReturns:\n    ThetaEvolution instance\n\nRaises:\n   \
+      \ FileNotFoundError: If data file doesn't exist\n    ValueError: If data format\
+      \ is invalid"
+    file: cmb/theta_data_loader.py
+    line: 148
+    name: load_evolution_data
+  cmb/theta_data_loader.py:load_frequency_spectrum:
+    args:
+    - data_path
+    docstring: "Load Θ-field frequency spectrum ρ_Θ(ω,t).\n\nSupports CSV and JSON\
+      \ formats. For CSV, expects columns:\n- 'frequency' or 'omega' or 'ω': frequency\
+      \ values\n- 'time' or 't': time values\n- 'spectrum' or 'rho' or 'ρ': spectrum\
+      \ values (2D array)\n\nFor JSON, expects structure:\n{\n    \"frequencies\"\
+      : [...],\n    \"times\": [...],\n    \"spectrum\": [[...], [...], ...],\n  \
+      \  \"metadata\": {...}\n}\n\nArgs:\n    data_path: Path to frequency spectrum\
+      \ data file.\n               If None, uses path from data index.\n\nReturns:\n\
+      \    ThetaFrequencySpectrum instance\n\nRaises:\n    FileNotFoundError: If data\
+      \ file doesn't exist\n    ValueError: If data format is invalid"
+    file: cmb/theta_data_loader.py
+    line: 65
+    name: load_frequency_spectrum
+  cmb/theta_data_loader.py:validate_evolution_data:
+    args:
+    - evolution
+    docstring: "Validate evolution data.\n\nChecks:\n- Non-empty arrays\n- Valid time\
+      \ range\n- Positive omega values\n- Consistent array lengths (all arrays must\
+      \ have same length)\n\nArgs:\n    evolution: ThetaEvolution to validate\n\n\
+      Returns:\n    True if valid\n\nRaises:\n    ValueError: If data is invalid"
+    file: cmb/theta_data_loader.py
+    line: 292
+    name: validate_evolution_data
+  cmb/theta_data_loader.py:validate_frequency_spectrum:
+    args:
+    - spectrum
+    docstring: "Validate frequency spectrum data.\n\nChecks:\n- Non-empty arrays\n\
+      - Positive frequencies\n- Valid time range\n- Non-negative spectrum values\n\
+      - Consistent array shapes (spectrum shape = (len(frequencies), len(times)))\n\
+      \nArgs:\n    spectrum: ThetaFrequencySpectrum to validate\n\nReturns:\n    True\
+      \ if valid\n\nRaises:\n    ValueError: If data is invalid"
+    file: cmb/theta_data_loader.py
+    line: 225
+    name: validate_frequency_spectrum
+  cmb/theta_data_parser.py:parse_csv_evolution_data:
+    args:
+    - data
+    - file_path
+    docstring: "Parse evolution data from CSV data.\n\nArgs:\n    data: Dictionary\
+      \ with CSV column data\n    file_path: Path to source file (for error messages)\n\
+      \nReturns:\n    ThetaEvolution instance\n\nRaises:\n    ValueError: If required\
+      \ columns are missing or data format is invalid"
+    file: cmb/theta_data_parser.py
+    line: 219
+    name: parse_csv_evolution_data
+  cmb/theta_data_parser.py:parse_csv_frequency_spectrum:
+    args:
+    - data
+    - file_path
+    docstring: "Parse frequency spectrum from CSV data.\n\nArgs:\n    data: Dictionary\
+      \ with CSV column data\n    file_path: Path to source file (for error messages)\n\
+      \nReturns:\n    ThetaFrequencySpectrum instance\n\nRaises:\n    ValueError:\
+      \ If required columns are missing or data format is invalid"
+    file: cmb/theta_data_parser.py
+    line: 15
+    name: parse_csv_frequency_spectrum
+  cmb/theta_data_parser.py:parse_json_evolution_data:
+    args:
+    - data
+    - file_path
+    docstring: "Parse evolution data from JSON data.\n\nArgs:\n    data: Dictionary\
+      \ with JSON data\n    file_path: Path to source file (for error messages)\n\n\
+      Returns:\n    ThetaEvolution instance\n\nRaises:\n    ValueError: If required\
+      \ keys are missing or data format is invalid"
+    file: cmb/theta_data_parser.py
+    line: 301
+    name: parse_json_evolution_data
+  cmb/theta_data_parser.py:parse_json_frequency_spectrum:
+    args:
+    - data
+    - file_path
+    docstring: "Parse frequency spectrum from JSON data.\n\nArgs:\n    data: Dictionary\
+      \ with JSON data\n    file_path: Path to source file (for error messages)\n\n\
+      Returns:\n    ThetaFrequencySpectrum instance\n\nRaises:\n    ValueError: If\
+      \ required keys are missing or data format is invalid"
+    file: cmb/theta_data_parser.py
+    line: 141
+    name: parse_json_frequency_spectrum
   config/settings.py:__init__:
     args:
     - self
@@ -1124,11 +1302,12 @@ functions:
     - constants
     - paths
     - logging_config
+    - cmb_config
     docstring: "Initialize configuration.\n\nArgs:\n    constants: Physical constants\
       \ configuration\n    paths: Data paths configuration\n    logging_config: Logging\
-      \ configuration"
+      \ configuration\n    cmb_config: CMB-specific configuration dictionary"
     file: docs/implementation_plan/phase_0_foundation/step_0.1_configuration/settings.py
-    line: 91
+    line: 95
     name: __init__
   docs/implementation_plan/phase_0_foundation/step_0.1_configuration/settings.py:_load_defaults:
     args:
@@ -1136,14 +1315,14 @@ functions:
     docstring: "Create configuration with default values.\n\nReturns:\n    Config\
       \ instance with default settings"
     file: docs/implementation_plan/phase_0_foundation/step_0.1_configuration/settings.py
-    line: 127
+    line: 198
     name: _load_defaults
   docs/implementation_plan/phase_0_foundation/step_0.1_configuration/settings.py:get_config:
     args: []
     docstring: "Get global configuration instance.\n\nReturns:\n    Global Config\
       \ instance\n\nRaises:\n    RuntimeError: If configuration has not been initialized"
     file: docs/implementation_plan/phase_0_foundation/step_0.1_configuration/settings.py
-    line: 155
+    line: 334
     name: get_config
   docs/implementation_plan/phase_0_foundation/step_0.1_configuration/settings.py:initialize_config:
     args:
@@ -1151,7 +1330,7 @@ functions:
     docstring: "Initialize global configuration.\n\nArgs:\n    config_file: Path to\
       \ configuration YAML file\n\nReturns:\n    Initialized Config instance"
     file: docs/implementation_plan/phase_0_foundation/step_0.1_configuration/settings.py
-    line: 168
+    line: 351
     name: initialize_config
   docs/implementation_plan/phase_0_foundation/step_0.1_configuration/settings.py:load:
     args:
@@ -1161,9 +1340,9 @@ functions:
       \ Path to configuration YAML file. If None, uses defaults.\n\nReturns:\n   \
       \ Config instance with loaded settings\n\nRaises:\n    FileNotFoundError: If\
       \ config_file is specified but doesn't exist\n    ValueError: If configuration\
-      \ values are invalid"
+      \ values are invalid\n    yaml.YAMLError: If YAML file is malformed"
     file: docs/implementation_plan/phase_0_foundation/step_0.1_configuration/settings.py
-    line: 110
+    line: 117
     name: load
   docs/implementation_plan/phase_0_foundation/step_0.1_configuration/settings.py:setup_logging:
     args:
@@ -1175,7 +1354,7 @@ functions:
 
       logging_config.'
     file: docs/implementation_plan/phase_0_foundation/step_0.1_configuration/settings.py
-    line: 145
+    line: 289
     name: setup_logging
   docs/implementation_plan/phase_0_foundation/step_0.1_configuration/settings.py:validate:
     args:
@@ -1183,7 +1362,7 @@ functions:
     docstring: "Validate configuration values.\n\nRaises:\n    ValueError: If any\
       \ configuration value is invalid"
     file: docs/implementation_plan/phase_0_foundation/step_0.1_configuration/settings.py
-    line: 136
+    line: 254
     name: validate
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/cmb_plots.py:plot_healpix_map:
     args:
@@ -1295,14 +1474,14 @@ functions:
     - obj
     docstring: null
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py
-    line: 164
+    line: 171
     name: convert_to_serializable
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py:convert_to_yaml_serializable:
     args:
     - obj
     docstring: null
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py
-    line: 192
+    line: 199
     name: convert_to_yaml_serializable
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py:ensure_output_directory:
     args:
@@ -1311,7 +1490,7 @@ functions:
       \ Path to output file or directory\n\nRaises:\n    PermissionError: If directory\
       \ cannot be created"
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py
-    line: 215
+    line: 222
     name: ensure_output_directory
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py:save_analysis_results:
     args:
@@ -1322,7 +1501,7 @@ functions:
       \ analysis results\n    file_path: Path to output file\n    format: Output format\
       \ ('json', 'yaml')\n\nRaises:\n    ValueError: If format is invalid"
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py
-    line: 144
+    line: 151
     name: save_analysis_results
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py:save_healpix_map:
     args:
@@ -1497,8 +1676,16 @@ functions:
       \ from index file\n    index_path: Path to index file (for resolving relative\
       \ paths)"
     file: docs/implementation_plan/phase_0_foundation/step_0.3_data_index/data_index_loader.py
-    line: 25
+    line: 26
     name: __init__
+  docs/implementation_plan/phase_0_foundation/step_0.3_data_index/data_index_loader.py:_resolve_path:
+    args:
+    - self
+    docstring: "Resolve file path relative to data index root.\n\nArgs:\n    *path_parts:\
+      \ Path components to join\n\nReturns:\n    Resolved Path object"
+    file: docs/implementation_plan/phase_0_foundation/step_0.3_data_index/data_index_loader.py
+    line: 327
+    name: _resolve_path
   docs/implementation_plan/phase_0_foundation/step_0.3_data_index/data_index_loader.py:get_file_path:
     args:
     - self
@@ -1508,7 +1695,7 @@ functions:
       \ category (e.g., 'act_dr6_02', 'cmb_microcells')\n    file_name: Name of the\
       \ file\n\nReturns:\n    Path to file, or None if not found"
     file: docs/implementation_plan/phase_0_foundation/step_0.3_data_index/data_index_loader.py
-    line: 53
+    line: 73
     name: get_file_path
   docs/implementation_plan/phase_0_foundation/step_0.3_data_index/data_index_loader.py:get_files_by_category:
     args:
@@ -1517,17 +1704,18 @@ functions:
     docstring: "Get all files in a specific category.\n\nArgs:\n    category: Data\
       \ category name\n\nReturns:\n    List of file information dictionaries"
     file: docs/implementation_plan/phase_0_foundation/step_0.3_data_index/data_index_loader.py
-    line: 66
+    line: 118
     name: get_files_by_category
   docs/implementation_plan/phase_0_foundation/step_0.3_data_index/data_index_loader.py:get_usage_guidelines:
     args:
     - self
     - category
     docstring: "Get usage guidelines for a data category.\n\nArgs:\n    category:\
-      \ Data category name\n\nReturns:\n    Usage guidelines dictionary, or None if\
-      \ not found"
+      \ Data category name (can be specific category or\n        usage guideline key\
+      \ like 'cmb_verification')\n\nReturns:\n    Usage guidelines dictionary, or\
+      \ None if not found"
     file: docs/implementation_plan/phase_0_foundation/step_0.3_data_index/data_index_loader.py
-    line: 87
+    line: 233
     name: get_usage_guidelines
   docs/implementation_plan/phase_0_foundation/step_0.3_data_index/data_index_loader.py:load:
     args:
@@ -1538,16 +1726,17 @@ functions:
       \nRaises:\n    FileNotFoundError: If index file doesn't exist\n    yaml.YAMLError:\
       \ If YAML is invalid"
     file: docs/implementation_plan/phase_0_foundation/step_0.3_data_index/data_index_loader.py
-    line: 37
+    line: 39
     name: load
   docs/implementation_plan/phase_0_foundation/step_0.3_data_index/data_index_loader.py:search_by_name:
     args:
     - self
     - pattern
     docstring: "Search for files by name pattern.\n\nArgs:\n    pattern: Search pattern\
-      \ (supports wildcards)\n\nReturns:\n    List of matching file information dictionaries"
+      \ (supports wildcards like * and ?)\n\nReturns:\n    List of matching file information\
+      \ dictionaries"
     file: docs/implementation_plan/phase_0_foundation/step_0.3_data_index/data_index_loader.py
-    line: 99
+    line: 281
     name: search_by_name
   docs/implementation_plan/phase_0_foundation/step_0.3_data_index/data_index_loader.py:validate_files:
     args:
@@ -1555,7 +1744,7 @@ functions:
     docstring: "Validate that all indexed files exist.\n\nReturns:\n    Dictionary\
       \ with 'missing' and 'found' keys containing file lists"
     file: docs/implementation_plan/phase_0_foundation/step_0.3_data_index/data_index_loader.py
-    line: 78
+    line: 169
     name: validate_files
   docs/implementation_plan/phase_1_theta_data/step_1.1_data_loader/theta_data_loader.py:load_evolution_data:
     args:
@@ -2973,49 +3162,49 @@ functions:
     - self
     docstring: Test getting path for invalid category returns None.
     file: tests/unit/test_data_index_loader_basic.py
-    line: 147
+    line: 149
     name: test_get_file_path_invalid_category
   tests/unit/test_data_index_loader_basic.py:test_get_file_path_nonexistent:
     args:
     - self
     docstring: Test getting path for non-existent file returns None.
     file: tests/unit/test_data_index_loader_basic.py
-    line: 127
+    line: 129
     name: test_get_file_path_nonexistent
   tests/unit/test_data_index_loader_basic.py:test_get_file_path_single_file:
     args:
     - self
     docstring: Test getting path for category with single file.
     file: tests/unit/test_data_index_loader_basic.py
-    line: 74
+    line: 76
     name: test_get_file_path_single_file
   tests/unit/test_data_index_loader_basic.py:test_get_file_path_with_directory:
     args:
     - self
     docstring: Test getting path for file in directory.
     file: tests/unit/test_data_index_loader_basic.py
-    line: 99
+    line: 101
     name: test_get_file_path_with_directory
   tests/unit/test_data_index_loader_basic.py:test_get_files_invalid_category:
     args:
     - self
     docstring: Test getting files for invalid category returns empty list.
     file: tests/unit/test_data_index_loader_basic.py
-    line: 215
+    line: 217
     name: test_get_files_invalid_category
   tests/unit/test_data_index_loader_basic.py:test_get_files_list:
     args:
     - self
     docstring: Test getting files for category with files list.
     file: tests/unit/test_data_index_loader_basic.py
-    line: 190
+    line: 192
     name: test_get_files_list
   tests/unit/test_data_index_loader_basic.py:test_get_files_single_file:
     args:
     - self
     docstring: Test getting files for category with single file.
     file: tests/unit/test_data_index_loader_basic.py
-    line: 165
+    line: 167
     name: test_get_files_single_file
   tests/unit/test_data_index_loader_basic.py:test_load_invalid_yaml:
     args:
@@ -3050,28 +3239,28 @@ functions:
     - self
     docstring: Test getting usage guidelines from category data.
     file: tests/unit/test_data_index_loader_validation.py
-    line: 99
+    line: 98
     name: test_get_usage_guidelines_from_category
   tests/unit/test_data_index_loader_validation.py:test_get_usage_guidelines_from_section:
     args:
     - self
     docstring: Test getting usage guidelines from usage_guidelines section.
     file: tests/unit/test_data_index_loader_validation.py
-    line: 75
+    line: 74
     name: test_get_usage_guidelines_from_section
   tests/unit/test_data_index_loader_validation.py:test_get_usage_guidelines_nonexistent:
     args:
     - self
     docstring: Test getting usage guidelines for non-existent category.
     file: tests/unit/test_data_index_loader_validation.py
-    line: 123
+    line: 122
     name: test_get_usage_guidelines_nonexistent
   tests/unit/test_data_index_loader_validation.py:test_search_exact_match:
     args:
     - self
     docstring: Test searching for exact file name.
     file: tests/unit/test_data_index_loader_validation.py
-    line: 141
+    line: 140
     name: test_search_exact_match
   tests/unit/test_data_index_loader_validation.py:test_search_no_matches:
     args:
@@ -3085,21 +3274,21 @@ functions:
     - self
     docstring: Test searching with wildcard pattern.
     file: tests/unit/test_data_index_loader_validation.py
-    line: 162
+    line: 161
     name: test_search_wildcard
   tests/unit/test_data_index_loader_validation.py:test_validate_existing_files:
     args:
     - self
     docstring: Test validation of existing files.
     file: tests/unit/test_data_index_loader_validation.py
-    line: 19
+    line: 18
     name: test_validate_existing_files
   tests/unit/test_data_index_loader_validation.py:test_validate_missing_files:
     args:
     - self
     docstring: Test validation of missing files.
     file: tests/unit/test_data_index_loader_validation.py
-    line: 47
+    line: 46
     name: test_validate_missing_files
   tests/unit/test_data_loader.py:test_load_invalid_hdu:
     args:
@@ -3535,6 +3724,146 @@ functions:
     file: tests/unit/test_spherical_harmonics.py
     line: 66
     name: test_synthesize_valid_alm
+  tests/unit/test_theta_data_loader.py:test_create_evolution:
+    args:
+    - self
+    docstring: Test creating ThetaEvolution instance.
+    file: tests/unit/test_theta_data_loader.py
+    line: 51
+    name: test_create_evolution
+  tests/unit/test_theta_data_loader.py:test_create_frequency_spectrum:
+    args:
+    - self
+    docstring: Test creating ThetaFrequencySpectrum instance.
+    file: tests/unit/test_theta_data_loader.py
+    line: 28
+    name: test_create_frequency_spectrum
+  tests/unit/test_theta_data_loader.py:test_load_csv_evolution_data:
+    args:
+    - self
+    docstring: Test loading evolution data from CSV file.
+    file: tests/unit/test_theta_data_loader.py
+    line: 178
+    name: test_load_csv_evolution_data
+  tests/unit/test_theta_data_loader.py:test_load_csv_frequency_spectrum:
+    args:
+    - self
+    docstring: Test loading frequency spectrum from CSV file.
+    file: tests/unit/test_theta_data_loader.py
+    line: 74
+    name: test_load_csv_frequency_spectrum
+  tests/unit/test_theta_data_loader.py:test_load_csv_missing_column:
+    args:
+    - self
+    docstring: Test loading CSV with missing column raises ValueError.
+    file: tests/unit/test_theta_data_loader.py
+    line: 241
+    name: test_load_csv_missing_column
+  tests/unit/test_theta_data_loader.py:test_load_json_evolution_data:
+    args:
+    - self
+    docstring: Test loading evolution data from JSON file.
+    file: tests/unit/test_theta_data_loader.py
+    line: 204
+    name: test_load_json_evolution_data
+  tests/unit/test_theta_data_loader.py:test_load_json_frequency_spectrum:
+    args:
+    - self
+    docstring: Test loading frequency spectrum from JSON file.
+    file: tests/unit/test_theta_data_loader.py
+    line: 105
+    name: test_load_json_frequency_spectrum
+  tests/unit/test_theta_data_loader.py:test_load_json_missing_key:
+    args:
+    - self
+    docstring: Test loading JSON with missing key raises ValueError.
+    file: tests/unit/test_theta_data_loader.py
+    line: 158
+    name: test_load_json_missing_key
+  tests/unit/test_theta_data_loader.py:test_load_nonexistent_file:
+    args:
+    - self
+    docstring: Test loading non-existent file raises FileNotFoundError.
+    file: tests/unit/test_theta_data_loader.py
+    line: 234
+    name: test_load_nonexistent_file
+  tests/unit/test_theta_data_loader.py:test_validate_empty_frequencies:
+    args:
+    - self
+    docstring: Test validating spectrum with empty frequencies.
+    file: tests/unit/test_theta_data_loader.py
+    line: 275
+    name: test_validate_empty_frequencies
+  tests/unit/test_theta_data_loader.py:test_validate_empty_times:
+    args:
+    - self
+    docstring: Test validating evolution with empty times raises ValueError.
+    file: tests/unit/test_theta_data_loader.py
+    line: 386
+    name: test_validate_empty_times
+  tests/unit/test_theta_data_loader.py:test_validate_length_mismatch:
+    args:
+    - self
+    docstring: Test validating evolution with length mismatch raises ValueError.
+    file: tests/unit/test_theta_data_loader.py
+    line: 403
+    name: test_validate_length_mismatch
+  tests/unit/test_theta_data_loader.py:test_validate_nan_frequencies:
+    args:
+    - self
+    docstring: Test validating spectrum with NaN frequencies raises ValueError.
+    file: tests/unit/test_theta_data_loader.py
+    line: 347
+    name: test_validate_nan_frequencies
+  tests/unit/test_theta_data_loader.py:test_validate_nan_times:
+    args:
+    - self
+    docstring: Test validating evolution with NaN times raises ValueError.
+    file: tests/unit/test_theta_data_loader.py
+    line: 441
+    name: test_validate_nan_times
+  tests/unit/test_theta_data_loader.py:test_validate_negative_frequencies:
+    args:
+    - self
+    docstring: Test validating spectrum with negative frequencies.
+    file: tests/unit/test_theta_data_loader.py
+    line: 292
+    name: test_validate_negative_frequencies
+  tests/unit/test_theta_data_loader.py:test_validate_negative_omega_min:
+    args:
+    - self
+    docstring: Test validating evolution with negative omega_min.
+    file: tests/unit/test_theta_data_loader.py
+    line: 420
+    name: test_validate_negative_omega_min
+  tests/unit/test_theta_data_loader.py:test_validate_negative_spectrum:
+    args:
+    - self
+    docstring: Test validating spectrum with negative values raises ValueError.
+    file: tests/unit/test_theta_data_loader.py
+    line: 311
+    name: test_validate_negative_spectrum
+  tests/unit/test_theta_data_loader.py:test_validate_shape_mismatch:
+    args:
+    - self
+    docstring: Test validating spectrum with shape mismatch raises ValueError.
+    file: tests/unit/test_theta_data_loader.py
+    line: 330
+    name: test_validate_shape_mismatch
+  tests/unit/test_theta_data_loader.py:test_validate_valid_evolution:
+    args:
+    - self
+    docstring: Test validating valid evolution data.
+    file: tests/unit/test_theta_data_loader.py
+    line: 370
+    name: test_validate_valid_evolution
+  tests/unit/test_theta_data_loader.py:test_validate_valid_spectrum:
+    args:
+    - self
+    docstring: Test validating valid frequency spectrum.
+    file: tests/unit/test_theta_data_loader.py
+    line: 259
+    name: test_validate_valid_spectrum
   utils/io/data_index_loader.py:__init__:
     args:
     - self
@@ -3922,6 +4251,129 @@ functions:
     line: 218
     name: plot_subpeaks
 imports:
+  cmb/theta_data_loader.py:Any:
+    file: cmb/theta_data_loader.py
+    line: 12
+    module: typing
+    name: Any
+    type: import_from
+  cmb/theta_data_loader.py:Config:
+    file: cmb/theta_data_loader.py
+    line: 16
+    module: config.settings
+    name: Config
+    type: import_from
+  cmb/theta_data_loader.py:DataIndex:
+    file: cmb/theta_data_loader.py
+    line: 18
+    module: utils.io.data_index_loader
+    name: DataIndex
+    type: import_from
+  cmb/theta_data_loader.py:Dict:
+    file: cmb/theta_data_loader.py
+    line: 12
+    module: typing
+    name: Dict
+    type: import_from
+  cmb/theta_data_loader.py:Optional:
+    file: cmb/theta_data_loader.py
+    line: 12
+    module: typing
+    name: Optional
+    type: import_from
+  cmb/theta_data_loader.py:Path:
+    file: cmb/theta_data_loader.py
+    line: 11
+    module: pathlib
+    name: Path
+    type: import_from
+  cmb/theta_data_loader.py:dataclass:
+    file: cmb/theta_data_loader.py
+    line: 14
+    module: dataclasses
+    name: dataclass
+    type: import_from
+  cmb/theta_data_loader.py:load_csv_data:
+    file: cmb/theta_data_loader.py
+    line: 17
+    module: utils.io.data_loader
+    name: load_csv_data
+    type: import_from
+  cmb/theta_data_loader.py:load_json_data:
+    file: cmb/theta_data_loader.py
+    line: 17
+    module: utils.io.data_loader
+    name: load_json_data
+    type: import_from
+  cmb/theta_data_loader.py:logging:
+    file: cmb/theta_data_loader.py
+    line: 15
+    name: logging
+    type: import
+  cmb/theta_data_loader.py:numpy:
+    file: cmb/theta_data_loader.py
+    line: 13
+    name: numpy
+    type: import
+  cmb/theta_data_loader.py:parse_csv_evolution_data:
+    file: cmb/theta_data_loader.py
+    line: 19
+    module: cmb.theta_data_parser
+    name: parse_csv_evolution_data
+    type: import_from
+  cmb/theta_data_loader.py:parse_csv_frequency_spectrum:
+    file: cmb/theta_data_loader.py
+    line: 19
+    module: cmb.theta_data_parser
+    name: parse_csv_frequency_spectrum
+    type: import_from
+  cmb/theta_data_loader.py:parse_json_evolution_data:
+    file: cmb/theta_data_loader.py
+    line: 19
+    module: cmb.theta_data_parser
+    name: parse_json_evolution_data
+    type: import_from
+  cmb/theta_data_loader.py:parse_json_frequency_spectrum:
+    file: cmb/theta_data_loader.py
+    line: 19
+    module: cmb.theta_data_parser
+    name: parse_json_frequency_spectrum
+    type: import_from
+  cmb/theta_data_parser.py:Any:
+    file: cmb/theta_data_parser.py
+    line: 11
+    module: typing
+    name: Any
+    type: import_from
+  cmb/theta_data_parser.py:Dict:
+    file: cmb/theta_data_parser.py
+    line: 11
+    module: typing
+    name: Dict
+    type: import_from
+  cmb/theta_data_parser.py:Path:
+    file: cmb/theta_data_parser.py
+    line: 10
+    module: pathlib
+    name: Path
+    type: import_from
+  cmb/theta_data_parser.py:ThetaEvolution:
+    file: cmb/theta_data_parser.py
+    line: 347
+    module: cmb.theta_data_loader
+    name: ThetaEvolution
+    type: import_from
+  cmb/theta_data_parser.py:ThetaFrequencySpectrum:
+    file: cmb/theta_data_parser.py
+    line: 209
+    module: cmb.theta_data_loader
+    name: ThetaFrequencySpectrum
+    type: import_from
+  cmb/theta_data_parser.py:numpy:
+    file: cmb/theta_data_parser.py
+    line: 12
+    name: numpy
+    type: import
   config/__init__.py:Config:
     file: config/__init__.py
     line: 8
@@ -4004,6 +4456,18 @@ imports:
     line: 16
     name: yaml
     type: import
+  docs/implementation_plan/phase_0_foundation/step_0.1_configuration/settings.py:Any:
+    file: docs/implementation_plan/phase_0_foundation/step_0.1_configuration/settings.py
+    line: 13
+    module: typing
+    name: Any
+    type: import_from
+  docs/implementation_plan/phase_0_foundation/step_0.1_configuration/settings.py:Dict:
+    file: docs/implementation_plan/phase_0_foundation/step_0.1_configuration/settings.py
+    line: 13
+    module: typing
+    name: Dict
+    type: import_from
   docs/implementation_plan/phase_0_foundation/step_0.1_configuration/settings.py:Optional:
     file: docs/implementation_plan/phase_0_foundation/step_0.1_configuration/settings.py
     line: 13
@@ -4015,6 +4479,12 @@ imports:
     line: 12
     module: pathlib
     name: Path
+    type: import_from
+  docs/implementation_plan/phase_0_foundation/step_0.1_configuration/settings.py:RotatingFileHandler:
+    file: docs/implementation_plan/phase_0_foundation/step_0.1_configuration/settings.py
+    line: 15
+    module: logging.handlers
+    name: RotatingFileHandler
     type: import_from
   docs/implementation_plan/phase_0_foundation/step_0.1_configuration/settings.py:dataclass:
     file: docs/implementation_plan/phase_0_foundation/step_0.1_configuration/settings.py
@@ -4029,7 +4499,7 @@ imports:
     type: import
   docs/implementation_plan/phase_0_foundation/step_0.1_configuration/settings.py:yaml:
     file: docs/implementation_plan/phase_0_foundation/step_0.1_configuration/settings.py
-    line: 15
+    line: 16
     name: yaml
     type: import
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/cmb_plots.py:Optional:
@@ -4154,7 +4624,7 @@ imports:
     type: import
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py:yaml:
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py
-    line: 185
+    line: 192
     name: yaml
     type: import
   docs/implementation_plan/phase_0_foundation/step_0.2_utilities/frequency_conversion.py:Config:
@@ -4250,7 +4720,7 @@ imports:
     type: import_from
   docs/implementation_plan/phase_0_foundation/step_0.3_data_index/data_index_loader.py:Config:
     file: docs/implementation_plan/phase_0_foundation/step_0.3_data_index/data_index_loader.py
-    line: 14
+    line: 15
     module: config.settings
     name: Config
     type: import_from
@@ -4278,6 +4748,11 @@ imports:
     module: pathlib
     name: Path
     type: import_from
+  docs/implementation_plan/phase_0_foundation/step_0.3_data_index/data_index_loader.py:fnmatch:
+    file: docs/implementation_plan/phase_0_foundation/step_0.3_data_index/data_index_loader.py
+    line: 14
+    name: fnmatch
+    type: import
   docs/implementation_plan/phase_0_foundation/step_0.3_data_index/data_index_loader.py:yaml:
     file: docs/implementation_plan/phase_0_foundation/step_0.3_data_index/data_index_loader.py
     line: 13
@@ -5553,29 +6028,24 @@ imports:
     type: import
   tests/unit/test_data_index_loader_validation.py:DataIndex:
     file: tests/unit/test_data_index_loader_validation.py
-    line: 13
+    line: 12
     module: utils.io.data_index_loader
     name: DataIndex
     type: import_from
   tests/unit/test_data_index_loader_validation.py:Path:
     file: tests/unit/test_data_index_loader_validation.py
-    line: 10
+    line: 9
     module: pathlib
     name: Path
     type: import_from
-  tests/unit/test_data_index_loader_validation.py:pytest:
-    file: tests/unit/test_data_index_loader_validation.py
-    line: 8
-    name: pytest
-    type: import
   tests/unit/test_data_index_loader_validation.py:tempfile:
     file: tests/unit/test_data_index_loader_validation.py
-    line: 9
+    line: 8
     name: tempfile
     type: import
   tests/unit/test_data_index_loader_validation.py:yaml:
     file: tests/unit/test_data_index_loader_validation.py
-    line: 11
+    line: 10
     name: yaml
     type: import
   tests/unit/test_data_loader.py:Path:
@@ -5820,6 +6290,73 @@ imports:
     line: 12
     module: utils.math.spherical_harmonics
     name: synthesize_map
+    type: import_from
+  tests/unit/test_theta_data_loader.py:Path:
+    file: tests/unit/test_theta_data_loader.py
+    line: 11
+    module: pathlib
+    name: Path
+    type: import_from
+  tests/unit/test_theta_data_loader.py:ThetaEvolution:
+    file: tests/unit/test_theta_data_loader.py
+    line: 15
+    module: cmb.theta_data_loader
+    name: ThetaEvolution
+    type: import_from
+  tests/unit/test_theta_data_loader.py:ThetaFrequencySpectrum:
+    file: tests/unit/test_theta_data_loader.py
+    line: 15
+    module: cmb.theta_data_loader
+    name: ThetaFrequencySpectrum
+    type: import_from
+  tests/unit/test_theta_data_loader.py:csv:
+    file: tests/unit/test_theta_data_loader.py
+    line: 13
+    name: csv
+    type: import
+  tests/unit/test_theta_data_loader.py:json:
+    file: tests/unit/test_theta_data_loader.py
+    line: 12
+    name: json
+    type: import
+  tests/unit/test_theta_data_loader.py:load_evolution_data:
+    file: tests/unit/test_theta_data_loader.py
+    line: 15
+    module: cmb.theta_data_loader
+    name: load_evolution_data
+    type: import_from
+  tests/unit/test_theta_data_loader.py:load_frequency_spectrum:
+    file: tests/unit/test_theta_data_loader.py
+    line: 15
+    module: cmb.theta_data_loader
+    name: load_frequency_spectrum
+    type: import_from
+  tests/unit/test_theta_data_loader.py:numpy:
+    file: tests/unit/test_theta_data_loader.py
+    line: 9
+    name: numpy
+    type: import
+  tests/unit/test_theta_data_loader.py:pytest:
+    file: tests/unit/test_theta_data_loader.py
+    line: 8
+    name: pytest
+    type: import
+  tests/unit/test_theta_data_loader.py:tempfile:
+    file: tests/unit/test_theta_data_loader.py
+    line: 10
+    name: tempfile
+    type: import
+  tests/unit/test_theta_data_loader.py:validate_evolution_data:
+    file: tests/unit/test_theta_data_loader.py
+    line: 15
+    module: cmb.theta_data_loader
+    name: validate_evolution_data
+    type: import_from
+  tests/unit/test_theta_data_loader.py:validate_frequency_spectrum:
+    file: tests/unit/test_theta_data_loader.py
+    line: 15
+    module: cmb.theta_data_loader
+    name: validate_frequency_spectrum
     type: import_from
   utils/io/__init__.py:DataIndex:
     file: utils/io/__init__.py

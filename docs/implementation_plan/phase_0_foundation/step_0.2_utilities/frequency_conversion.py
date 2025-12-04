@@ -134,4 +134,5 @@ def get_frequency_range_for_multipole_range(
     freq_min = multipole_to_frequency(l_min, D)
     freq_max = multipole_to_frequency(l_max, D)
 
-    return (freq_min, freq_max)
+    # Ensure return type is Tuple[float, float]
+    return (float(freq_min), float(freq_max))

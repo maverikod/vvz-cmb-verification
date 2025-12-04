@@ -152,7 +152,7 @@ def load_power_spectrum_from_tar(
         raise ValueError(f"Failed to load power spectrum from {tar_path}: {e}") from e
 
 
-def load_csv_data(file_path: Path) -> Dict[str, np.ndarray]:
+def load_csv_data(file_path: Path) -> Dict[str, Any]:
     """
     Load CSV data file.
 
@@ -170,7 +170,7 @@ def load_csv_data(file_path: Path) -> Dict[str, np.ndarray]:
         raise FileNotFoundError(f"CSV file not found: {file_path}")
 
     try:
-        data_dict: Dict[str, np.ndarray] = {}
+        data_dict: Dict[str, Any] = {}
         with open(file_path, "r", encoding="utf-8") as f:
             reader = csv.DictReader(f)
             fieldnames = reader.fieldnames

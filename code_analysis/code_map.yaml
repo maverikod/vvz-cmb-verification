@@ -1193,7 +1193,7 @@ functions:
       \nReturns:\n    ThetaEvolution instance\n\nRaises:\n    ValueError: If required\
       \ columns are missing or data format is invalid"
     file: cmb/theta_data_parser.py
-    line: 219
+    line: 215
     name: parse_csv_evolution_data
   cmb/theta_data_parser.py:parse_csv_frequency_spectrum:
     args:
@@ -1215,7 +1215,7 @@ functions:
       Returns:\n    ThetaEvolution instance\n\nRaises:\n    ValueError: If required\
       \ keys are missing or data format is invalid"
     file: cmb/theta_data_parser.py
-    line: 301
+    line: 297
     name: parse_json_evolution_data
   cmb/theta_data_parser.py:parse_json_frequency_spectrum:
     args:
@@ -1226,7 +1226,7 @@ functions:
       Returns:\n    ThetaFrequencySpectrum instance\n\nRaises:\n    ValueError: If\
       \ required keys are missing or data format is invalid"
     file: cmb/theta_data_parser.py
-    line: 141
+    line: 139
     name: parse_json_frequency_spectrum
   config/settings.py:__init__:
     args:
@@ -4251,12 +4251,6 @@ functions:
     line: 218
     name: plot_subpeaks
 imports:
-  cmb/theta_data_loader.py:Any:
-    file: cmb/theta_data_loader.py
-    line: 12
-    module: typing
-    name: Any
-    type: import_from
   cmb/theta_data_loader.py:Config:
     file: cmb/theta_data_loader.py
     line: 16
@@ -4268,12 +4262,6 @@ imports:
     line: 18
     module: utils.io.data_index_loader
     name: DataIndex
-    type: import_from
-  cmb/theta_data_loader.py:Dict:
-    file: cmb/theta_data_loader.py
-    line: 12
-    module: typing
-    name: Dict
     type: import_from
   cmb/theta_data_loader.py:Optional:
     file: cmb/theta_data_loader.py
@@ -4359,13 +4347,13 @@ imports:
     type: import_from
   cmb/theta_data_parser.py:ThetaEvolution:
     file: cmb/theta_data_parser.py
-    line: 347
+    line: 343
     module: cmb.theta_data_loader
     name: ThetaEvolution
     type: import_from
   cmb/theta_data_parser.py:ThetaFrequencySpectrum:
     file: cmb/theta_data_parser.py
-    line: 209
+    line: 205
     module: cmb.theta_data_loader
     name: ThetaFrequencySpectrum
     type: import_from

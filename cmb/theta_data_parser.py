@@ -111,9 +111,7 @@ def parse_csv_frequency_spectrum(
     elif spectrum_data.ndim == 2:
         spectrum = spectrum_data
     else:
-        raise ValueError(
-            f"Spectrum must be 1D or 2D array, got {spectrum_data.ndim}D"
-        )
+        raise ValueError(f"Spectrum must be 1D or 2D array, got {spectrum_data.ndim}D")
 
     # Extract metadata
     metadata = {
@@ -186,9 +184,7 @@ def parse_json_frequency_spectrum(
                 f"does not match expected {expected_size}"
             )
     elif spectrum.ndim != 2:
-        raise ValueError(
-            f"Spectrum must be 1D or 2D array, got {spectrum.ndim}D"
-        )
+        raise ValueError(f"Spectrum must be 1D or 2D array, got {spectrum.ndim}D")
 
     # Extract metadata
     metadata = data.get("metadata", {})

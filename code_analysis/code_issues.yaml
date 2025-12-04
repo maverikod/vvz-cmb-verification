@@ -2,6 +2,10 @@ issues:
   any_type_usage: []
   classes_without_docstrings: []
   files_too_large:
+  - exceeds_limit: 26
+    file: tests/unit/test_theta_evolution_processor.py
+    limit: 400
+    lines: 426
   - exceeds_limit: 43
     file: tests/unit/test_theta_data_loader.py
     limit: 400
@@ -25,12 +29,6 @@ issues:
     imported: SubPeakAnalysis
     line: 16
     module: cmb.spectrum.subpeaks_analyzer
-    type: import_from
-  - description: Module 'cmb.theta_evolution_processor' cannot be imported
-    file: docs/implementation_plan/phase_5_act_spt_predictions/step_5.1_highl_peak/highl_peak_predictor.py
-    imported: ThetaEvolutionProcessor
-    line: 17
-    module: cmb.theta_evolution_processor
     type: import_from
   - description: Module 'cmb.reconstruction.cmb_map_reconstructor' cannot be imported
     file: docs/implementation_plan/phase_5_act_spt_predictions/step_5.2_frequency_invariance/frequency_invariance.py
@@ -104,41 +102,11 @@ issues:
     line: 25
     module: cmb.correlation.cmb_lss_correlator
     type: import_from
-  - description: Module 'scipy.ndimage' cannot be imported
-    file: docs/implementation_plan/phase_1_theta_data/step_1.4_node_map_generation/theta_node_map.py
-    imported: minimum_filter
-    line: 17
-    module: scipy.ndimage
-    type: import_from
-  - description: Module 'scipy.interpolate' cannot be imported
-    file: docs/implementation_plan/phase_1_theta_data/step_1.3_evolution_data/theta_evolution_processor.py
-    imported: interp1d
-    line: 14
-    module: scipy.interpolate
-    type: import_from
-  - description: Module 'cmb.theta_evolution_processor' cannot be imported
-    file: docs/implementation_plan/phase_3_power_spectrum/step_3.1_spectrum_calculation/power_spectrum.py
-    imported: ThetaEvolutionProcessor
-    line: 23
-    module: cmb.theta_evolution_processor
-    type: import_from
-  - description: Module 'scipy.signal' cannot be imported
-    file: docs/implementation_plan/phase_3_power_spectrum/step_3.2_subpeaks_analysis/subpeaks_analyzer.py
-    imported: find_peaks
-    line: 14
-    module: scipy.signal
-    type: import_from
   - description: Module 'cmb.spectrum.power_spectrum' cannot be imported
     file: docs/implementation_plan/phase_3_power_spectrum/step_3.2_subpeaks_analysis/subpeaks_analyzer.py
     imported: PowerSpectrum
     line: 15
     module: cmb.spectrum.power_spectrum
-    type: import_from
-  - description: Module 'cmb.theta_evolution_processor' cannot be imported
-    file: docs/implementation_plan/phase_3_power_spectrum/step_3.2_subpeaks_analysis/subpeaks_analyzer.py
-    imported: ThetaEvolutionProcessor
-    line: 16
-    module: cmb.theta_evolution_processor
     type: import_from
   - description: Module 'cmb.spectrum.power_spectrum' cannot be imported
     file: docs/implementation_plan/phase_3_power_spectrum/step_3.3_spectrum_comparison/spectrum_comparator.py
@@ -202,13 +170,13 @@ issues:
 summary:
   any_type_usage: 0
   classes_without_docstrings: 0
-  files_too_large: 2
+  files_too_large: 3
   files_without_docstrings: 0
   generic_exception_usage: 0
   imports_in_middle: 0
-  invalid_imports: 29
+  invalid_imports: 23
   max_lines_limit: 400
   methods_with_pass: 0
   methods_without_docstrings: 2
   not_implemented_in_non_abstract: 0
-  total_issues: 33
+  total_issues: 28

@@ -144,3 +144,4 @@ def convert_healpix_to_alm(
     """
     # This is essentially the same as decompose_map
     return decompose_map(map_data, nside, l_max)
+

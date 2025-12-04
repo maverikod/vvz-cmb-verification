@@ -17,6 +17,25 @@ classes:
     line: 30
     methods: []
     name: ThetaFrequencySpectrum
+  cmb/theta_evolution_processor.py:ThetaEvolutionProcessor:
+    bases: []
+    docstring: 'Θ-field evolution data processor.
+
+
+      Processes and provides interface for temporal evolution data
+
+      ω_min(t) and ω_macro(t).'
+    file: cmb/theta_evolution_processor.py
+    line: 17
+    methods:
+    - __init__
+    - process
+    - get_omega_min
+    - get_omega_macro
+    - get_evolution_rate_min
+    - get_evolution_rate_macro
+    - validate_time_range
+    name: ThetaEvolutionProcessor
   cmb/theta_node_processor.py:ThetaNodeData:
     bases: []
     docstring: "Θ-node structure data.\n\nAttributes:\n    positions: Node sky positions\
@@ -698,6 +717,18 @@ classes:
     - test_config_with_actual_paths
     - test_cmb_config_available
     name: TestConfigurationIntegration
+  tests/integration/test_theta_evolution_integration.py:TestThetaEvolutionIntegration:
+    bases: []
+    docstring: Integration tests for theta evolution processing.
+    file: tests/integration/test_theta_evolution_integration.py
+    line: 23
+    methods:
+    - test_end_to_end_evolution_processing
+    - test_process_evolution_data_function
+    - test_evolution_processing_with_json_file
+    - test_evolution_processing_with_csv_file
+    - test_evolution_processing_realistic_time_range
+    name: TestThetaEvolutionIntegration
   tests/unit/test_cmb_plots.py:TestPlotHealpixMap:
     bases: []
     docstring: Tests for plot_healpix_map function.
@@ -1120,6 +1151,39 @@ classes:
     - test_validate_shape_mismatch
     - test_validate_nan_frequencies
     name: TestValidateFrequencySpectrum
+  tests/unit/test_theta_evolution_processor.py:TestProcessEvolutionData:
+    bases: []
+    docstring: Tests for process_evolution_data function.
+    file: tests/unit/test_theta_evolution_processor.py
+    line: 383
+    methods:
+    - test_process_evolution_data
+    - test_process_evolution_data_invalid
+    name: TestProcessEvolutionData
+  tests/unit/test_theta_evolution_processor.py:TestThetaEvolutionProcessor:
+    bases: []
+    docstring: Tests for ThetaEvolutionProcessor class.
+    file: tests/unit/test_theta_evolution_processor.py
+    line: 17
+    methods:
+    - test_init_valid_evolution
+    - test_init_invalid_evolution
+    - test_process_creates_interpolators
+    - test_process_handles_unsorted_times
+    - test_get_omega_min_at_data_points
+    - test_get_omega_min_interpolated
+    - test_get_omega_min_out_of_range
+    - test_get_omega_min_not_processed
+    - test_get_omega_macro_at_data_points
+    - test_get_omega_macro_interpolated
+    - test_get_omega_macro_out_of_range
+    - test_get_evolution_rate_min
+    - test_get_evolution_rate_min_not_processed
+    - test_get_evolution_rate_macro
+    - test_get_evolution_rate_macro_not_processed
+    - test_validate_time_range_valid
+    - test_validate_time_range_invalid
+    name: TestThetaEvolutionProcessor
   tests/unit/test_theta_node_processor.py:TestLoadNodeDepths:
     bases: []
     docstring: Test node depth loading.
@@ -1296,6 +1360,83 @@ functions:
     file: cmb/theta_data_parser.py
     line: 142
     name: parse_json_frequency_spectrum
+  cmb/theta_evolution_processor.py:__init__:
+    args:
+    - self
+    - evolution
+    docstring: "Initialize evolution processor.\n\nArgs:\n    evolution: ThetaEvolution\
+      \ data instance\n\nRaises:\n    ValueError: If evolution data is invalid"
+    file: cmb/theta_evolution_processor.py
+    line: 25
+    name: __init__
+  cmb/theta_evolution_processor.py:get_evolution_rate_macro:
+    args:
+    - self
+    - time
+    docstring: "Calculate evolution rate d(ω_macro)/dt at given time.\n\nArgs:\n \
+      \   time: Time value\n\nReturns:\n    Evolution rate\n\nRaises:\n    ValueError:\
+      \ If time is out of range or processor not initialized"
+    file: cmb/theta_evolution_processor.py
+    line: 196
+    name: get_evolution_rate_macro
+  cmb/theta_evolution_processor.py:get_evolution_rate_min:
+    args:
+    - self
+    - time
+    docstring: "Calculate evolution rate d(ω_min)/dt at given time.\n\nArgs:\n   \
+      \ time: Time value\n\nReturns:\n    Evolution rate\n\nRaises:\n    ValueError:\
+      \ If time is out of range or processor not initialized"
+    file: cmb/theta_evolution_processor.py
+    line: 173
+    name: get_evolution_rate_min
+  cmb/theta_evolution_processor.py:get_omega_macro:
+    args:
+    - self
+    - time
+    docstring: "Get ω_macro value at given time.\n\nArgs:\n    time: Time value\n\n\
+      Returns:\n    ω_macro(t) value\n\nRaises:\n    ValueError: If time is out of\
+      \ range or processor not initialized"
+    file: cmb/theta_evolution_processor.py
+    line: 150
+    name: get_omega_macro
+  cmb/theta_evolution_processor.py:get_omega_min:
+    args:
+    - self
+    - time
+    docstring: "Get ω_min value at given time.\n\nArgs:\n    time: Time value\n\n\
+      Returns:\n    ω_min(t) value\n\nRaises:\n    ValueError: If time is out of range\
+      \ or processor not initialized"
+    file: cmb/theta_evolution_processor.py
+    line: 127
+    name: get_omega_min
+  cmb/theta_evolution_processor.py:process:
+    args:
+    - self
+    docstring: "Process evolution data and create interpolators.\n\nCreates interpolation\
+      \ functions for ω_min(t) and ω_macro(t)\nand their derivatives for evolution\
+      \ rate calculations.\n\nRaises:\n    ValueError: If processing fails"
+    file: cmb/theta_evolution_processor.py
+    line: 48
+    name: process
+  cmb/theta_evolution_processor.py:process_evolution_data:
+    args:
+    - evolution
+    docstring: "Process Θ-field evolution data.\n\nArgs:\n    evolution: ThetaEvolution\
+      \ data instance\n\nReturns:\n    ThetaEvolutionProcessor instance with processed\
+      \ data\n\nRaises:\n    ValueError: If processing fails"
+    file: cmb/theta_evolution_processor.py
+    line: 240
+    name: process_evolution_data
+  cmb/theta_evolution_processor.py:validate_time_range:
+    args:
+    - self
+    - time
+    docstring: "Validate that time is within data range.\n\nArgs:\n    time: Time\
+      \ value to validate\n\nReturns:\n    True if time is within range\n\nRaises:\n\
+      \    ValueError: If time is out of range"
+    file: cmb/theta_evolution_processor.py
+    line: 219
+    name: validate_time_range
   cmb/theta_node_loader.py:load_node_depths:
     args:
     - data_path
@@ -3066,6 +3207,56 @@ functions:
     file: tests/integration/test_config_integration.py
     line: 14
     name: test_import_and_use_config
+  tests/integration/test_theta_evolution_integration.py:test_end_to_end_evolution_processing:
+    args:
+    - self
+    docstring: 'Test complete evolution processing workflow.
+
+
+      Load data → Process → Query → Validate'
+    file: tests/integration/test_theta_evolution_integration.py
+    line: 26
+    name: test_end_to_end_evolution_processing
+  tests/integration/test_theta_evolution_integration.py:test_evolution_processing_realistic_time_range:
+    args:
+    - self
+    docstring: 'Test evolution processing with realistic time ranges and values.
+
+
+      Uses time values typical for cosmological evolution.'
+    file: tests/integration/test_theta_evolution_integration.py
+    line: 234
+    name: test_evolution_processing_realistic_time_range
+  tests/integration/test_theta_evolution_integration.py:test_evolution_processing_with_csv_file:
+    args:
+    - self
+    docstring: 'Test evolution processing with CSV file format.
+
+
+      Creates temporary CSV file and tests loading and processing.'
+    file: tests/integration/test_theta_evolution_integration.py
+    line: 182
+    name: test_evolution_processing_with_csv_file
+  tests/integration/test_theta_evolution_integration.py:test_evolution_processing_with_json_file:
+    args:
+    - self
+    docstring: 'Test evolution processing with JSON file format.
+
+
+      Creates temporary JSON file and tests loading and processing.'
+    file: tests/integration/test_theta_evolution_integration.py
+    line: 129
+    name: test_evolution_processing_with_json_file
+  tests/integration/test_theta_evolution_integration.py:test_process_evolution_data_function:
+    args:
+    - self
+    docstring: 'Test process_evolution_data() convenience function.
+
+
+      Verify it creates and processes processor correctly.'
+    file: tests/integration/test_theta_evolution_integration.py
+    line: 86
+    name: test_process_evolution_data_function
   tests/unit/test_cmb_plots.py:test_plot_comparison:
     args:
     - self
@@ -3990,6 +4181,139 @@ functions:
     file: tests/unit/test_theta_data_loader.py
     line: 253
     name: test_validate_valid_spectrum
+  tests/unit/test_theta_evolution_processor.py:test_get_evolution_rate_macro:
+    args:
+    - self
+    docstring: Test get_evolution_rate_macro() calculates d(ω_macro)/dt.
+    file: tests/unit/test_theta_evolution_processor.py
+    line: 297
+    name: test_get_evolution_rate_macro
+  tests/unit/test_theta_evolution_processor.py:test_get_evolution_rate_macro_not_processed:
+    args:
+    - self
+    docstring: Test get_evolution_rate_macro() raises ValueError.
+    file: tests/unit/test_theta_evolution_processor.py
+    line: 320
+    name: test_get_evolution_rate_macro_not_processed
+  tests/unit/test_theta_evolution_processor.py:test_get_evolution_rate_min:
+    args:
+    - self
+    docstring: Test get_evolution_rate_min() calculates d(ω_min)/dt correctly.
+    file: tests/unit/test_theta_evolution_processor.py
+    line: 255
+    name: test_get_evolution_rate_min
+  tests/unit/test_theta_evolution_processor.py:test_get_evolution_rate_min_not_processed:
+    args:
+    - self
+    docstring: Test get_evolution_rate_min() raises ValueError if not processed.
+    file: tests/unit/test_theta_evolution_processor.py
+    line: 278
+    name: test_get_evolution_rate_min_not_processed
+  tests/unit/test_theta_evolution_processor.py:test_get_omega_macro_at_data_points:
+    args:
+    - self
+    docstring: Test get_omega_macro() returns exact values at data points.
+    file: tests/unit/test_theta_evolution_processor.py
+    line: 190
+    name: test_get_omega_macro_at_data_points
+  tests/unit/test_theta_evolution_processor.py:test_get_omega_macro_interpolated:
+    args:
+    - self
+    docstring: Test get_omega_macro() interpolates between data points.
+    file: tests/unit/test_theta_evolution_processor.py
+    line: 212
+    name: test_get_omega_macro_interpolated
+  tests/unit/test_theta_evolution_processor.py:test_get_omega_macro_out_of_range:
+    args:
+    - self
+    docstring: Test get_omega_macro() raises ValueError for out-of-range times.
+    file: tests/unit/test_theta_evolution_processor.py
+    line: 235
+    name: test_get_omega_macro_out_of_range
+  tests/unit/test_theta_evolution_processor.py:test_get_omega_min_at_data_points:
+    args:
+    - self
+    docstring: Test get_omega_min() returns exact values at data points.
+    file: tests/unit/test_theta_evolution_processor.py
+    line: 103
+    name: test_get_omega_min_at_data_points
+  tests/unit/test_theta_evolution_processor.py:test_get_omega_min_interpolated:
+    args:
+    - self
+    docstring: Test get_omega_min() interpolates correctly between data points.
+    file: tests/unit/test_theta_evolution_processor.py
+    line: 125
+    name: test_get_omega_min_interpolated
+  tests/unit/test_theta_evolution_processor.py:test_get_omega_min_not_processed:
+    args:
+    - self
+    docstring: Test get_omega_min() raises ValueError if process() not called.
+    file: tests/unit/test_theta_evolution_processor.py
+    line: 171
+    name: test_get_omega_min_not_processed
+  tests/unit/test_theta_evolution_processor.py:test_get_omega_min_out_of_range:
+    args:
+    - self
+    docstring: Test get_omega_min() raises ValueError for out-of-range times.
+    file: tests/unit/test_theta_evolution_processor.py
+    line: 148
+    name: test_get_omega_min_out_of_range
+  tests/unit/test_theta_evolution_processor.py:test_init_invalid_evolution:
+    args:
+    - self
+    docstring: Test initializing processor with invalid evolution data.
+    file: tests/unit/test_theta_evolution_processor.py
+    line: 42
+    name: test_init_invalid_evolution
+  tests/unit/test_theta_evolution_processor.py:test_init_valid_evolution:
+    args:
+    - self
+    docstring: Test initializing processor with valid evolution data.
+    file: tests/unit/test_theta_evolution_processor.py
+    line: 20
+    name: test_init_valid_evolution
+  tests/unit/test_theta_evolution_processor.py:test_process_creates_interpolators:
+    args:
+    - self
+    docstring: Test that process() creates interpolation functions.
+    file: tests/unit/test_theta_evolution_processor.py
+    line: 59
+    name: test_process_creates_interpolators
+  tests/unit/test_theta_evolution_processor.py:test_process_evolution_data:
+    args:
+    - self
+    docstring: Test process_evolution_data() creates and processes processor.
+    file: tests/unit/test_theta_evolution_processor.py
+    line: 386
+    name: test_process_evolution_data
+  tests/unit/test_theta_evolution_processor.py:test_process_evolution_data_invalid:
+    args:
+    - self
+    docstring: Test process_evolution_data() raises ValueError for invalid data.
+    file: tests/unit/test_theta_evolution_processor.py
+    line: 410
+    name: test_process_evolution_data_invalid
+  tests/unit/test_theta_evolution_processor.py:test_process_handles_unsorted_times:
+    args:
+    - self
+    docstring: Test that process() handles unsorted time arrays.
+    file: tests/unit/test_theta_evolution_processor.py
+    line: 81
+    name: test_process_handles_unsorted_times
+  tests/unit/test_theta_evolution_processor.py:test_validate_time_range_invalid:
+    args:
+    - self
+    docstring: Test validate_time_range() raises ValueError for invalid times.
+    file: tests/unit/test_theta_evolution_processor.py
+    line: 360
+    name: test_validate_time_range_invalid
+  tests/unit/test_theta_evolution_processor.py:test_validate_time_range_valid:
+    args:
+    - self
+    docstring: Test validate_time_range() returns True for valid times.
+    file: tests/unit/test_theta_evolution_processor.py
+    line: 339
+    name: test_validate_time_range_valid
   tests/unit/test_theta_node_processor.py:sample_config:
     args: []
     docstring: Create sample configuration for tests.
@@ -4732,6 +5056,41 @@ imports:
     line: 12
     name: numpy
     type: import
+  cmb/theta_evolution_processor.py:Callable:
+    file: cmb/theta_evolution_processor.py
+    line: 11
+    module: typing
+    name: Callable
+    type: import_from
+  cmb/theta_evolution_processor.py:Optional:
+    file: cmb/theta_evolution_processor.py
+    line: 11
+    module: typing
+    name: Optional
+    type: import_from
+  cmb/theta_evolution_processor.py:ThetaEvolution:
+    file: cmb/theta_evolution_processor.py
+    line: 14
+    module: cmb.theta_data_loader
+    name: ThetaEvolution
+    type: import_from
+  cmb/theta_evolution_processor.py:interp1d:
+    file: cmb/theta_evolution_processor.py
+    line: 13
+    module: scipy.interpolate
+    name: interp1d
+    type: import_from
+  cmb/theta_evolution_processor.py:numpy:
+    file: cmb/theta_evolution_processor.py
+    line: 12
+    name: numpy
+    type: import
+  cmb/theta_evolution_processor.py:validate_evolution_data:
+    file: cmb/theta_evolution_processor.py
+    line: 14
+    module: cmb.theta_data_loader
+    name: validate_evolution_data
+    type: import_from
   cmb/theta_node_loader.py:Optional:
     file: cmb/theta_node_loader.py
     line: 11
@@ -6343,6 +6702,61 @@ imports:
     module: config
     name: initialize_config
     type: import_from
+  tests/integration/test_theta_evolution_integration.py:Path:
+    file: tests/integration/test_theta_evolution_integration.py
+    line: 13
+    module: pathlib
+    name: Path
+    type: import_from
+  tests/integration/test_theta_evolution_integration.py:ThetaEvolution:
+    file: tests/integration/test_theta_evolution_integration.py
+    line: 16
+    module: cmb.theta_data_loader
+    name: ThetaEvolution
+    type: import_from
+  tests/integration/test_theta_evolution_integration.py:ThetaEvolutionProcessor:
+    file: tests/integration/test_theta_evolution_integration.py
+    line: 17
+    module: cmb.theta_evolution_processor
+    name: ThetaEvolutionProcessor
+    type: import_from
+  tests/integration/test_theta_evolution_integration.py:csv:
+    file: tests/integration/test_theta_evolution_integration.py
+    line: 188
+    name: csv
+    type: import
+  tests/integration/test_theta_evolution_integration.py:json:
+    file: tests/integration/test_theta_evolution_integration.py
+    line: 15
+    name: json
+    type: import
+  tests/integration/test_theta_evolution_integration.py:load_evolution_data:
+    file: tests/integration/test_theta_evolution_integration.py
+    line: 16
+    module: cmb.theta_data_loader
+    name: load_evolution_data
+    type: import_from
+  tests/integration/test_theta_evolution_integration.py:numpy:
+    file: tests/integration/test_theta_evolution_integration.py
+    line: 12
+    name: numpy
+    type: import
+  tests/integration/test_theta_evolution_integration.py:process_evolution_data:
+    file: tests/integration/test_theta_evolution_integration.py
+    line: 17
+    module: cmb.theta_evolution_processor
+    name: process_evolution_data
+    type: import_from
+  tests/integration/test_theta_evolution_integration.py:pytest:
+    file: tests/integration/test_theta_evolution_integration.py
+    line: 11
+    name: pytest
+    type: import
+  tests/integration/test_theta_evolution_integration.py:tempfile:
+    file: tests/integration/test_theta_evolution_integration.py
+    line: 14
+    name: tempfile
+    type: import
   tests/unit/test_cmb_plots.py:Path:
     file: tests/unit/test_cmb_plots.py
     line: 11
@@ -6814,6 +7228,34 @@ imports:
     module: cmb.theta_data_loader
     name: validate_frequency_spectrum
     type: import_from
+  tests/unit/test_theta_evolution_processor.py:ThetaEvolution:
+    file: tests/unit/test_theta_evolution_processor.py
+    line: 10
+    module: cmb.theta_data_loader
+    name: ThetaEvolution
+    type: import_from
+  tests/unit/test_theta_evolution_processor.py:ThetaEvolutionProcessor:
+    file: tests/unit/test_theta_evolution_processor.py
+    line: 11
+    module: cmb.theta_evolution_processor
+    name: ThetaEvolutionProcessor
+    type: import_from
+  tests/unit/test_theta_evolution_processor.py:numpy:
+    file: tests/unit/test_theta_evolution_processor.py
+    line: 9
+    name: numpy
+    type: import
+  tests/unit/test_theta_evolution_processor.py:process_evolution_data:
+    file: tests/unit/test_theta_evolution_processor.py
+    line: 11
+    module: cmb.theta_evolution_processor
+    name: process_evolution_data
+    type: import_from
+  tests/unit/test_theta_evolution_processor.py:pytest:
+    file: tests/unit/test_theta_evolution_processor.py
+    line: 8
+    name: pytest
+    type: import
   tests/unit/test_theta_node_processor.py:Config:
     file: tests/unit/test_theta_node_processor.py
     line: 21

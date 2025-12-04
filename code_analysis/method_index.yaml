@@ -306,6 +306,9 @@ TestPlotSubpeaks:
 TestPlotTemperatureFluctuations:
 - test_plot_fluctuations
 - test_plot_invalid_data_raises_error
+TestProcessEvolutionData:
+- test_process_evolution_data
+- test_process_evolution_data_invalid
 TestProcessNodeData:
 - test_process_node_data
 - test_process_node_data_inconsistent
@@ -331,6 +334,30 @@ TestSynthesizeMap:
 - test_synthesize_invalid_nside
 TestThetaEvolution:
 - test_create_evolution
+TestThetaEvolutionIntegration:
+- test_end_to_end_evolution_processing
+- test_process_evolution_data_function
+- test_evolution_processing_with_json_file
+- test_evolution_processing_with_csv_file
+- test_evolution_processing_realistic_time_range
+TestThetaEvolutionProcessor:
+- test_init_valid_evolution
+- test_init_invalid_evolution
+- test_process_creates_interpolators
+- test_process_handles_unsorted_times
+- test_get_omega_min_at_data_points
+- test_get_omega_min_interpolated
+- test_get_omega_min_out_of_range
+- test_get_omega_min_not_processed
+- test_get_omega_macro_at_data_points
+- test_get_omega_macro_interpolated
+- test_get_omega_macro_out_of_range
+- test_get_evolution_rate_min
+- test_get_evolution_rate_min_not_processed
+- test_get_evolution_rate_macro
+- test_get_evolution_rate_macro_not_processed
+- test_validate_time_range_valid
+- test_validate_time_range_invalid
 TestThetaFrequencySpectrum:
 - test_create_frequency_spectrum
 TestValidateEvolutionData:
@@ -362,6 +389,13 @@ TestValidateNodeData:
 - test_validate_node_data_negative_depths
 ThetaEvolution: []
 ThetaEvolutionProcessor:
+- __init__
+- process
+- get_omega_min
+- get_omega_macro
+- get_evolution_rate_min
+- get_evolution_rate_macro
+- validate_time_range
 - __init__
 - process
 - get_omega_min

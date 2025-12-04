@@ -4,6 +4,7 @@
 
 # Numerical computing
 numpy>=2.0.0
+scipy>=1.10.0
 
 # HEALPix operations
 healpy>=1.19.0

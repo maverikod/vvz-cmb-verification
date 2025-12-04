@@ -272,34 +272,34 @@ class CudaArray:
                     self._check_gpu_memory_limit(required_bytes)
                     self._gpu_data = cp.asarray(self._data)
                 self._device = "cuda"
-        except CudaMemoryError as e:
+
+                # Update watchdog with actual memory usage
+                actual_bytes = self._gpu_data.nbytes
+                try:
+                    # Check memory limit before updating
+                    self._check_gpu_memory_limit(actual_bytes - required_bytes)
+                    self._watchdog.update_process_memory(self._process_id, actual_bytes)
+                except (CudaProcessKilledError, CudaMemoryLimitExceededError):
+                    # Process was killed or limit exceeded - cleanup immediately
+                    process_id_backup = self._process_id
+                    if self._gpu_data is not None:
+                        try:
+                            del self._gpu_data
+                            cp.get_default_memory_pool().free_all_blocks()
+                        except Exception:
+                            pass
+                    self._process_id = None
+                    self._device = "cpu"
+                    self._gpu_data = None
+                    raise CudaProcessKilledError(
+                        process_id_backup or "unknown",
+                        "Memory limit exceeded during allocation",
+                    )
+        except CudaMemoryError:
             # Timeout or memory error - cleanup and re-raise
             cleanup_func()
             raise
-
-            # Update watchdog with actual memory usage
-            actual_bytes = self._gpu_data.nbytes
-            try:
-                # Check memory limit before updating
-                self._check_gpu_memory_limit(actual_bytes - required_bytes)
-                self._watchdog.update_process_memory(self._process_id, actual_bytes)
-            except (CudaProcessKilledError, CudaMemoryLimitExceededError):
-                # Process was killed or limit exceeded - cleanup immediately
-                process_id_backup = self._process_id
-                if self._gpu_data is not None:
-                    try:
-                        del self._gpu_data
-                        cp.get_default_memory_pool().free_all_blocks()
-                    except Exception:
-                        pass
-                self._process_id = None
-                self._device = "cpu"
-                self._gpu_data = None
-                raise CudaProcessKilledError(
-                    process_id_backup or "unknown",
-                    "Memory limit exceeded during allocation",
-                )
-        except cp.cuda.memory.OutOfMemoryError as e:
+        except cp.cuda.memory.OutOfMemoryError:
             # Emergency cleanup on out of memory
             if self._process_id is not None:
                 self._watchdog.unregister_process(self._process_id)
@@ -310,7 +310,7 @@ class CudaArray:
                     cp.get_default_memory_pool().free_all_blocks()
                 except Exception:
                     pass
-            raise CudaMemoryError(f"Out of GPU memory: {e}") from e
+            raise CudaMemoryError("Out of GPU memory") from None
 
     def swap_to_cpu(self) -> None:
         """

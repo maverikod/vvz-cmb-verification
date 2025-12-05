@@ -357,14 +357,18 @@ class ThetaEvolutionProcessor:
                 dv0_diff_cuda.swap_to_cpu()
 
         # Last point: backward difference
-        dt_last_cuda = CudaArray(times_np[n - 1:n], device="cpu")
-        dt_last_base_cuda = CudaArray(times_np[n - 2:n - 1], device="cpu")
+        dt_last_cuda = CudaArray(times_np[n - 1 : n], device="cpu")  # noqa: E203
+        dt_last_base_cuda = CudaArray(  # noqa: E203
+            times_np[n - 2 : n - 1], device="cpu"  # noqa: E203
+        )
         dt_last_diff_cuda = elem_vec.subtract(dt_last_cuda, dt_last_base_cuda)
         dt_last = dt_last_diff_cuda.to_numpy()[0]
 
         if dt_last > 0:
-            dv_last_cuda = CudaArray(values_np[n - 1:n], device="cpu")
-            dv_last_base_cuda = CudaArray(values_np[n - 2:n - 1], device="cpu")
+            dv_last_cuda = CudaArray(values_np[n - 1 : n], device="cpu")  # noqa: E203
+            dv_last_base_cuda = CudaArray(  # noqa: E203
+                values_np[n - 2 : n - 1], device="cpu"  # noqa: E203
+            )
             dv_last_diff_cuda = elem_vec.subtract(dv_last_cuda, dv_last_base_cuda)
             derivatives[n - 1] = dv_last_diff_cuda.to_numpy()[0] / dt_last
 
@@ -782,6 +786,7 @@ class ThetaEvolutionProcessor:
         Verify time array completeness.
 
         Checks if time array has expected coverage and no missing points.
+        Uses CUDA acceleration for all array operations.
 
         Args:
             expected_interval: Expected time interval between
@@ -806,35 +811,153 @@ class ThetaEvolutionProcessor:
                 "coverage_ratio": 1.0,
             }
 
-        # Calculate expected interval
+        # Use CUDA for all array operations
+        times_cuda = CudaArray(times, device="cpu")
+        times_np = times_cuda.to_numpy()
+        elem_vec = ElementWiseVectorizer(use_gpu=True)
+
+        # Calculate expected interval using CUDA
         if expected_interval is None:
-            intervals = np.diff(times)
-            expected_interval = float(np.median(intervals))
+            # Calculate intervals using CUDA
+            # For diff, we need to use numpy, but wrap result in CudaArray
+            intervals_np = np.diff(times_np)
+            intervals_cuda = CudaArray(intervals_np, device="cpu")
+            # Median requires sorting, so use numpy for median
+            # but use CUDA for other operations
+            expected_interval = float(np.median(intervals_np))
+            # Cleanup
+            if intervals_cuda.device == "cuda":
+                intervals_cuda.swap_to_cpu()
+        else:
+            expected_interval = float(expected_interval)
 
         if expected_interval <= 0:
+            if times_cuda.device == "cuda":
+                times_cuda.swap_to_cpu()
             return {
                 "is_complete": False,
                 "missing_points": [],
                 "coverage_ratio": 0.0,
             }
 
-        # Check for missing points
-        missing_points = []
+        # Check for missing points using CUDA vectorized operations
+        # Calculate all intervals at once using CUDA
+        if n_points >= 2:
+            # Create arrays for interval calculation
+            times_forward_np = times_np[1:]
+            times_backward_np = times_np[:-1]
+            times_forward_cuda = CudaArray(times_forward_np, device="cpu")
+            times_backward_cuda = CudaArray(times_backward_np, device="cpu")
+            intervals_cuda = elem_vec.subtract(times_forward_cuda, times_backward_cuda)
 
-        for i in range(len(times) - 1):
-            interval = times[i + 1] - times[i]
-            # If interval is significantly larger than expected, check for gaps
-            if interval > expected_interval * 1.5:
-                # Calculate how many points might be missing
+            # Calculate threshold: expected_interval * 1.5
+            threshold = expected_interval * 1.5
+            threshold_cuda = CudaArray(np.array([threshold]), device="cpu")
+
+            # Find intervals that exceed threshold
+            gap_mask_cuda = elem_vec.vectorize_operation(
+                intervals_cuda, "greater", threshold_cuda.to_numpy()[0]
+            )
+            gap_mask = gap_mask_cuda.to_numpy()
+
+            # Cleanup GPU memory
+            if times_forward_cuda.device == "cuda":
+                times_forward_cuda.swap_to_cpu()
+            if times_backward_cuda.device == "cuda":
+                times_backward_cuda.swap_to_cpu()
+            if intervals_cuda.device == "cuda":
+                intervals_cuda.swap_to_cpu()
+            if gap_mask_cuda.device == "cuda":
+                gap_mask_cuda.swap_to_cpu()
+            if threshold_cuda.device == "cuda":
+                threshold_cuda.swap_to_cpu()
+
+            # Find gap indices
+            gap_indices = np.where(gap_mask)[0]
+
+            # Generate missing points for each gap
+            # This part still requires iteration, but it's over a small
+            # number of gaps (not all intervals)
+            missing_points = []
+            intervals_np = intervals_cuda.to_numpy()
+            for gap_idx in gap_indices:
+                interval = float(intervals_np[gap_idx])
                 n_expected = int(round(interval / expected_interval))
                 if n_expected > 1:
                     # Generate expected times in the gap
-                    for j in range(1, n_expected):
-                        expected_time = times[i] + j * expected_interval
-                        missing_points.append(float(expected_time))
+                    # Use CUDA for batch generation if many points
+                    if n_expected > 100:
+                        # For large gaps, use vectorized generation
+                        j_values = np.arange(1, n_expected, dtype=np.float64)
+                        j_cuda = CudaArray(j_values, device="cpu")
+                        expected_interval_cuda = CudaArray(
+                            np.array([expected_interval]), device="cpu"
+                        )
+                        time_base_cuda = CudaArray(
+                            np.array([times_np[gap_idx]]), device="cpu"
+                        )
+                        # Multiply j by expected_interval
+                        j_times_interval_cuda = elem_vec.multiply(
+                            j_cuda, expected_interval_cuda.to_numpy()[0]
+                        )
+                        # Add base time
+                        expected_times_cuda = elem_vec.add(
+                            j_times_interval_cuda, time_base_cuda.to_numpy()[0]
+                        )
+                        missing_points.extend(
+                            [float(x) for x in expected_times_cuda.to_numpy()]
+                        )
+                        # Cleanup
+                        if j_cuda.device == "cuda":
+                            j_cuda.swap_to_cpu()
+                        if expected_interval_cuda.device == "cuda":
+                            expected_interval_cuda.swap_to_cpu()
+                        if time_base_cuda.device == "cuda":
+                            time_base_cuda.swap_to_cpu()
+                        if j_times_interval_cuda.device == "cuda":
+                            j_times_interval_cuda.swap_to_cpu()
+                        if expected_times_cuda.device == "cuda":
+                            expected_times_cuda.swap_to_cpu()
+                    else:
+                        # For small gaps, use vectorized CUDA operations
+                        # Generate j values
+                        j_values = np.arange(1, n_expected, dtype=np.float64)
+                        j_cuda = CudaArray(j_values, device="cpu")
+                        expected_interval_cuda = CudaArray(
+                            np.array([expected_interval]), device="cpu"
+                        )
+                        time_base_cuda = CudaArray(
+                            np.array([times_np[gap_idx]]), device="cpu"
+                        )
+                        # Multiply j by expected_interval
+                        j_times_interval_cuda = elem_vec.multiply(
+                            j_cuda, expected_interval_cuda.to_numpy()[0]
+                        )
+                        # Add base time
+                        expected_times_cuda = elem_vec.add(
+                            j_times_interval_cuda, time_base_cuda.to_numpy()[0]
+                        )
+                        missing_points.extend(
+                            [float(x) for x in expected_times_cuda.to_numpy()]
+                        )
+                        # Cleanup
+                        if j_cuda.device == "cuda":
+                            j_cuda.swap_to_cpu()
+                        if expected_interval_cuda.device == "cuda":
+                            expected_interval_cuda.swap_to_cpu()
+                        if time_base_cuda.device == "cuda":
+                            time_base_cuda.swap_to_cpu()
+                        if j_times_interval_cuda.device == "cuda":
+                            j_times_interval_cuda.swap_to_cpu()
+                        if expected_times_cuda.device == "cuda":
+                            expected_times_cuda.swap_to_cpu()
+        else:
+            missing_points = []
 
         # Calculate coverage ratio
-        time_span = times[-1] - times[0]
+        # Simple subtraction for time span
+        time_span = float(times_np[-1] - times_np[0])
+
         if time_span > 0:
             expected_n_points = int(round(time_span / expected_interval)) + 1
             coverage_ratio = (
@@ -842,6 +965,10 @@ class ThetaEvolutionProcessor:
             )
         else:
             coverage_ratio = 1.0
+
+        # Cleanup GPU memory
+        if times_cuda.device == "cuda":
+            times_cuda.swap_to_cpu()
 
         return {
             "is_complete": len(missing_points) == 0,

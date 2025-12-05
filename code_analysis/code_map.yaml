@@ -1221,7 +1221,7 @@ classes:
     bases: []
     docstring: Tests for load_evolution_data function.
     file: tests/unit/test_theta_data_loader.py
-    line: 169
+    line: 175
     methods:
     - test_load_csv_evolution_data
     - test_load_json_evolution_data
@@ -1260,7 +1260,7 @@ classes:
     bases: []
     docstring: Tests for validate_evolution_data function.
     file: tests/unit/test_theta_data_loader.py
-    line: 357
+    line: 367
     methods:
     - test_validate_valid_evolution
     - test_validate_empty_times
@@ -1273,7 +1273,7 @@ classes:
     bases: []
     docstring: Tests for validate_frequency_spectrum function.
     file: tests/unit/test_theta_data_loader.py
-    line: 250
+    line: 256
     methods:
     - test_validate_valid_spectrum
     - test_validate_empty_frequencies
@@ -1810,7 +1810,7 @@ functions:
       \ FileNotFoundError: If data file doesn't exist\n    ValueError: If data format\
       \ is invalid"
     file: cmb/theta_data_loader.py
-    line: 142
+    line: 148
     name: load_evolution_data
   cmb/theta_data_loader.py:load_frequency_spectrum:
     args:
@@ -1835,7 +1835,7 @@ functions:
       \ have same length)\n\nArgs:\n    evolution: ThetaEvolution to validate\n\n\
       Returns:\n    True if valid\n\nRaises:\n    ValueError: If data is invalid"
     file: cmb/theta_data_loader.py
-    line: 284
+    line: 292
     name: validate_evolution_data
   cmb/theta_data_loader.py:validate_frequency_spectrum:
     args:
@@ -1846,7 +1846,7 @@ functions:
       \nArgs:\n    spectrum: ThetaFrequencySpectrum to validate\n\nReturns:\n    True\
       \ if valid\n\nRaises:\n    ValueError: If data is invalid"
     file: cmb/theta_data_loader.py
-    line: 217
+    line: 225
     name: validate_frequency_spectrum
   cmb/theta_data_parser.py:parse_csv_evolution_data:
     args:
@@ -1857,7 +1857,7 @@ functions:
       \nReturns:\n    ThetaEvolution instance\n\nRaises:\n    ValueError: If required\
       \ columns are missing or data format is invalid"
     file: cmb/theta_data_parser.py
-    line: 218
+    line: 222
     name: parse_csv_evolution_data
   cmb/theta_data_parser.py:parse_csv_frequency_spectrum:
     args:
@@ -1879,7 +1879,7 @@ functions:
       Returns:\n    ThetaEvolution instance\n\nRaises:\n    ValueError: If required\
       \ keys are missing or data format is invalid"
     file: cmb/theta_data_parser.py
-    line: 300
+    line: 304
     name: parse_json_evolution_data
   cmb/theta_data_parser.py:parse_json_frequency_spectrum:
     args:
@@ -1890,7 +1890,7 @@ functions:
       Returns:\n    ThetaFrequencySpectrum instance\n\nRaises:\n    ValueError: If\
       \ required keys are missing or data format is invalid"
     file: cmb/theta_data_parser.py
-    line: 142
+    line: 144
     name: parse_json_frequency_spectrum
   cmb/theta_evolution_processor.py:__init__:
     args:
@@ -5267,7 +5267,7 @@ functions:
     - self
     docstring: Test loading evolution data from CSV file.
     file: tests/unit/test_theta_data_loader.py
-    line: 172
+    line: 178
     name: test_load_csv_evolution_data
   tests/unit/test_theta_data_loader.py:test_load_csv_frequency_spectrum:
     args:
@@ -5281,119 +5281,119 @@ functions:
     - self
     docstring: Test loading CSV with missing column raises ValueError.
     file: tests/unit/test_theta_data_loader.py
-    line: 235
+    line: 241
     name: test_load_csv_missing_column
   tests/unit/test_theta_data_loader.py:test_load_json_evolution_data:
     args:
     - self
     docstring: Test loading evolution data from JSON file.
     file: tests/unit/test_theta_data_loader.py
-    line: 198
+    line: 204
     name: test_load_json_evolution_data
   tests/unit/test_theta_data_loader.py:test_load_json_frequency_spectrum:
     args:
     - self
     docstring: Test loading frequency spectrum from JSON file.
     file: tests/unit/test_theta_data_loader.py
-    line: 103
+    line: 105
     name: test_load_json_frequency_spectrum
   tests/unit/test_theta_data_loader.py:test_load_json_missing_key:
     args:
     - self
     docstring: Test loading JSON with missing key raises ValueError.
     file: tests/unit/test_theta_data_loader.py
-    line: 154
+    line: 158
     name: test_load_json_missing_key
   tests/unit/test_theta_data_loader.py:test_load_nonexistent_file:
     args:
     - self
     docstring: Test loading non-existent file raises FileNotFoundError.
     file: tests/unit/test_theta_data_loader.py
-    line: 228
+    line: 234
     name: test_load_nonexistent_file
   tests/unit/test_theta_data_loader.py:test_validate_empty_frequencies:
     args:
     - self
     docstring: Test validating spectrum with empty frequencies.
     file: tests/unit/test_theta_data_loader.py
-    line: 269
+    line: 275
     name: test_validate_empty_frequencies
   tests/unit/test_theta_data_loader.py:test_validate_empty_times:
     args:
     - self
     docstring: Test validating evolution with empty times raises ValueError.
     file: tests/unit/test_theta_data_loader.py
-    line: 376
+    line: 386
     name: test_validate_empty_times
   tests/unit/test_theta_data_loader.py:test_validate_length_mismatch:
     args:
     - self
     docstring: Test validating evolution with length mismatch raises ValueError.
     file: tests/unit/test_theta_data_loader.py
-    line: 393
+    line: 403
     name: test_validate_length_mismatch
   tests/unit/test_theta_data_loader.py:test_validate_nan_frequencies:
     args:
     - self
     docstring: Test validating spectrum with NaN frequencies raises ValueError.
     file: tests/unit/test_theta_data_loader.py
-    line: 339
+    line: 347
     name: test_validate_nan_frequencies
   tests/unit/test_theta_data_loader.py:test_validate_nan_times:
     args:
     - self
     docstring: Test validating evolution with NaN times raises ValueError.
     file: tests/unit/test_theta_data_loader.py
-    line: 427
+    line: 439
     name: test_validate_nan_times
   tests/unit/test_theta_data_loader.py:test_validate_negative_frequencies:
     args:
     - self
     docstring: Test validating spectrum with negative frequencies.
     file: tests/unit/test_theta_data_loader.py
-    line: 286
+    line: 292
     name: test_validate_negative_frequencies
   tests/unit/test_theta_data_loader.py:test_validate_negative_omega_min:
     args:
     - self
     docstring: Test validating evolution with negative omega_min.
     file: tests/unit/test_theta_data_loader.py
-    line: 410
+    line: 420
     name: test_validate_negative_omega_min
   tests/unit/test_theta_data_loader.py:test_validate_negative_spectrum:
     args:
     - self
     docstring: Test validating spectrum with negative values raises ValueError.
     file: tests/unit/test_theta_data_loader.py
-    line: 303
+    line: 311
     name: test_validate_negative_spectrum
   tests/unit/test_theta_data_loader.py:test_validate_omega_min_greater_than_macro:
     args:
     - self
     docstring: Test validating evolution where omega_min >= omega_macro.
     file: tests/unit/test_theta_data_loader.py
-    line: 444
+    line: 456
     name: test_validate_omega_min_greater_than_macro
   tests/unit/test_theta_data_loader.py:test_validate_shape_mismatch:
     args:
     - self
     docstring: Test validating spectrum with shape mismatch raises ValueError.
     file: tests/unit/test_theta_data_loader.py
-    line: 322
+    line: 330
     name: test_validate_shape_mismatch
   tests/unit/test_theta_data_loader.py:test_validate_valid_evolution:
     args:
     - self
     docstring: Test validating valid evolution data.
     file: tests/unit/test_theta_data_loader.py
-    line: 360
+    line: 370
     name: test_validate_valid_evolution
   tests/unit/test_theta_data_loader.py:test_validate_valid_spectrum:
     args:
     - self
     docstring: Test validating valid frequency spectrum.
     file: tests/unit/test_theta_data_loader.py
-    line: 253
+    line: 259
     name: test_validate_valid_spectrum
   tests/unit/test_theta_evolution_processor.py:test_check_time_coverage_gaps_no_gaps:
     args:
@@ -7450,13 +7450,13 @@ imports:
     type: import_from
   cmb/theta_data_parser.py:ThetaEvolution:
     file: cmb/theta_data_parser.py
-    line: 346
+    line: 350
     module: cmb.theta_data_loader
     name: ThetaEvolution
     type: import_from
   cmb/theta_data_parser.py:ThetaFrequencySpectrum:
     file: cmb/theta_data_parser.py
-    line: 208
+    line: 212
     module: cmb.theta_data_loader
     name: ThetaFrequencySpectrum
     type: import_from

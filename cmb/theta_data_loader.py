@@ -107,7 +107,9 @@ def load_frequency_spectrum(
                 keyword in file_name.lower()
                 for keyword in ["frequency", "spectrum", "rho", "omega"]
             ):
-                spectrum_file = data_index.get_file_path("theta_field_data", file_name)
+                spectrum_file = data_index.get_file_path(  # noqa: E501
+                    "theta_field_data", file_name
+                )
                 if spectrum_file and spectrum_file.exists():
                     break
 
@@ -115,7 +117,9 @@ def load_frequency_spectrum(
             # Try direct path in data/theta/
             spectrum_file = config.paths.data_theta / "frequency_spectrum.csv"
             if not spectrum_file.exists():
-                spectrum_file = config.paths.data_theta / "frequency_spectrum.json"
+                spectrum_file = (  # noqa: E501
+                    config.paths.data_theta / "frequency_spectrum.json"
+                )
                 if not spectrum_file.exists():
                     raise FileNotFoundError(
                         f"Frequency spectrum file not found in data/theta/ "
@@ -127,7 +131,9 @@ def load_frequency_spectrum(
     data_path = Path(data_path)
 
     if not data_path.exists():
-        raise FileNotFoundError(f"Frequency spectrum file not found: {data_path}")
+        raise FileNotFoundError(  # noqa: E501
+            f"Frequency spectrum file not found: {data_path}"
+        )
 
     # Determine file format and load
     if data_path.suffix.lower() == ".json":
@@ -182,7 +188,9 @@ def load_evolution_data(data_path: Optional[Path] = None) -> ThetaEvolution:
                 keyword in file_name.lower()
                 for keyword in ["evolution", "omega_min", "omega_macro"]
             ):
-                evolution_file = data_index.get_file_path("theta_field_data", file_name)
+                evolution_file = data_index.get_file_path(  # noqa: E501
+                    "theta_field_data", file_name
+                )
                 if evolution_file and evolution_file.exists():
                     break
 

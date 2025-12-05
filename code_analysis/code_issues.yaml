@@ -22,10 +22,10 @@ issues:
     file: tests/unit/test_theta_evolution_processor.py
     limit: 400
     lines: 874
-  - exceeds_limit: 62
+  - exceeds_limit: 75
     file: tests/unit/test_theta_data_loader.py
     limit: 400
-    lines: 462
+    lines: 475
   - exceeds_limit: 93
     file: tests/unit/test_theta_node_processor.py
     limit: 400

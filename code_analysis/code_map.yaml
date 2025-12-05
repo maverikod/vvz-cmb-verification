@@ -7057,7 +7057,7 @@ functions:
       Returns:\n    Dictionary with JSON data\n\nRaises:\n    FileNotFoundError: If\
       \ file doesn't exist\n    json.JSONDecodeError: If JSON is invalid"
     file: utils/io/data_loader.py
-    line: 329
+    line: 331
     name: load_json_data
   utils/io/data_loader.py:load_power_spectrum_from_tar:
     args:
@@ -7079,7 +7079,7 @@ functions:
       \    nside: Expected NSIDE value (optional)\n\nReturns:\n    True if map is\
       \ valid\n\nRaises:\n    ValueError: If map is invalid"
     file: utils/io/data_loader.py
-    line: 358
+    line: 360
     name: validate_healpix_map
   utils/io/data_saver.py:convert_to_serializable:
     args:
@@ -7088,7 +7088,7 @@ functions:
       \ to convert (can be numpy array, dict, list, etc.)\n\nReturns:\n    JSON-serializable\
       \ representation of the object"
     file: utils/io/data_saver.py
-    line: 214
+    line: 239
     name: convert_to_serializable
   utils/io/data_saver.py:convert_to_yaml_serializable:
     args:
@@ -7097,7 +7097,7 @@ functions:
       \ to convert (can be numpy array, dict, list, etc.)\n\nReturns:\n    YAML-serializable\
       \ representation of the object"
     file: utils/io/data_saver.py
-    line: 251
+    line: 276
     name: convert_to_yaml_serializable
   utils/io/data_saver.py:ensure_output_directory:
     args:
@@ -7106,7 +7106,7 @@ functions:
       \ Path to output file or directory\n\nRaises:\n    PermissionError: If directory\
       \ cannot be created"
     file: utils/io/data_saver.py
-    line: 283
+    line: 318
     name: ensure_output_directory
   utils/io/data_saver.py:save_analysis_results:
     args:
@@ -7117,7 +7117,7 @@ functions:
       \ analysis results\n    file_path: Path to output file\n    format: Output format\
       \ ('json', 'yaml')\n\nRaises:\n    ValueError: If format is invalid"
     file: utils/io/data_saver.py
-    line: 194
+    line: 219
     name: save_analysis_results
   utils/io/data_saver.py:save_healpix_map:
     args:
@@ -7137,12 +7137,16 @@ functions:
     - spectrum_data
     - file_path
     - format
-    docstring: "Save power spectrum data to file.\n\nArgs:\n    spectrum_data: Dictionary\
+    - chunksize
+    docstring: "Save power spectrum data to file.\n\nUses block processing for large\
+      \ files when chunksize is specified.\n\nArgs:\n    spectrum_data: Dictionary\
       \ with spectrum data (keys: 'l', 'cl', 'error')\n    file_path: Path to output\
-      \ file\n    format: Output format ('json', 'csv', 'npy')\n\nRaises:\n    ValueError:\
-      \ If format is invalid or data is missing"
+      \ file\n    format: Output format ('json', 'csv', 'npy')\n    chunksize: Optional\
+      \ chunk size for block processing large CSV files.\n               If None,\
+      \ writes entire file at once.\n\nRaises:\n    ValueError: If format is invalid\
+      \ or data is missing"
     file: utils/io/data_saver.py
-    line: 77
+    line: 79
     name: save_power_spectrum
   utils/math/frequency_conversion.py:frequency_to_multipole:
     args:
@@ -7190,7 +7194,7 @@ functions:
       \ uses data limit)\n\nReturns:\n    Tuple of (multipoles, C_l values)\n\nRaises:\n\
       \    ValueError: If coefficients are invalid"
     file: utils/math/spherical_harmonics.py
-    line: 188
+    line: 206
     name: calculate_power_spectrum_from_alm
   utils/math/spherical_harmonics.py:convert_healpix_to_alm:
     args:
@@ -7201,7 +7205,7 @@ functions:
       \    map_data: HEALPix map array\n    nside: HEALPix NSIDE parameter\n    l_max:\
       \ Maximum multipole\n\nReturns:\n    Array of harmonic coefficients a_lm"
     file: utils/math/spherical_harmonics.py
-    line: 229
+    line: 247
     name: convert_healpix_to_alm
   utils/math/spherical_harmonics.py:decompose_map:
     args:
@@ -7212,9 +7216,10 @@ functions:
     docstring: "Decompose HEALPix map into spherical harmonics.\n\nArgs:\n    map_data:\
       \ HEALPix map array (can be CudaArray for GPU acceleration)\n    nside: HEALPix\
       \ NSIDE parameter\n    l_max: Maximum multipole (if None, uses default)\n  \
-      \  use_cuda: Use CUDA acceleration if available (only if map_data is CudaArray)\n\
-      \nReturns:\n    Array of harmonic coefficients a_lm (returns CudaArray if input\
-      \ was CudaArray)\n\nRaises:\n    ValueError: If map data is invalid"
+      \  use_cuda: Use CUDA acceleration if available\n              (only if map_data\
+      \ is CudaArray)\n\nReturns:\n    Array of harmonic coefficients a_lm\n    (returns\
+      \ CudaArray if input was CudaArray)\n\nRaises:\n    ValueError: If map data\
+      \ is invalid"
     file: utils/math/spherical_harmonics.py
     line: 26
     name: decompose_map
@@ -7229,7 +7234,7 @@ functions:
       \ (only if alm is CudaArray)\n\nReturns:\n    HEALPix map array (returns CudaArray\
       \ if input was CudaArray)\n\nRaises:\n    ValueError: If coefficients are invalid"
     file: utils/math/spherical_harmonics.py
-    line: 116
+    line: 126
     name: synthesize_map
   utils/visualization/cmb_plots.py:plot_healpix_map:
     args:
@@ -10796,6 +10801,12 @@ imports:
     module: typing
     name: Dict
     type: import_from
+  utils/io/data_saver.py:Optional:
+    file: utils/io/data_saver.py
+    line: 11
+    module: typing
+    name: Optional
+    type: import_from
   utils/io/data_saver.py:Path:
     file: utils/io/data_saver.py
     line: 10
@@ -10829,7 +10840,7 @@ imports:
     type: import
   utils/io/data_saver.py:yaml:
     file: utils/io/data_saver.py
-    line: 244
+    line: 269
     name: yaml
     type: import
   utils/math/__init__.py:calculate_power_spectrum_from_alm:
@@ -10917,7 +10928,7 @@ imports:
     type: import
   utils/math/spherical_harmonics.py:CudaArray:
     file: utils/math/spherical_harmonics.py
-    line: 159
+    line: 16
     module: utils.cuda.array_model
     name: CudaArray
     type: import_from

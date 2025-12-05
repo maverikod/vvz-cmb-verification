@@ -36,10 +36,12 @@ def decompose_map(
         map_data: HEALPix map array (can be CudaArray for GPU acceleration)
         nside: HEALPix NSIDE parameter
         l_max: Maximum multipole (if None, uses default)
-        use_cuda: Use CUDA acceleration if available (only if map_data is CudaArray)
+        use_cuda: Use CUDA acceleration if available
+                  (only if map_data is CudaArray)
 
     Returns:
-        Array of harmonic coefficients a_lm (returns CudaArray if input was CudaArray)
+        Array of harmonic coefficients a_lm
+        (returns CudaArray if input was CudaArray)
 
     Raises:
         ValueError: If map data is invalid
@@ -47,15 +49,19 @@ def decompose_map(
     # Check if input is CudaArray and CUDA is available
     is_cuda_array = CUDA_AVAILABLE and isinstance(map_data, CudaArray)
 
-    if is_cuda_array and use_cuda and CudaArray is not None:
-        # Use CUDA-accelerated path
+    if (
+        is_cuda_array
+        and use_cuda
+        and CudaArray is not None
+        and TransformVectorizer is not None
+    ):
+        # Use CUDA-accelerated path via TransformVectorizer
         # Type narrowing: map_data is CudaArray here
         cuda_map: CudaArray = map_data  # type: ignore
-        # Convert to numpy for healpy (healpy doesn't support GPU directly)
-        map_numpy = cuda_map.to_numpy()
 
         # Validate map size
         expected_npix = 12 * nside * nside
+        map_numpy = cuda_map.to_numpy()
         if map_numpy.size != expected_npix:
             raise ValueError(
                 f"Map size {map_numpy.size} does not match NSIDE {nside} "
@@ -70,13 +76,17 @@ def decompose_map(
             raise ValueError(f"l_max must be non-negative, got {l_max}")
 
         try:
-            # Perform decomposition on CPU (healpy limitation)
-            alm = hp.map2alm(map_numpy, lmax=l_max, iter=0)
+            # Use TransformVectorizer for decomposition
+            # Note: healpy doesn't support GPU directly, but
+            # TransformVectorizer handles CPU-GPU conversion and provides
+            # consistent interface
+            vectorizer = TransformVectorizer(use_gpu=True, whole_array=True)
+            alm = vectorizer.vectorize_transform(
+                cuda_map, "sph_harm_analysis", lmax=l_max, iter=0
+            )
 
-            # Convert back to CudaArray
-            from utils.cuda.array_model import CudaArray as CudaArrayClass
-
-            return CudaArrayClass(alm, device=cuda_map.device)
+            # Result is already CudaArray from vectorizer
+            return alm
         except Exception as e:
             raise ValueError(f"Failed to decompose map: {e}") from e
 
@@ -135,30 +145,36 @@ def synthesize_map(
     # Check if input is CudaArray and CUDA is available
     is_cuda_array = CUDA_AVAILABLE and isinstance(alm, CudaArray)
 
-    if is_cuda_array and use_cuda and CudaArray is not None:
+    if (
+        is_cuda_array
+        and use_cuda
+        and CudaArray is not None
+        and TransformVectorizer is not None
+    ):
         # Use CUDA-accelerated path via TransformVectorizer
         # Type narrowing: alm is CudaArray here
         cuda_alm: CudaArray = alm  # type: ignore
-        # Note: TransformVectorizer not used yet (healpy limitation)
-        # Convert to numpy for healpy (healpy doesn't support GPU directly)
-        alm_numpy = cuda_alm.to_numpy()
 
-        if alm_numpy.size == 0:
+        # Check if array is empty using to_numpy()
+        alm_numpy_check = cuda_alm.to_numpy()
+        if alm_numpy_check.size == 0:
             raise ValueError("Harmonic coefficients array is empty")
 
         if nside <= 0:
             raise ValueError(f"NSIDE must be positive, got {nside}")
 
         try:
-            # Use transform vectorizer for synthesis
-            # Note: Currently healpy doesn't support GPU, so we do CPU synthesis
-            # but wrap result in CudaArray
-            map_data = hp.alm2map(alm_numpy, nside=nside)
+            # Use TransformVectorizer for synthesis
+            # Note: healpy doesn't support GPU directly, but
+            # TransformVectorizer handles CPU-GPU conversion and provides
+            # consistent interface
+            vectorizer = TransformVectorizer(use_gpu=True, whole_array=True)
+            map_data = vectorizer.vectorize_transform(
+                cuda_alm, "sph_harm_synthesis", lmax=None, nside=nside
+            )
 
-            # Convert back to CudaArray
-            from utils.cuda.array_model import CudaArray as CudaArrayClass
-
-            return CudaArrayClass(map_data, device=cuda_alm.device)
+            # Result is already CudaArray from vectorizer
+            return map_data
         except Exception as e:
             raise ValueError(f"Failed to synthesize map: {e}") from e
 
@@ -169,7 +185,9 @@ def synthesize_map(
             cuda_alm: CudaArray = alm  # type: ignore
             alm = cuda_alm.to_numpy()
         else:
-            raise ValueError("Harmonic coefficients must be a numpy array or CudaArray")
+            raise ValueError(
+                "Harmonic coefficients must be a numpy array or CudaArray"
+            )
 
     if alm.size == 0:
         raise ValueError("Harmonic coefficients array is empty")

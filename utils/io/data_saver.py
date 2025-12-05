@@ -8,7 +8,7 @@ Email: vasilyvz@gmail.com
 """
 
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 import numpy as np
 import healpy as hp
 import json
@@ -71,19 +71,28 @@ def save_healpix_map(
             dtype=None,  # Preserve input dtype
         )
     except Exception as e:
-        raise ValueError(f"Failed to save HEALPix map to {file_path}: {e}") from e
+        raise ValueError(
+            f"Failed to save HEALPix map to {file_path}: {e}"
+        ) from e
 
 
 def save_power_spectrum(
-    spectrum_data: Dict[str, np.ndarray], file_path: Path, format: str = "json"
+    spectrum_data: Dict[str, np.ndarray],
+    file_path: Path,
+    format: str = "json",
+    chunksize: Optional[int] = None,
 ) -> None:
     """
     Save power spectrum data to file.
+
+    Uses block processing for large files when chunksize is specified.
 
     Args:
         spectrum_data: Dictionary with spectrum data (keys: 'l', 'cl', 'error')
         file_path: Path to output file
         format: Output format ('json', 'csv', 'npy')
+        chunksize: Optional chunk size for block processing large CSV files.
+                   If None, writes entire file at once.
 
     Raises:
         ValueError: If format is invalid or data is missing
@@ -143,8 +152,22 @@ def save_power_spectrum(
                     df_data[key] = [value] * max_len
 
             df = pd.DataFrame(df_data)
-            # Write with pandas (vectorized, faster)
-            df.to_csv(file_path, index=False, encoding="utf-8")
+
+            # Use block processing for large files if chunksize specified
+            if chunksize is not None and chunksize > 0 and max_len > chunksize:
+                # Write in chunks to avoid memory overflow
+                with open(file_path, "w", encoding="utf-8", newline="") as f:
+                    # Write header
+                    df.head(0).to_csv(f, index=False)
+                    # Write data in chunks
+                    for start_idx in range(0, max_len, chunksize):
+                        end_idx = min(start_idx + chunksize, max_len)
+                        chunk_df = df.iloc[start_idx:end_idx]
+                        chunk_df.to_csv(f, index=False, header=False, mode="a")
+            else:
+                # Write entire file at once
+                # (vectorized, faster for small-medium files)
+                df.to_csv(file_path, index=False, encoding="utf-8")
         else:
             # Fallback to original csv.writer approach
             # Get all keys and ensure they have same length
@@ -188,7 +211,9 @@ def save_power_spectrum(
         np.savez(str(file_path), **spectrum_data)  # type: ignore[arg-type]
 
     else:
-        raise ValueError(f"Unsupported format: {format}. Use 'json', 'csv', or 'npy'.")
+        raise ValueError(
+            f"Unsupported format: {format}. Use 'json', 'csv', or 'npy'."
+        )
 
 
 def save_analysis_results(
@@ -263,7 +288,10 @@ def save_analysis_results(
             elif isinstance(obj, (np.integer, np.floating)):
                 return float(obj)
             elif isinstance(obj, dict):
-                return {k: convert_to_yaml_serializable(v) for k, v in obj.items()}
+                return {
+                    k: convert_to_yaml_serializable(v)
+                    for k, v in obj.items()
+                }
             elif isinstance(obj, (list, tuple)):
                 return [convert_to_yaml_serializable(item) for item in obj]
             elif isinstance(obj, Path):
@@ -274,10 +302,17 @@ def save_analysis_results(
         yaml_data = convert_to_yaml_serializable(results)
 
         with open(file_path, "w", encoding="utf-8") as f:
-            yaml.dump(yaml_data, f, default_flow_style=False, allow_unicode=True)
+            yaml.dump(
+                yaml_data,
+                f,
+                default_flow_style=False,
+                allow_unicode=True,
+            )
 
     else:
-        raise ValueError(f"Unsupported format: {format}. Use 'json' or 'yaml'.")
+        raise ValueError(
+            f"Unsupported format: {format}. Use 'json' or 'yaml'."
+        )
 
 
 def ensure_output_directory(output_path: Path) -> None:

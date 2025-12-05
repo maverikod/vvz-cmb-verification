@@ -14,10 +14,10 @@ issues:
     file: utils/cuda/array_model.py
     limit: 400
     lines: 520
-  - exceeds_limit: 8
+  - exceeds_limit: 10
     file: utils/io/data_loader.py
     limit: 400
-    lines: 408
+    lines: 410
   - exceeds_limit: 474
     file: tests/unit/test_theta_evolution_processor.py
     limit: 400

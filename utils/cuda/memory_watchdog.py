@@ -225,7 +225,13 @@ class MemoryWatchdog:
 
         try:
             # Get total GPU memory
-            total_mem = cp.cuda.runtime.getDeviceProperties(0).totalGlobalMem
+            # getDeviceProperties returns dict in newer CuPy versions
+            device_props = cp.cuda.runtime.getDeviceProperties(0)
+            total_mem = (
+                device_props["totalGlobalMem"]
+                if isinstance(device_props, dict)
+                else device_props.totalGlobalMem
+            )
             max_allowed = total_mem * (self._memory_limit_percent / 100.0)
 
             # Get actual GPU memory usage (more accurate than registered)

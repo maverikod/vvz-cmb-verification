@@ -8,7 +8,7 @@ Email: vasilyvz@gmail.com
 """
 
 from pathlib import Path
-from typing import Dict, Any, TYPE_CHECKING
+from typing import Dict, Any, Optional, TYPE_CHECKING
 import numpy as np
 
 if TYPE_CHECKING:
@@ -16,14 +16,20 @@ if TYPE_CHECKING:
 
 
 def parse_csv_frequency_spectrum(
-    data: Dict[str, np.ndarray], file_path: Path
+    data: Dict[str, np.ndarray],
+    file_path: Path,
+    block_size: Optional[int] = None,
 ) -> "ThetaFrequencySpectrum":  # noqa: F821
     """
     Parse frequency spectrum from CSV data.
 
+    Supports block processing for large datasets to reduce memory usage.
+
     Args:
         data: Dictionary with CSV column data
         file_path: Path to source file (for error messages)
+        block_size: Optional block size for processing large arrays.
+                   If None, processes entire array at once.
 
     Returns:
         ThetaFrequencySpectrum instance
@@ -94,15 +100,33 @@ def parse_csv_frequency_spectrum(
         elif spectrum_data.size == len(frequencies_raw):
             # CSV format: one value per row, need to reshape based on
             # original frequencies and times order
-            # Create mapping from (freq, time) to index
+            # Vectorized approach using numpy searchsorted
             spectrum_2d = np.zeros((len(frequencies), len(times)))
-            freq_to_idx = {f: i for i, f in enumerate(frequencies)}
-            time_to_idx = {t: i for i, t in enumerate(times)}
 
-            for k in range(len(frequencies_raw)):
-                freq_idx = freq_to_idx[frequencies_raw[k]]
-                time_idx = time_to_idx[times_raw[k]]
-                spectrum_2d[freq_idx, time_idx] = spectrum_data[k]
+            # Use searchsorted for vectorized index finding
+            # This is faster than dictionary lookup for large arrays
+            freq_indices = np.searchsorted(frequencies, frequencies_raw)
+            time_indices = np.searchsorted(times, times_raw)
+
+            # Block processing for very large arrays to reduce memory usage
+            if block_size is not None and len(frequencies_raw) > block_size:
+                # Process in blocks
+                n_blocks = (
+                    len(frequencies_raw) + block_size - 1
+                ) // block_size
+                for i in range(n_blocks):
+                    start_idx = i * block_size
+                    end_idx = min((i + 1) * block_size, len(frequencies_raw))
+                    block_freq_indices = freq_indices[start_idx:end_idx]
+                    block_time_indices = time_indices[start_idx:end_idx]
+                    block_spectrum = spectrum_data[start_idx:end_idx]
+                    # Vectorized assignment for block
+                    spectrum_2d[
+                        block_freq_indices, block_time_indices
+                    ] = block_spectrum
+            else:
+                # Vectorized assignment using advanced indexing (entire array)
+                spectrum_2d[freq_indices, time_indices] = spectrum_data
 
             spectrum = spectrum_2d
         else:
@@ -207,7 +231,7 @@ def parse_json_frequency_spectrum(
     if "n_frequencies" not in metadata:
         metadata["n_frequencies"] = len(frequencies)
     if "n_times" not in metadata:
-        metadata["n_times"] = len(times)
+        metadata["n_times"] = len(times)  # noqa: E501
 
     from cmb.theta_data_loader import ThetaFrequencySpectrum
 

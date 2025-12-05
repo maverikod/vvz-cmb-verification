@@ -2,10 +2,14 @@ issues:
   any_type_usage: []
   classes_without_docstrings: []
   files_too_large:
-  - exceeds_limit: 265
+  - exceeds_limit: 317
     file: cmb/theta_evolution_processor.py
     limit: 400
-    lines: 665
+    lines: 717
+  - exceeds_limit: 175
+    file: cmb/theta_data_loader.py
+    limit: 400
+    lines: 575
   - exceeds_limit: 89
     file: utils/cuda/memory_watchdog.py
     limit: 400
@@ -292,7 +296,7 @@ issues:
 summary:
   any_type_usage: 0
   classes_without_docstrings: 0
-  files_too_large: 7
+  files_too_large: 8
   files_without_docstrings: 0
   generic_exception_usage: 0
   imports_in_middle: 0
@@ -301,4 +305,4 @@ summary:
   methods_with_pass: 0
   methods_without_docstrings: 5
   not_implemented_in_non_abstract: 1
-  total_issues: 53
+  total_issues: 54

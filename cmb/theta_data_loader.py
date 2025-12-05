@@ -23,7 +23,23 @@ from cmb.theta_data_parser import (
     parse_json_evolution_data,
 )
 
+# Try to import CUDA utilities for large array validation
+try:
+    from utils.cuda.array_model import CudaArray
+    from utils.cuda.elementwise_vectorizer import ElementWiseVectorizer
+    from utils.cuda.reduction_vectorizer import ReductionVectorizer
+
+    CUDA_AVAILABLE = True
+except ImportError:
+    CUDA_AVAILABLE = False
+    CudaArray = None  # type: ignore
+    ElementWiseVectorizer = None  # type: ignore
+    ReductionVectorizer = None  # type: ignore
+
 logger = logging.getLogger(__name__)
+
+# Threshold for using CUDA acceleration (array size)
+CUDA_THRESHOLD = 1000000  # 1M elements
 
 
 @dataclass
@@ -250,19 +266,78 @@ def validate_frequency_spectrum(spectrum: ThetaFrequencySpectrum) -> bool:
     if spectrum.spectrum.size == 0:
         raise ValueError("Spectrum array is empty")
 
-    # Check positive frequencies
-    if np.any(spectrum.frequencies <= 0):
-        raise ValueError(
-            "All frequencies must be positive. "
-            f"Found non-positive values: {np.sum(spectrum.frequencies <= 0)}"
-        )
+    # Check positive frequencies (use CUDA for large arrays)
+    if (
+        CUDA_AVAILABLE
+        and spectrum.frequencies.size > CUDA_THRESHOLD
+        and CudaArray is not None
+        and ElementWiseVectorizer is not None
+        and ReductionVectorizer is not None
+    ):
+        # Use CUDA-accelerated validation for large arrays
+        cuda_freq = CudaArray(spectrum.frequencies, device="cuda")
+        vectorizer = ElementWiseVectorizer(use_gpu=True)
+        reducer = ReductionVectorizer(use_gpu=True)
 
-    # Check non-negative spectrum values
-    if np.any(spectrum.spectrum < 0):
-        raise ValueError(
-            "All spectrum values must be non-negative. "
-            f"Found negative values: {np.sum(spectrum.spectrum < 0)}"
+        # Check for non-positive values on GPU
+        non_positive = vectorizer.vectorize_operation(
+            cuda_freq, "less_equal", 0.0
         )
+        has_non_positive = reducer.vectorize_reduction(non_positive, "any")
+        if has_non_positive:
+            count_result = reducer.vectorize_reduction(non_positive, "sum")
+            # Convert to int (handles CudaArray, float, int)
+            if hasattr(count_result, "to_numpy"):
+                count = int(count_result.to_numpy().item())
+            else:
+                count = int(count_result)
+            raise ValueError(
+                "All frequencies must be positive. "
+                f"Found non-positive values: {count}"
+            )
+    else:
+        # CPU path
+        if np.any(spectrum.frequencies <= 0):
+            raise ValueError(
+                "All frequencies must be positive. "
+                f"Found non-positive values: "
+                f"{np.sum(spectrum.frequencies <= 0)}"
+            )
+
+    # Check non-negative spectrum values (use CUDA for large arrays)
+    if (
+        CUDA_AVAILABLE
+        and spectrum.spectrum.size > CUDA_THRESHOLD
+        and CudaArray is not None
+        and ElementWiseVectorizer is not None
+        and ReductionVectorizer is not None
+    ):
+        # Use CUDA-accelerated validation for large arrays
+        cuda_spec = CudaArray(spectrum.spectrum, device="cuda")
+        vectorizer = ElementWiseVectorizer(use_gpu=True)
+        reducer = ReductionVectorizer(use_gpu=True)
+
+        # Check for negative values on GPU
+        negative = vectorizer.vectorize_operation(cuda_spec, "less", 0.0)
+        has_negative = reducer.vectorize_reduction(negative, "any")
+        if has_negative:
+            count_result = reducer.vectorize_reduction(negative, "sum")
+            # Convert to int (handles CudaArray, float, int)
+            if hasattr(count_result, "to_numpy"):
+                count = int(count_result.to_numpy().item())
+            else:
+                count = int(count_result)
+            raise ValueError(
+                "All spectrum values must be non-negative. "
+                f"Found negative values: {count}"
+            )
+    else:
+        # CPU path
+        if np.any(spectrum.spectrum < 0):
+            raise ValueError(
+                "All spectrum values must be non-negative. "
+                f"Found negative values: {np.sum(spectrum.spectrum < 0)}"
+            )
 
     # Check consistent array shapes
     expected_shape = (len(spectrum.frequencies), len(spectrum.times))
@@ -272,19 +347,61 @@ def validate_frequency_spectrum(spectrum: ThetaFrequencySpectrum) -> bool:
             f"(frequencies × times), got {spectrum.spectrum.shape}"
         )
 
-    # Check for NaN or Inf values
-    if np.any(np.isnan(spectrum.frequencies)):
-        raise ValueError("Frequency array contains NaN values")
-    if np.any(np.isnan(spectrum.times)):
-        raise ValueError("Time array contains NaN values")
-    if np.any(np.isnan(spectrum.spectrum)):
-        raise ValueError("Spectrum array contains NaN values")
-    if np.any(np.isinf(spectrum.frequencies)):
-        raise ValueError("Frequency array contains Inf values")
-    if np.any(np.isinf(spectrum.times)):
-        raise ValueError("Time array contains Inf values")
-    if np.any(np.isinf(spectrum.spectrum)):
-        raise ValueError("Spectrum array contains Inf values")
+    # Check for NaN or Inf values (use CUDA for large arrays)
+    if (
+        CUDA_AVAILABLE
+        and spectrum.frequencies.size > CUDA_THRESHOLD
+        and CudaArray is not None
+        and ElementWiseVectorizer is not None
+        and ReductionVectorizer is not None
+    ):
+        # Use CUDA-accelerated validation for large arrays
+        cuda_freq = CudaArray(spectrum.frequencies, device="cuda")
+        cuda_times = CudaArray(spectrum.times, device="cuda")
+        cuda_spec = CudaArray(spectrum.spectrum, device="cuda")
+        reducer = ReductionVectorizer(use_gpu=True)
+
+        # Check NaN on GPU (convert to numpy for isnan check)
+        if reducer.vectorize_reduction(
+            CudaArray(np.isnan(cuda_freq.to_numpy()), device="cuda"), "any"
+        ):
+            raise ValueError("Frequency array contains NaN values")
+        if reducer.vectorize_reduction(
+            CudaArray(np.isnan(cuda_times.to_numpy()), device="cuda"), "any"
+        ):
+            raise ValueError("Time array contains NaN values")
+        if reducer.vectorize_reduction(
+            CudaArray(np.isnan(cuda_spec.to_numpy()), device="cuda"), "any"
+        ):
+            raise ValueError("Spectrum array contains NaN values")
+
+        # Check Inf on GPU
+        if reducer.vectorize_reduction(
+            CudaArray(np.isinf(cuda_freq.to_numpy()), device="cuda"), "any"
+        ):
+            raise ValueError("Frequency array contains Inf values")
+        if reducer.vectorize_reduction(
+            CudaArray(np.isinf(cuda_times.to_numpy()), device="cuda"), "any"
+        ):
+            raise ValueError("Time array contains Inf values")
+        if reducer.vectorize_reduction(
+            CudaArray(np.isinf(cuda_spec.to_numpy()), device="cuda"), "any"
+        ):
+            raise ValueError("Spectrum array contains Inf values")
+    else:
+        # CPU path
+        if np.any(np.isnan(spectrum.frequencies)):
+            raise ValueError("Frequency array contains NaN values")
+        if np.any(np.isnan(spectrum.times)):
+            raise ValueError("Time array contains NaN values")
+        if np.any(np.isnan(spectrum.spectrum)):
+            raise ValueError("Spectrum array contains NaN values")
+        if np.any(np.isinf(spectrum.frequencies)):
+            raise ValueError("Frequency array contains Inf values")
+        if np.any(np.isinf(spectrum.times)):
+            raise ValueError("Time array contains Inf values")
+        if np.any(np.isinf(spectrum.spectrum)):
+            raise ValueError("Spectrum array contains Inf values")
 
     return True
 
@@ -329,17 +446,72 @@ def validate_evolution_data(evolution: ThetaEvolution) -> bool:
             f"omega_macro has {len(evolution.omega_macro)} elements"
         )
 
-    # Check positive omega values
-    if np.any(evolution.omega_min <= 0):
-        raise ValueError(
-            "All omega_min values must be positive. "
-            f"Found non-positive values: {np.sum(evolution.omega_min <= 0)}"
+    # Check positive omega values (use CUDA for large arrays)
+    if (
+        CUDA_AVAILABLE
+        and evolution.omega_min.size > CUDA_THRESHOLD
+        and CudaArray is not None
+        and ElementWiseVectorizer is not None
+        and ReductionVectorizer is not None
+    ):
+        # Use CUDA-accelerated validation for large arrays
+        cuda_omega_min = CudaArray(evolution.omega_min, device="cuda")
+        cuda_omega_macro = CudaArray(evolution.omega_macro, device="cuda")
+        vectorizer = ElementWiseVectorizer(use_gpu=True)
+        reducer = ReductionVectorizer(use_gpu=True)
+
+        # Check for non-positive values on GPU
+        non_positive_min = vectorizer.vectorize_operation(
+            cuda_omega_min, "less_equal", 0.0
         )
-    if np.any(evolution.omega_macro <= 0):
-        raise ValueError(
-            "All omega_macro values must be positive. "
-            f"Found non-positive values: {np.sum(evolution.omega_macro <= 0)}"
+        has_non_positive_min = reducer.vectorize_reduction(
+            non_positive_min, "any"
         )
+        if has_non_positive_min:
+            count_result = reducer.vectorize_reduction(non_positive_min, "sum")
+            # Convert to int (handles CudaArray, float, int)
+            if hasattr(count_result, "to_numpy"):
+                count = int(count_result.to_numpy().item())
+            else:
+                count = int(count_result)
+            raise ValueError(
+                "All omega_min values must be positive. "
+                f"Found non-positive values: {count}"
+            )
+
+        non_positive_macro = vectorizer.vectorize_operation(
+            cuda_omega_macro, "less_equal", 0.0
+        )
+        has_non_positive_macro = reducer.vectorize_reduction(
+            non_positive_macro, "any"
+        )
+        if has_non_positive_macro:
+            count_result = reducer.vectorize_reduction(
+                non_positive_macro, "sum"
+            )
+            # Convert to int (handles CudaArray, float, int)
+            if hasattr(count_result, "to_numpy"):
+                count = int(count_result.to_numpy().item())
+            else:
+                count = int(count_result)
+            raise ValueError(
+                "All omega_macro values must be positive. "
+                f"Found non-positive values: {count}"
+            )
+    else:
+        # CPU path
+        if np.any(evolution.omega_min <= 0):
+            raise ValueError(
+                "All omega_min values must be positive. "
+                f"Found non-positive values: "
+                f"{np.sum(evolution.omega_min <= 0)}"
+            )
+        if np.any(evolution.omega_macro <= 0):
+            raise ValueError(
+                "All omega_macro values must be positive. "
+                f"Found non-positive values: "
+                f"{np.sum(evolution.omega_macro <= 0)}"
+            )
 
     # Check for NaN or Inf values
     if np.any(np.isnan(evolution.times)):
@@ -356,11 +528,47 @@ def validate_evolution_data(evolution: ThetaEvolution) -> bool:
         raise ValueError("omega_macro array contains Inf values")
 
     # Check that omega_min < omega_macro (physical constraint)
-    if np.any(evolution.omega_min >= evolution.omega_macro):
-        invalid_count = np.sum(evolution.omega_min >= evolution.omega_macro)
-        raise ValueError(
-            f"Physical constraint violated: omega_min must be < omega_macro. "
-            f"Found {invalid_count} invalid value(s)"
+    # Use CUDA for large arrays
+    if (
+        CUDA_AVAILABLE
+        and evolution.omega_min.size > CUDA_THRESHOLD
+        and CudaArray is not None
+        and ElementWiseVectorizer is not None
+        and ReductionVectorizer is not None
+    ):
+        # Use CUDA-accelerated validation for large arrays
+        cuda_omega_min = CudaArray(evolution.omega_min, device="cuda")
+        cuda_omega_macro = CudaArray(evolution.omega_macro, device="cuda")
+        vectorizer = ElementWiseVectorizer(use_gpu=True)
+        reducer = ReductionVectorizer(use_gpu=True)
+
+        # Check omega_min >= omega_macro on GPU
+        violation = vectorizer.vectorize_operation(
+            cuda_omega_min, "greater_equal", cuda_omega_macro
         )
+        has_violation = reducer.vectorize_reduction(violation, "any")
+        if has_violation:
+            count_result = reducer.vectorize_reduction(violation, "sum")
+            # Convert to int (handles CudaArray, float, int)
+            if hasattr(count_result, "to_numpy"):
+                count = int(count_result.to_numpy().item())
+            else:
+                count = int(count_result)
+            raise ValueError(
+                f"Physical constraint violated: "
+                f"omega_min must be < omega_macro. "
+                f"Found {count} invalid value(s)"
+            )
+    else:
+        # CPU path
+        if np.any(evolution.omega_min >= evolution.omega_macro):
+            invalid_count = np.sum(
+                evolution.omega_min >= evolution.omega_macro
+            )
+            raise ValueError(
+                f"Physical constraint violated: "
+                f"omega_min must be < omega_macro. "
+                f"Found {invalid_count} invalid value(s)"
+            )
 
     return True

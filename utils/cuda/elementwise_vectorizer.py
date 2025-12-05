@@ -176,14 +176,26 @@ class ElementWiseVectorizer(BaseVectorizer):
             from utils.cuda.array_model import CudaArray
 
             if isinstance(operand, CudaArray):
-                # Extract numpy array from CudaArray
-                operand = operand.to_numpy()
+                # If operand is CudaArray, get data from same device as block
+                if self.use_gpu and CUPY_AVAILABLE and isinstance(block, cp.ndarray):
+                    # Block is on GPU, get operand from GPU if available
+                    if operand.device == "cuda":
+                        operand = operand.use_whole_array()
+                    else:
+                        # Operand is on CPU, convert to CuPy
+                        operand = cp.asarray(operand.to_numpy())
+                else:
+                    # Block is on CPU, get operand from CPU
+                    operand = operand.to_numpy()
             elif self.use_gpu and CUPY_AVAILABLE and isinstance(block, cp.ndarray):
-                # Convert operand to CuPy if block is CuPy
+                # Block is CuPy array, convert operand to CuPy
                 if isinstance(operand, np.ndarray):
                     operand = cp.asarray(operand)
                 elif isinstance(operand, (int, float)):
                     operand = operand  # Scalar is fine
+            elif isinstance(operand, np.ndarray):
+                # Block is numpy, operand is numpy - both on CPU, fine
+                pass
 
         # Apply operation
         if operand is None:

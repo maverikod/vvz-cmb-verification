@@ -201,6 +201,19 @@ NodeLssMapper:
 - create_displacement_map
 - analyze_node_lss_relationships
 NodeLssMapping: []
+NodeMapCreator:
+- __init__
+- create_omega_min_map
+- create_node_mask
+NodeMapValidator:
+- __init__
+- validate_node_map
+NodePropertiesCalculator:
+- __init__
+- calculate_node_depth
+- calculate_node_area
+- calculate_local_curvature
+- calculate_node_properties_batch
 NodeToCmbMapper:
 - __init__
 - map_nodes_to_sky
@@ -656,7 +669,6 @@ ThetaNodeMapGenerator:
 - classify_nodes
 - calculate_node_depth
 - calculate_node_area
-- _calculate_node_properties_batch
 - calculate_local_curvature
 - generate_node_map
 - create_omega_min_map

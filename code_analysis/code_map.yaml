@@ -1,23 +1,65 @@
 classes:
-  cmb/nodes/theta_node_map.py:NodeClassification:
+  cmb/nodes/node_data.py:NodeClassification:
     bases: []
     docstring: "Node classification data.\n\nAttributes:\n    node_id: Node identifier\n\
       \    depth: Node depth (Δω/ω)\n    area: Node area (spatial extent)\n    curvature:\
       \ Local curvature at node\n    position: Node position (x, y, z or sky coordinates)"
-    file: cmb/nodes/theta_node_map.py
-    line: 28
+    file: cmb/nodes/node_data.py
+    line: 16
     methods: []
     name: NodeClassification
-  cmb/nodes/theta_node_map.py:ThetaNodeMap:
+  cmb/nodes/node_data.py:ThetaNodeMap:
     bases: []
     docstring: "Θ-node map data.\n\nAttributes:\n    omega_min_map: Map of ω_min(x)\
       \ values\n    node_mask: Binary mask of node locations\n    node_classifications:\
       \ List of node classifications\n    grid_shape: Shape of input grid\n    metadata:\
       \ Additional metadata"
-    file: cmb/nodes/theta_node_map.py
-    line: 48
+    file: cmb/nodes/node_data.py
+    line: 36
     methods: []
     name: ThetaNodeMap
+  cmb/nodes/node_map_creator.py:NodeMapCreator:
+    bases: []
+    docstring: 'Creator for node maps (omega_min map and node mask).
+
+
+      Uses CUDA-accelerated operations for efficient map creation.'
+    file: cmb/nodes/node_map_creator.py
+    line: 16
+    methods:
+    - __init__
+    - create_omega_min_map
+    - create_node_mask
+    name: NodeMapCreator
+  cmb/nodes/node_map_validator.py:NodeMapValidator:
+    bases: []
+    docstring: 'Validator for node maps.
+
+
+      Validates node maps for shape consistency, classification correctness,
+
+      and data validity using CUDA-accelerated operations.'
+    file: cmb/nodes/node_map_validator.py
+    line: 17
+    methods:
+    - __init__
+    - validate_node_map
+    name: NodeMapValidator
+  cmb/nodes/node_properties.py:NodePropertiesCalculator:
+    bases: []
+    docstring: 'Calculator for node properties (depth, area, curvature).
+
+
+      Uses CUDA-accelerated operations for efficient computation.'
+    file: cmb/nodes/node_properties.py
+    line: 20
+    methods:
+    - __init__
+    - calculate_node_depth
+    - calculate_node_area
+    - calculate_local_curvature
+    - calculate_node_properties_batch
+    name: NodePropertiesCalculator
   cmb/nodes/theta_node_map.py:ThetaNodeMapGenerator:
     bases: []
     docstring: 'Θ-node map generator.
@@ -28,16 +70,24 @@ classes:
       by depth, area, and local curvature.
 
 
-      Implements Module C from tech_spec-new.md.'
+      Implements Module C from tech_spec-new.md.
+
+
+      This is a facade class that coordinates:
+
+      - NodePropertiesCalculator: calculates node properties
+
+      - NodeMapCreator: creates node maps
+
+      - NodeMapValidator: validates node maps'
     file: cmb/nodes/theta_node_map.py
-    line: 67
+    line: 31
     methods:
     - __init__
     - find_nodes
     - classify_nodes
     - calculate_node_depth
     - calculate_node_area
-    - _calculate_node_properties_batch
     - calculate_local_curvature
     - generate_node_map
     - create_omega_min_map
@@ -1846,19 +1896,103 @@ classes:
 dependencies: {}
 files: {}
 functions:
-  cmb/nodes/theta_node_map.py:__init__:
+  cmb/nodes/node_map_creator.py:__init__:
     args:
     - self
-    - omega_field
-    - grid_spacing
-    - config
-    docstring: "Initialize node map generator.\n\nArgs:\n    omega_field: Field ω(x)\
-      \ on grid\n    grid_spacing: Grid spacing (if None, uses config)\n    config:\
-      \ Configuration instance (uses global if None)"
-    file: cmb/nodes/theta_node_map.py
-    line: 77
+    - omega_field_cuda
+    - grid_vec
+    - elem_vec
+    - omega_field_shape
+    docstring: "Initialize map creator.\n\nArgs:\n    omega_field_cuda: CUDA array\
+      \ of omega field\n    grid_vec: Grid vectorizer for grid operations\n    elem_vec:\
+      \ Element-wise vectorizer for element operations\n    omega_field_shape: Shape\
+      \ of omega field"
+    file: cmb/nodes/node_map_creator.py
+    line: 23
     name: __init__
-  cmb/nodes/theta_node_map.py:_calculate_node_properties_batch:
+  cmb/nodes/node_map_creator.py:create_node_mask:
+    args:
+    - self
+    - node_positions
+    docstring: "Create binary mask of node locations.\n\nArgs:\n    node_positions:\
+      \ Array of node positions\n\nReturns:\n    Binary mask (1 at nodes, 0 elsewhere)\n\
+      \nRaises:\n    ValueError: If mask creation fails"
+    file: cmb/nodes/node_map_creator.py
+    line: 165
+    name: create_node_mask
+  cmb/nodes/node_map_creator.py:create_omega_min_map:
+    args:
+    - self
+    - node_positions
+    docstring: "Create map of ω_min(x) values.\n\nArgs:\n    node_positions: Array\
+      \ of node positions\n\nReturns:\n    Map of ω_min(x) values at each grid point\n\
+      \nRaises:\n    ValueError: If map creation fails"
+    file: cmb/nodes/node_map_creator.py
+    line: 44
+    name: create_omega_min_map
+  cmb/nodes/node_map_validator.py:__init__:
+    args:
+    - self
+    docstring: Initialize validator.
+    file: cmb/nodes/node_map_validator.py
+    line: 25
+    name: __init__
+  cmb/nodes/node_map_validator.py:validate_node_map:
+    args:
+    - self
+    - node_map
+    docstring: "Validate generated node map.\n\nArgs:\n    node_map: ThetaNodeMap\
+      \ to validate\n\nReturns:\n    True if map is valid\n\nRaises:\n    ValueError:\
+      \ If map is invalid"
+    file: cmb/nodes/node_map_validator.py
+    line: 29
+    name: validate_node_map
+  cmb/nodes/node_properties.py:__init__:
+    args:
+    - self
+    - omega_field_cuda
+    - grid_vec
+    - reduction_vec
+    - grid_spacing
+    docstring: "Initialize properties calculator.\n\nArgs:\n    omega_field_cuda:\
+      \ CUDA array of omega field\n    grid_vec: Grid vectorizer for grid operations\n\
+      \    reduction_vec: Reduction vectorizer for reductions\n    grid_spacing: Grid\
+      \ spacing for area conversion"
+    file: cmb/nodes/node_properties.py
+    line: 27
+    name: __init__
+  cmb/nodes/node_properties.py:calculate_local_curvature:
+    args:
+    - self
+    - node_position
+    docstring: "Calculate local curvature at node position.\n\nArgs:\n    node_position:\
+      \ Node position (grid indices)\n\nReturns:\n    Local curvature value\n\nRaises:\n\
+      \    ValueError: If curvature calculation fails"
+    file: cmb/nodes/node_properties.py
+    line: 182
+    name: calculate_local_curvature
+  cmb/nodes/node_properties.py:calculate_node_area:
+    args:
+    - self
+    - node_position
+    docstring: "Calculate node area (spatial extent).\n\nArgs:\n    node_position:\
+      \ Node position (grid indices)\n\nReturns:\n    Node area in grid units or physical\
+      \ units\n\nRaises:\n    ValueError: If area calculation fails"
+    file: cmb/nodes/node_properties.py
+    line: 117
+    name: calculate_node_area
+  cmb/nodes/node_properties.py:calculate_node_depth:
+    args:
+    - self
+    - node_position
+    docstring: "Calculate node depth (Δω/ω).\n\nFormula: Δω = ω - ω_min\nwhere ω_min\
+      \ is local minimum at node position.\n\nArgs:\n    node_position: Node position\
+      \ (grid indices)\n\nReturns:\n    Node depth (Δω/ω)\n\nRaises:\n    ValueError:\
+      \ If depth calculation fails"
+    file: cmb/nodes/node_properties.py
+    line: 48
+    name: calculate_node_depth
+  cmb/nodes/node_properties.py:calculate_node_properties_batch:
     args:
     - self
     - node_positions
@@ -1869,9 +2003,21 @@ functions:
       \ of node positions (N, D) where N is number\n        of nodes and D is dimensionality\n\
       \nReturns:\n    Tuple of (depths, areas, curvatures) arrays, each of shape (N,)\n\
       \nRaises:\n    ValueError: If batch calculation fails"
+    file: cmb/nodes/node_properties.py
+    line: 243
+    name: calculate_node_properties_batch
+  cmb/nodes/theta_node_map.py:__init__:
+    args:
+    - self
+    - omega_field
+    - grid_spacing
+    - config
+    docstring: "Initialize node map generator.\n\nArgs:\n    omega_field: Field ω(x)\
+      \ on grid\n    grid_spacing: Grid spacing (if None, uses config)\n    config:\
+      \ Configuration instance (uses global if None)"
     file: cmb/nodes/theta_node_map.py
-    line: 363
-    name: _calculate_node_properties_batch
+    line: 46
+    name: __init__
   cmb/nodes/theta_node_map.py:calculate_local_curvature:
     args:
     - self
@@ -1879,7 +2025,7 @@ functions:
     docstring: "Calculate local curvature at node position.\n\nArgs:\n    node_position:\
       \ Node position (grid indices)\n\nReturns:\n    Local curvature value"
     file: cmb/nodes/theta_node_map.py
-    line: 510
+    line: 243
     name: calculate_local_curvature
   cmb/nodes/theta_node_map.py:calculate_node_area:
     args:
@@ -1889,7 +2035,7 @@ functions:
       \ Node position (grid indices)\n\nReturns:\n    Node area in grid units or physical\
       \ units"
     file: cmb/nodes/theta_node_map.py
-    line: 300
+    line: 231
     name: calculate_node_area
   cmb/nodes/theta_node_map.py:calculate_node_depth:
     args:
@@ -1899,7 +2045,7 @@ functions:
       \ is local minimum at node position.\n\nArgs:\n    node_position: Node position\
       \ (grid indices)\n\nReturns:\n    Node depth (Δω/ω)"
     file: cmb/nodes/theta_node_map.py
-    line: 232
+    line: 216
     name: calculate_node_depth
   cmb/nodes/theta_node_map.py:classify_nodes:
     args:
@@ -1910,7 +2056,7 @@ functions:
       \ Array of node positions\n\nReturns:\n    List of NodeClassification instances\n\
       \nRaises:\n    ValueError: If classification fails"
     file: cmb/nodes/theta_node_map.py
-    line: 160
+    line: 144
     name: classify_nodes
   cmb/nodes/theta_node_map.py:create_node_mask:
     args:
@@ -1919,7 +2065,7 @@ functions:
     docstring: "Create binary mask of node locations.\n\nArgs:\n    node_positions:\
       \ Array of node positions\n\nReturns:\n    Binary mask (1 at nodes, 0 elsewhere)"
     file: cmb/nodes/theta_node_map.py
-    line: 743
+    line: 322
     name: create_node_mask
   cmb/nodes/theta_node_map.py:create_omega_min_map:
     args:
@@ -1928,7 +2074,7 @@ functions:
     docstring: "Create map of ω_min(x) values.\n\nArgs:\n    node_positions: Array\
       \ of node positions\n\nReturns:\n    Map of ω_min(x) values at each grid point"
     file: cmb/nodes/theta_node_map.py
-    line: 623
+    line: 310
     name: create_omega_min_map
   cmb/nodes/theta_node_map.py:find_nodes:
     args:
@@ -1940,7 +2086,7 @@ functions:
       \ for local minimum detection\n\nReturns:\n    Array of node positions (indices\
       \ or coordinates)\n\nRaises:\n    ValueError: If node detection fails"
     file: cmb/nodes/theta_node_map.py
-    line: 103
+    line: 87
     name: find_nodes
   cmb/nodes/theta_node_map.py:generate_node_map:
     args:
@@ -1952,7 +2098,7 @@ functions:
       \ map\n    - Node mask\n    - Node classifications\n\nRaises:\n    ValueError:\
       \ If map generation fails"
     file: cmb/nodes/theta_node_map.py
-    line: 568
+    line: 255
     name: generate_node_map
   cmb/nodes/theta_node_map.py:validate_node_map:
     args:
@@ -1962,7 +2108,7 @@ functions:
       \ to validate\n\nReturns:\n    True if map is valid\n\nRaises:\n    ValueError:\
       \ If map is invalid"
     file: cmb/nodes/theta_node_map.py
-    line: 798
+    line: 334
     name: validate_node_map
   cmb/theta_data_loader.py:load_evolution_data:
     args:
@@ -7571,14 +7717,14 @@ functions:
 imports:
   cmb/nodes/__init__.py:NodeClassification:
     file: cmb/nodes/__init__.py
-    line: 10
-    module: cmb.nodes.theta_node_map
+    line: 11
+    module: cmb.nodes.node_data
     name: NodeClassification
     type: import_from
   cmb/nodes/__init__.py:ThetaNodeMap:
     file: cmb/nodes/__init__.py
-    line: 10
-    module: cmb.nodes.theta_node_map
+    line: 11
+    module: cmb.nodes.node_data
     name: ThetaNodeMap
     type: import_from
   cmb/nodes/__init__.py:ThetaNodeMapGenerator:
@@ -7587,27 +7733,131 @@ imports:
     module: cmb.nodes.theta_node_map
     name: ThetaNodeMapGenerator
     type: import_from
+  cmb/nodes/node_data.py:List:
+    file: cmb/nodes/node_data.py
+    line: 10
+    module: typing
+    name: List
+    type: import_from
+  cmb/nodes/node_data.py:Tuple:
+    file: cmb/nodes/node_data.py
+    line: 10
+    module: typing
+    name: Tuple
+    type: import_from
+  cmb/nodes/node_data.py:dataclass:
+    file: cmb/nodes/node_data.py
+    line: 12
+    module: dataclasses
+    name: dataclass
+    type: import_from
+  cmb/nodes/node_data.py:numpy:
+    file: cmb/nodes/node_data.py
+    line: 11
+    name: numpy
+    type: import
+  cmb/nodes/node_map_creator.py:CudaArray:
+    file: cmb/nodes/node_map_creator.py
+    line: 13
+    module: utils.cuda
+    name: CudaArray
+    type: import_from
+  cmb/nodes/node_map_creator.py:ElementWiseVectorizer:
+    file: cmb/nodes/node_map_creator.py
+    line: 13
+    module: utils.cuda
+    name: ElementWiseVectorizer
+    type: import_from
+  cmb/nodes/node_map_creator.py:Tuple:
+    file: cmb/nodes/node_map_creator.py
+    line: 10
+    module: typing
+    name: Tuple
+    type: import_from
+  cmb/nodes/node_map_creator.py:numpy:
+    file: cmb/nodes/node_map_creator.py
+    line: 11
+    name: numpy
+    type: import
+  cmb/nodes/node_map_validator.py:CudaArray:
+    file: cmb/nodes/node_map_validator.py
+    line: 12
+    module: utils.cuda
+    name: CudaArray
+    type: import_from
+  cmb/nodes/node_map_validator.py:ElementWiseVectorizer:
+    file: cmb/nodes/node_map_validator.py
+    line: 12
+    module: utils.cuda
+    name: ElementWiseVectorizer
+    type: import_from
+  cmb/nodes/node_map_validator.py:ReductionVectorizer:
+    file: cmb/nodes/node_map_validator.py
+    line: 12
+    module: utils.cuda
+    name: ReductionVectorizer
+    type: import_from
+  cmb/nodes/node_map_validator.py:ThetaNodeMap:
+    file: cmb/nodes/node_map_validator.py
+    line: 14
+    module: cmb.nodes.node_data
+    name: ThetaNodeMap
+    type: import_from
+  cmb/nodes/node_map_validator.py:numpy:
+    file: cmb/nodes/node_map_validator.py
+    line: 10
+    name: numpy
+    type: import
+  cmb/nodes/node_properties.py:CudaArray:
+    file: cmb/nodes/node_properties.py
+    line: 13
+    module: utils.cuda
+    name: CudaArray
+    type: import_from
+  cmb/nodes/node_properties.py:GridVectorizer:
+    file: cmb/nodes/node_properties.py
+    line: 13
+    module: utils.cuda
+    name: GridVectorizer
+    type: import_from
+  cmb/nodes/node_properties.py:ReductionVectorizer:
+    file: cmb/nodes/node_properties.py
+    line: 13
+    module: utils.cuda
+    name: ReductionVectorizer
+    type: import_from
+  cmb/nodes/node_properties.py:Tuple:
+    file: cmb/nodes/node_properties.py
+    line: 10
+    module: typing
+    name: Tuple
+    type: import_from
+  cmb/nodes/node_properties.py:numpy:
+    file: cmb/nodes/node_properties.py
+    line: 11
+    name: numpy
+    type: import
   cmb/nodes/theta_node_map.py:Config:
     file: cmb/nodes/theta_node_map.py
-    line: 24
+    line: 23
     module: config.settings
     name: Config
     type: import_from
   cmb/nodes/theta_node_map.py:CudaArray:
     file: cmb/nodes/theta_node_map.py
-    line: 18
+    line: 17
     module: utils.cuda
     name: CudaArray
     type: import_from
   cmb/nodes/theta_node_map.py:ElementWiseVectorizer:
     file: cmb/nodes/theta_node_map.py
-    line: 18
+    line: 17
     module: utils.cuda
     name: ElementWiseVectorizer
     type: import_from
   cmb/nodes/theta_node_map.py:GridVectorizer:
     file: cmb/nodes/theta_node_map.py
-    line: 18
+    line: 17
     module: utils.cuda
     name: GridVectorizer
     type: import_from
@@ -7617,6 +7867,30 @@ imports:
     module: typing
     name: List
     type: import_from
+  cmb/nodes/theta_node_map.py:NodeClassification:
+    file: cmb/nodes/theta_node_map.py
+    line: 25
+    module: cmb.nodes.node_data
+    name: NodeClassification
+    type: import_from
+  cmb/nodes/theta_node_map.py:NodeMapCreator:
+    file: cmb/nodes/theta_node_map.py
+    line: 27
+    module: cmb.nodes.node_map_creator
+    name: NodeMapCreator
+    type: import_from
+  cmb/nodes/theta_node_map.py:NodeMapValidator:
+    file: cmb/nodes/theta_node_map.py
+    line: 28
+    module: cmb.nodes.node_map_validator
+    name: NodeMapValidator
+    type: import_from
+  cmb/nodes/theta_node_map.py:NodePropertiesCalculator:
+    file: cmb/nodes/theta_node_map.py
+    line: 26
+    module: cmb.nodes.node_properties
+    name: NodePropertiesCalculator
+    type: import_from
   cmb/nodes/theta_node_map.py:Optional:
     file: cmb/nodes/theta_node_map.py
     line: 14
@@ -7625,21 +7899,21 @@ imports:
     type: import_from
   cmb/nodes/theta_node_map.py:ReductionVectorizer:
     file: cmb/nodes/theta_node_map.py
-    line: 18
+    line: 17
     module: utils.cuda
     name: ReductionVectorizer
+    type: import_from
+  cmb/nodes/theta_node_map.py:ThetaNodeMap:
+    file: cmb/nodes/theta_node_map.py
+    line: 25
+    module: cmb.nodes.node_data
+    name: ThetaNodeMap
     type: import_from
   cmb/nodes/theta_node_map.py:Tuple:
     file: cmb/nodes/theta_node_map.py
     line: 14
     module: typing
     name: Tuple
-    type: import_from
-  cmb/nodes/theta_node_map.py:dataclass:
-    file: cmb/nodes/theta_node_map.py
-    line: 16
-    module: dataclasses
-    name: dataclass
     type: import_from
   cmb/nodes/theta_node_map.py:numpy:
     file: cmb/nodes/theta_node_map.py

@@ -7,11 +7,8 @@ Author: Vasiliy Zdanovskiy
 Email: vasilyvz@gmail.com
 """
 
-from cmb.nodes.theta_node_map import (
-    ThetaNodeMapGenerator,
-    ThetaNodeMap,
-    NodeClassification,
-)
+from cmb.nodes.theta_node_map import ThetaNodeMapGenerator
+from cmb.nodes.node_data import ThetaNodeMap, NodeClassification
 
 __all__ = [
     "ThetaNodeMapGenerator",

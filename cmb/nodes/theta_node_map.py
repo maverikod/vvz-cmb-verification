@@ -157,9 +157,7 @@ class ThetaNodeMapGenerator:
                 self.omega_field_cuda.swap_to_cpu()
             raise ValueError(f"Node detection failed: {str(e)}") from e
 
-    def classify_nodes(
-        self, node_positions: np.ndarray
-    ) -> List[NodeClassification]:
+    def classify_nodes(self, node_positions: np.ndarray) -> List[NodeClassification]:
         """
         Classify nodes by depth, area, and local curvature.
 
@@ -253,9 +251,7 @@ class ThetaNodeMapGenerator:
             neighborhood_cuda.swap_to_gpu()
 
             # Find minimum in neighborhood using ReductionVectorizer
-            omega_min = self.reduction_vec.vectorize_reduction(
-                neighborhood_cuda, "min"
-            )
+            omega_min = self.reduction_vec.vectorize_reduction(neighborhood_cuda, "min")
 
             # Convert to float
             if isinstance(omega_min, CudaArray):
@@ -346,9 +342,7 @@ class ThetaNodeMapGenerator:
                 self.omega_field_cuda.swap_to_cpu()
             raise ValueError(f"Area calculation failed: {str(e)}") from e
 
-    def calculate_local_curvature(
-        self, node_position: Tuple[int, ...]
-    ) -> float:
+    def calculate_local_curvature(self, node_position: Tuple[int, ...]) -> float:
         """
         Calculate local curvature at node position.
 
@@ -425,9 +419,7 @@ class ThetaNodeMapGenerator:
         """
         try:
             # Find nodes
-            node_positions = self.find_nodes(
-                neighborhood_size=neighborhood_size
-            )
+            node_positions = self.find_nodes(neighborhood_size=neighborhood_size)
 
             # Create node mask
             node_mask = self.create_node_mask(node_positions)
@@ -502,10 +494,7 @@ class ThetaNodeMapGenerator:
                     shape_tuple: Tuple[int, ...] = node_mask.shape
                     for pos in node_positions:
                         pos_tuple = tuple(int(p) for p in pos)
-                        if all(
-                            0 <= p < s
-                            for p, s in zip(pos_tuple, shape_tuple)
-                        ):
+                        if all(0 <= p < s for p, s in zip(pos_tuple, shape_tuple)):
                             valid_positions.append(pos_tuple)
                     # Use advanced indexing for vectorized mask setting
                     if valid_positions:
@@ -522,9 +511,7 @@ class ThetaNodeMapGenerator:
 
                 # Use ElementWiseVectorizer for vectorized combination
                 # Create masks and values as CudaArrays
-                node_mask_cuda = CudaArray(
-                    node_mask.astype(np.float32), device="cpu"
-                )
+                node_mask_cuda = CudaArray(node_mask.astype(np.float32), device="cpu")
                 node_mask_cuda.swap_to_gpu()
 
                 omega_np_cuda = CudaArray(omega_np, device="cpu")
@@ -537,21 +524,15 @@ class ThetaNodeMapGenerator:
                     np.ones_like(node_mask, dtype=np.float32), device="cpu"
                 )
                 ones_cuda.swap_to_gpu()
-                non_node_mask_cuda = self.elem_vec.subtract(
-                    ones_cuda, node_mask_cuda
-                )
+                non_node_mask_cuda = self.elem_vec.subtract(ones_cuda, node_mask_cuda)
 
                 # Combine: omega_min_map = node_mask * omega
                 # + non_node_mask * local_minima
-                node_values = self.elem_vec.multiply(
-                    node_mask_cuda, omega_np_cuda
-                )
+                node_values = self.elem_vec.multiply(node_mask_cuda, omega_np_cuda)
                 non_node_values = self.elem_vec.multiply(
                     non_node_mask_cuda, local_minima_cuda
                 )
-                omega_min_map_cuda = self.elem_vec.add(
-                    node_values, non_node_values
-                )
+                omega_min_map_cuda = self.elem_vec.add(node_values, non_node_values)
                 omega_min_map = omega_min_map_cuda.to_numpy()
 
                 # Cleanup temporary arrays
@@ -596,9 +577,7 @@ class ThetaNodeMapGenerator:
 
             if len(node_positions) == 0:
                 # Convert to int32 using CudaArray for consistency
-                mask_cuda = CudaArray(
-                    node_mask.astype(np.float32), device="cpu"
-                )
+                mask_cuda = CudaArray(node_mask.astype(np.float32), device="cpu")
                 return mask_cuda.to_numpy().astype(np.int32)
 
             # Set node positions to 1 using vectorized operations
@@ -613,15 +592,11 @@ class ThetaNodeMapGenerator:
                 # Create validity mask for bounds checking
                 valid_mask = np.ones(len(node_positions), dtype=bool)
                 for i, pos_arr in enumerate(pos_arrays):
-                    valid_mask &= (pos_arr >= 0) & (
-                        pos_arr < node_mask.shape[i]
-                    )
+                    valid_mask &= (pos_arr >= 0) & (pos_arr < node_mask.shape[i])
 
                 # Apply advanced indexing with valid positions only
                 if np.any(valid_mask):
-                    valid_indices = tuple(
-                        pos_arr[valid_mask] for pos_arr in pos_arrays
-                    )
+                    valid_indices = tuple(pos_arr[valid_mask] for pos_arr in pos_arrays)
                     node_mask[valid_indices] = True
             else:
                 # 1D case - use vectorized indexing
@@ -673,21 +648,15 @@ class ThetaNodeMapGenerator:
             )
 
         # Check node mask values (should be 0 or 1)
-        mask_valid = np.all(
-            (node_map.node_mask == 0) | (node_map.node_mask == 1)
-        )
+        mask_valid = np.all((node_map.node_mask == 0) | (node_map.node_mask == 1))
         if not mask_valid:
             raise ValueError("Node mask contains values other than 0 and 1")
 
         # Check that all nodes have valid classifications
         for classification in node_map.node_classifications:
             if classification.depth < 0:
-                raise ValueError(
-                    f"Node {classification.node_id} has negative depth"
-                )
+                raise ValueError(f"Node {classification.node_id} has negative depth")
             if classification.area < 0:
-                raise ValueError(
-                    f"Node {classification.node_id} has negative area"
-                )
+                raise ValueError(f"Node {classification.node_id} has negative area")
 
         return True

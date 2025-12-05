@@ -154,9 +154,7 @@ class GridVectorizer(BaseVectorizer):
         # For grid operations, whole array is same as block processing
         return self._process_block(array, *args, **kwargs)
 
-    def _local_minima(
-        self, grid: np.ndarray, neighborhood_size: int = 3
-    ) -> np.ndarray:
+    def _local_minima(self, grid: np.ndarray, neighborhood_size: int = 3) -> np.ndarray:
         """
         Find local minima in grid.
 
@@ -183,9 +181,7 @@ class GridVectorizer(BaseVectorizer):
             is_minimum = grid == neighborhood_min
             return is_minimum
 
-    def _local_maxima(
-        self, grid: np.ndarray, neighborhood_size: int = 3
-    ) -> np.ndarray:
+    def _local_maxima(self, grid: np.ndarray, neighborhood_size: int = 3) -> np.ndarray:
         """
         Find local maxima in grid.
 
@@ -260,14 +256,10 @@ class GridVectorizer(BaseVectorizer):
             laplacian = np.zeros_like(grid)
             # Second derivative in first dimension
             if grid.shape[0] > 2:
-                laplacian[1:-1, :] += (
-                    grid[2:, :] - 2 * grid[1:-1, :] + grid[:-2, :]
-                )
+                laplacian[1:-1, :] += grid[2:, :] - 2 * grid[1:-1, :] + grid[:-2, :]
             # Second derivative in second dimension
             if grid.shape[1] > 2:
-                laplacian[:, 1:-1] += (
-                    grid[:, 2:] - 2 * grid[:, 1:-1] + grid[:, :-2]
-                )
+                laplacian[:, 1:-1] += grid[:, 2:] - 2 * grid[:, 1:-1] + grid[:, :-2]
 
         return laplacian
 

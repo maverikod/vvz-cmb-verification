@@ -287,3 +287,4 @@ def plot_subpeaks(
     except Exception as e:
         raise ValueError(f"Failed to plot sub-peaks: {e}") from e
 
+

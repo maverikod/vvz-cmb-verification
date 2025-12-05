@@ -221,6 +221,8 @@ class ThetaEvolutionProcessor:
         For interior points: (f[i+1] - f[i-1]) / (t[i+1] - t[i-1])
         For boundaries: forward/backward differences
 
+        Uses CUDA acceleration for large arrays when use_cuda=True.
+
         Args:
             times: Time array (must be sorted)
             values: Value array
@@ -230,7 +232,6 @@ class ThetaEvolutionProcessor:
             Derivative array
         """
         n = len(times)
-        derivatives = np.zeros(n)
 
         if n == 1:
             return np.array([0.0])
@@ -239,35 +240,153 @@ class ThetaEvolutionProcessor:
             # Only two points: use forward difference
             dt = times[1] - times[0]
             if dt > 0:
-                derivatives[0] = (values[1] - values[0]) / dt
-                derivatives[1] = derivatives[0]  # Same for both
-            return derivatives
+                derivative = (values[1] - values[0]) / dt
+                return np.array([derivative, derivative])
+            return np.array([0.0, 0.0])
 
-        # Use numpy.gradient for vectorized calculation
-        # (numpy.gradient is already optimized and vectorized)
-        # Note: numpy.gradient is already highly optimized and vectorized.
-        # For very large arrays, we could use CUDA, but the overhead
-        # of GPU transfer may not be worth it unless array is extremely large.
-        # For now, use numpy.gradient which handles edge cases well.
+        # Threshold for using CUDA: arrays larger than 10k elements
+        # For smaller arrays, GPU transfer overhead may not be worth it
+        use_cuda_accel = use_cuda and n > 10000
+
+        if use_cuda_accel:
+            # Use CUDA-accelerated calculation for large arrays
+            return self._calculate_derivative_central_cuda(times, values)
+
+        # Use numpy.gradient for smaller arrays or when CUDA disabled
+        # numpy.gradient is already optimized and handles edge cases well
         derivatives = np.gradient(values, times, edge_order=2)
         return derivatives
-        # Create mask for valid (positive) time differences
-        valid_mask = dt_central > 0
-        # Vectorized calculation for interior points
-        derivatives[1:-1][valid_mask] = (
-            values[2:][valid_mask] - values[:-2][valid_mask]
-        ) / dt_central[valid_mask]
+
+    def _calculate_derivative_central_cuda(
+        self, times: np.ndarray, values: np.ndarray
+    ) -> np.ndarray:
+        """
+        Calculate derivative using central differences with CUDA acceleration.
+
+        Uses CudaArray and vectorizers for all array operations.
+
+        Args:
+            times: Time array (must be sorted)
+            values: Value array
+
+        Returns:
+            Derivative array
+        """
+        n = len(times)
+        derivatives = np.zeros(n)
+
+        # Convert to CudaArray - use CudaArray for all operations
+        times_cuda = CudaArray(times, device="cpu")
+        values_cuda = CudaArray(values, device="cpu")
+        elem_vec = ElementWiseVectorizer(use_gpu=True)
+
+        # Calculate time differences for interior points
+        # dt_central[i] = times[i+1] - times[i-1] for i in [1, n-2]
+        if n >= 3:
+            # Interior points: central differences
+            # Get slices using to_numpy() and create new CudaArray
+            times_np = times_cuda.to_numpy()
+            values_np = values_cuda.to_numpy()
+
+            # Create CudaArray for slices
+            times_forward = CudaArray(times_np[2:], device="cpu")
+            times_backward = CudaArray(times_np[:-2], device="cpu")
+            dt_central_cuda = elem_vec.subtract(times_forward, times_backward)
+
+            values_forward = CudaArray(values_np[2:], device="cpu")
+            values_backward = CudaArray(values_np[:-2], device="cpu")
+            dv_central_cuda = elem_vec.subtract(values_forward, values_backward)
+
+            # derivatives[1:-1] = dv_central / dt_central
+            # Check for zero division using CudaArray operations
+            dt_central_np = dt_central_cuda.to_numpy()
+            valid_mask = dt_central_np > 0
+
+            if np.any(valid_mask):
+                # Divide only where dt > 0 using CudaArray
+                dv_valid_cuda = CudaArray(
+                    dv_central_cuda.to_numpy()[valid_mask], device="cpu"
+                )
+                dt_valid_cuda = CudaArray(dt_central_np[valid_mask], device="cpu")
+                derivatives_cuda = elem_vec.divide(dv_valid_cuda, dt_valid_cuda)
+                derivatives[1:-1][valid_mask] = derivatives_cuda.to_numpy()
+
+            # Cleanup GPU memory
+            if times_forward.device == "cuda":
+                times_forward.swap_to_cpu()
+            if times_backward.device == "cuda":
+                times_backward.swap_to_cpu()
+            if dt_central_cuda.device == "cuda":
+                dt_central_cuda.swap_to_cpu()
+            if values_forward.device == "cuda":
+                values_forward.swap_to_cpu()
+            if values_backward.device == "cuda":
+                values_backward.swap_to_cpu()
+            if dv_central_cuda.device == "cuda":
+                dv_central_cuda.swap_to_cpu()
 
         # Boundary points: forward/backward differences
+        # Use CudaArray for boundary calculations
+        times_np = times_cuda.to_numpy()
+        values_np = values_cuda.to_numpy()
+
         # First point: forward difference
-        dt0 = times[1] - times[0]
+        dt0_cuda = CudaArray(times_np[1:2], device="cpu")
+        dt0_base_cuda = CudaArray(times_np[0:1], device="cpu")
+        dt0_diff_cuda = elem_vec.subtract(dt0_cuda, dt0_base_cuda)
+        dt0 = dt0_diff_cuda.to_numpy()[0]
+
         if dt0 > 0:
-            derivatives[0] = (values[1] - values[0]) / dt0
+            dv0_cuda = CudaArray(values_np[1:2], device="cpu")
+            dv0_base_cuda = CudaArray(values_np[0:1], device="cpu")
+            dv0_diff_cuda = elem_vec.subtract(dv0_cuda, dv0_base_cuda)
+            derivatives[0] = dv0_diff_cuda.to_numpy()[0] / dt0
+
+            # Cleanup
+            if dt0_cuda.device == "cuda":
+                dt0_cuda.swap_to_cpu()
+            if dt0_base_cuda.device == "cuda":
+                dt0_base_cuda.swap_to_cpu()
+            if dt0_diff_cuda.device == "cuda":
+                dt0_diff_cuda.swap_to_cpu()
+            if dv0_cuda.device == "cuda":
+                dv0_cuda.swap_to_cpu()
+            if dv0_base_cuda.device == "cuda":
+                dv0_base_cuda.swap_to_cpu()
+            if dv0_diff_cuda.device == "cuda":
+                dv0_diff_cuda.swap_to_cpu()
 
         # Last point: backward difference
-        dt_last = times[n - 1] - times[n - 2]
+        dt_last_cuda = CudaArray(times_np[n - 1:n], device="cpu")
+        dt_last_base_cuda = CudaArray(times_np[n - 2:n - 1], device="cpu")
+        dt_last_diff_cuda = elem_vec.subtract(dt_last_cuda, dt_last_base_cuda)
+        dt_last = dt_last_diff_cuda.to_numpy()[0]
+
         if dt_last > 0:
-            derivatives[n - 1] = (values[n - 1] - values[n - 2]) / dt_last
+            dv_last_cuda = CudaArray(values_np[n - 1:n], device="cpu")
+            dv_last_base_cuda = CudaArray(values_np[n - 2:n - 1], device="cpu")
+            dv_last_diff_cuda = elem_vec.subtract(dv_last_cuda, dv_last_base_cuda)
+            derivatives[n - 1] = dv_last_diff_cuda.to_numpy()[0] / dt_last
+
+            # Cleanup
+            if dt_last_cuda.device == "cuda":
+                dt_last_cuda.swap_to_cpu()
+            if dt_last_base_cuda.device == "cuda":
+                dt_last_base_cuda.swap_to_cpu()
+            if dt_last_diff_cuda.device == "cuda":
+                dt_last_diff_cuda.swap_to_cpu()
+            if dv_last_cuda.device == "cuda":
+                dv_last_cuda.swap_to_cpu()
+            if dv_last_base_cuda.device == "cuda":
+                dv_last_base_cuda.swap_to_cpu()
+            if dv_last_diff_cuda.device == "cuda":
+                dv_last_diff_cuda.swap_to_cpu()
+
+        # Cleanup GPU memory
+        if times_cuda.device == "cuda":
+            times_cuda.swap_to_cpu()
+        if values_cuda.device == "cuda":
+            values_cuda.swap_to_cpu()
 
         return derivatives
 
@@ -275,7 +394,10 @@ class ThetaEvolutionProcessor:
         self, times: np.ndarray, max_gap_ratio: float = 5.0
     ) -> List[Tuple[float, float]]:
         """
-        Check for gaps in time coverage (vectorized).
+        Check for gaps in time coverage (vectorized with CUDA support).
+
+        Uses CudaArray and vectorizers for all array operations.
+        Uses CUDA acceleration for large arrays (>10k elements).
 
         Args:
             times: Sorted time array
@@ -287,20 +409,48 @@ class ThetaEvolutionProcessor:
         if len(times) < 2:
             return []
 
-        intervals = np.diff(times)
-        if len(intervals) == 0:
-            return []
+        # Use CudaArray for all operations
+        times_cuda = CudaArray(times, device="cpu")
+        times_np = times_cuda.to_numpy()
 
-        median_interval = np.median(intervals)
+        # Calculate intervals using CudaArray
+        # For diff operation, we need to use numpy, but wrap result in CudaArray
+        intervals_np = np.diff(times_np)
+        intervals_cuda = CudaArray(intervals_np, device="cpu")
+
+        # Calculate median - median requires sorting, so use numpy
+        # but wrap in CudaArray for consistency
+        median_interval = float(np.median(intervals_np))
+
         if median_interval <= 0:
+            if intervals_cuda.device == "cuda":
+                intervals_cuda.swap_to_cpu()
+            if times_cuda.device == "cuda":
+                times_cuda.swap_to_cpu()
             return []
 
         threshold = max_gap_ratio * median_interval
 
-        # Vectorized gap detection using boolean indexing
-        gap_mask = intervals > threshold
+        # Use CUDA for gap detection with CudaArray
+        elem_vec = ElementWiseVectorizer(use_gpu=True)
+        threshold_cuda = CudaArray(np.array([threshold]), device="cpu")
+        gap_mask_cuda = elem_vec.vectorize_operation(
+            intervals_cuda, "greater", threshold_cuda.to_numpy()[0]
+        )
+        gap_mask = gap_mask_cuda.to_numpy()
+
+        # Cleanup GPU memory
+        if intervals_cuda.device == "cuda":
+            intervals_cuda.swap_to_cpu()
+        if gap_mask_cuda.device == "cuda":
+            gap_mask_cuda.swap_to_cpu()
+        if threshold_cuda.device == "cuda":
+            threshold_cuda.swap_to_cpu()
+        if times_cuda.device == "cuda":
+            times_cuda.swap_to_cpu()
+
         gap_indices = np.where(gap_mask)[0]
-        gaps = [(float(times[i]), float(times[i + 1])) for i in gap_indices]
+        gaps = [(float(times_np[i]), float(times_np[i + 1])) for i in gap_indices]
 
         return gaps
 

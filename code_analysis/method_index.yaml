@@ -626,6 +626,7 @@ ThetaEvolutionProcessor:
 - __init__
 - process
 - _calculate_derivative_central
+- _calculate_derivative_central_cuda
 - _check_time_coverage_gaps
 - _compute_statistics
 - get_omega_min

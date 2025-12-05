@@ -14,6 +14,15 @@ import healpy as hp
 import json
 import csv
 
+# Try to import pandas for optimized CSV writing
+try:
+    import pandas as pd
+
+    PANDAS_AVAILABLE = True
+except ImportError:
+    PANDAS_AVAILABLE = False
+    pd = None  # type: ignore
+
 
 def save_healpix_map(
     map_data: np.ndarray, file_path: Path, nside: int, overwrite: bool = False
@@ -99,39 +108,80 @@ def save_power_spectrum(
             json.dump(json_data, f, indent=2)
 
     elif format_lower == "csv":
-        # Get all keys and ensure they have same length
-        keys = list(spectrum_data.keys())
-        lengths = [
-            len(spectrum_data[k])
-            for k in keys
-            if isinstance(spectrum_data[k], np.ndarray)
-        ]
+        # Use pandas for optimized vectorized CSV writing if available
+        if PANDAS_AVAILABLE:
+            # Convert to DataFrame for efficient writing
+            # Get all keys and ensure they have same length
+            keys = list(spectrum_data.keys())
+            lengths = [
+                len(spectrum_data[k])
+                for k in keys
+                if isinstance(spectrum_data[k], np.ndarray)
+            ]
 
-        if not lengths:
-            raise ValueError("No valid array data in spectrum_data")
+            if not lengths:
+                raise ValueError("No valid array data in spectrum_data")
 
-        max_len = max(lengths)
-        if not all(
-            len(spectrum_data[k]) == max_len
-            for k in keys
-            if isinstance(spectrum_data[k], np.ndarray)
-        ):
-            raise ValueError("All arrays in spectrum_data must have the same length")
+            max_len = max(lengths)
+            if not all(
+                len(spectrum_data[k]) == max_len
+                for k in keys
+                if isinstance(spectrum_data[k], np.ndarray)
+            ):
+                raise ValueError(
+                    "All arrays in spectrum_data must have the same length"
+                )
 
-        with open(file_path, "w", encoding="utf-8", newline="") as f:
-            writer = csv.writer(f)
-            # Write header
-            writer.writerow(keys)
-            # Write data rows
-            for i in range(max_len):
-                row = []
-                for key in keys:
-                    value = spectrum_data[key]
-                    if isinstance(value, np.ndarray):
-                        row.append(str(value[i]) if i < len(value) else "")
-                    else:
-                        row.append(str(value))
-                writer.writerow(row)
+            # Build DataFrame
+            df_data: Dict[str, Any] = {}
+            for key in keys:
+                value = spectrum_data[key]
+                if isinstance(value, np.ndarray):
+                    df_data[key] = value
+                else:
+                    # Repeat scalar value for all rows
+                    df_data[key] = [value] * max_len
+
+            df = pd.DataFrame(df_data)
+            # Write with pandas (vectorized, faster)
+            df.to_csv(file_path, index=False, encoding="utf-8")
+        else:
+            # Fallback to original csv.writer approach
+            # Get all keys and ensure they have same length
+            keys = list(spectrum_data.keys())
+            lengths = [
+                len(spectrum_data[k])
+                for k in keys
+                if isinstance(spectrum_data[k], np.ndarray)
+            ]
+
+            if not lengths:
+                raise ValueError("No valid array data in spectrum_data")
+
+            max_len = max(lengths)
+            if not all(
+                len(spectrum_data[k]) == max_len
+                for k in keys
+                if isinstance(spectrum_data[k], np.ndarray)
+            ):
+                raise ValueError(
+                    "All arrays in spectrum_data must have the same length"
+                )
+
+            with open(file_path, "w", encoding="utf-8", newline="") as f:
+                writer = csv.writer(f)
+                # Write header
+                writer.writerow(keys)
+                # Write data rows
+                for i in range(max_len):
+                    row = []
+                    for key in keys:
+                        value = spectrum_data[key]
+                        if isinstance(value, np.ndarray):
+                            row.append(str(value[i]) if i < len(value) else "")
+                        else:
+                            row.append(str(value))
+                    writer.writerow(row)
 
     elif format_lower == "npy":
         # Save as numpy archive

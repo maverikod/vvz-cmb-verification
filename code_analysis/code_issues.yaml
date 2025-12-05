@@ -14,6 +14,10 @@ issues:
     file: utils/cuda/array_model.py
     limit: 400
     lines: 520
+  - exceeds_limit: 8
+    file: utils/io/data_loader.py
+    limit: 400
+    lines: 408
   - exceeds_limit: 474
     file: tests/unit/test_theta_evolution_processor.py
     limit: 400
@@ -105,6 +109,16 @@ issues:
     line: 22
     module: cupyx.scipy.ndimage
     type: import_from
+  - description: Module 'pandas' cannot be imported
+    file: utils/io/data_loader.py
+    line: 21
+    module: pandas
+    type: import
+  - description: Module 'pandas' cannot be imported
+    file: utils/io/data_saver.py
+    line: 19
+    module: pandas
+    type: import
   - description: Module 'cupy' cannot be imported
     file: tests/unit/test_cuda_array.py
     line: 239
@@ -278,13 +292,13 @@ issues:
 summary:
   any_type_usage: 0
   classes_without_docstrings: 0
-  files_too_large: 6
+  files_too_large: 7
   files_without_docstrings: 0
   generic_exception_usage: 0
   imports_in_middle: 0
-  invalid_imports: 38
+  invalid_imports: 40
   max_lines_limit: 400
   methods_with_pass: 0
   methods_without_docstrings: 5
   not_implemented_in_non_abstract: 1
-  total_issues: 50
+  total_issues: 53

@@ -16,6 +16,15 @@ import tarfile
 import json
 import csv
 
+# Try to import pandas for optimized CSV parsing
+try:
+    import pandas as pd
+
+    PANDAS_AVAILABLE = True
+except ImportError:
+    PANDAS_AVAILABLE = False
+    pd = None  # type: ignore
+
 
 def load_healpix_map(file_path: Path, field: int = 0, hdu: int = 1) -> np.ndarray:
     """
@@ -109,35 +118,77 @@ def load_power_spectrum_from_tar(
                 elif col_lower in ["error", "err", "sigma"]:
                     error_col = i
 
-            # Parse data rows
-            l_values = []
-            cl_values = []
-            error_values = []
+            # Parse data rows - use vectorized approach
+            # Filter out comment lines and empty lines
+            data_lines = [
+                line
+                for line in lines[1:]
+                if line.strip() and not line.strip().startswith("#")
+            ]
 
-            for line in lines[1:]:
-                if not line.strip() or line.strip().startswith("#"):
-                    continue
-                parts = line.split()
-                if len(parts) < 2:
-                    continue
+            if not data_lines:
+                # No data lines found
+                return data_dict
 
-                try:
-                    if l_col is not None and l_col < len(parts):
-                        l_values.append(float(parts[l_col]))
-                    if cl_col is not None and cl_col < len(parts):
-                        cl_values.append(float(parts[cl_col]))
-                    if error_col is not None and error_col < len(parts):
-                        error_values.append(float(parts[error_col]))
-                except (ValueError, IndexError):
-                    continue
+            # Use numpy genfromtxt for vectorized parsing
+            try:
+                # Convert to string buffer for genfromtxt
+                data_str = "\n".join(data_lines)
+                from io import StringIO
 
-            # Build result dictionary
-            if l_values:
-                data_dict["l"] = np.array(l_values)
-            if cl_values:
-                data_dict["cl"] = np.array(cl_values)
-            if error_values:
-                data_dict["error"] = np.array(error_values)
+                # Parse with numpy (faster than loop)
+                parsed_data = np.genfromtxt(
+                    StringIO(data_str),
+                    dtype=float,
+                    invalid_raise=False,  # Skip invalid lines
+                    filling_values=np.nan,
+                )
+
+                # Handle case where only one row exists
+                if parsed_data.ndim == 1:
+                    parsed_data = parsed_data.reshape(1, -1)
+
+                # Extract columns based on indices
+                if l_col is not None and l_col < parsed_data.shape[1]:
+                    data_dict["l"] = parsed_data[:, l_col]
+                    # Remove NaN values
+                    data_dict["l"] = data_dict["l"][~np.isnan(data_dict["l"])]
+                if cl_col is not None and cl_col < parsed_data.shape[1]:
+                    data_dict["cl"] = parsed_data[:, cl_col]
+                    data_dict["cl"] = data_dict["cl"][~np.isnan(data_dict["cl"])]
+                if error_col is not None and error_col < parsed_data.shape[1]:
+                    data_dict["error"] = parsed_data[:, error_col]
+                    data_dict["error"] = data_dict["error"][
+                        ~np.isnan(data_dict["error"])
+                    ]
+            except Exception:
+                # Fallback to original loop-based parsing if genfromtxt fails
+                l_values = []
+                cl_values = []
+                error_values = []
+
+                for line in data_lines:
+                    parts = line.split()
+                    if len(parts) < 2:
+                        continue
+
+                    try:
+                        if l_col is not None and l_col < len(parts):
+                            l_values.append(float(parts[l_col]))
+                        if cl_col is not None and cl_col < len(parts):
+                            cl_values.append(float(parts[cl_col]))
+                        if error_col is not None and error_col < len(parts):
+                            error_values.append(float(parts[error_col]))
+                    except (ValueError, IndexError):
+                        continue
+
+                # Build result dictionary
+                if l_values:
+                    data_dict["l"] = np.array(l_values)
+                if cl_values:
+                    data_dict["cl"] = np.array(cl_values)
+                if error_values:
+                    data_dict["error"] = np.array(error_values)
 
             if not data_dict:
                 raise ValueError(
@@ -152,12 +203,19 @@ def load_power_spectrum_from_tar(
         raise ValueError(f"Failed to load power spectrum from {tar_path}: {e}") from e
 
 
-def load_csv_data(file_path: Path) -> Dict[str, np.ndarray]:
+def load_csv_data(
+    file_path: Path, chunksize: Optional[int] = None
+) -> Dict[str, np.ndarray]:
     """
     Load CSV data file.
 
+    Uses pandas for optimized vectorized parsing if available,
+    with optional block processing for large files.
+
     Args:
         file_path: Path to CSV file
+        chunksize: Optional chunk size for block processing large files.
+                   If None, loads entire file at once.
 
     Returns:
         Dictionary with column names as keys and arrays as values
@@ -170,44 +228,99 @@ def load_csv_data(file_path: Path) -> Dict[str, np.ndarray]:
         raise FileNotFoundError(f"CSV file not found: {file_path}")
 
     try:
-        data_dict: Dict[str, Any] = {}
-        with open(file_path, "r", encoding="utf-8") as f:
-            reader = csv.DictReader(f)
-            fieldnames = reader.fieldnames
+        # Use pandas for optimized CSV parsing if available
+        if PANDAS_AVAILABLE and chunksize is None:
+            # Load entire file with pandas (vectorized, fast)
+            df = pd.read_csv(
+                file_path, encoding="utf-8", comment="#", skipinitialspace=True
+            )
 
-            if fieldnames is None:
-                raise ValueError("CSV file has no header row")
-
-            # Initialize lists for each column
-            for field in fieldnames:
-                data_dict[field] = []
-
-            # Read rows
-            for row in reader:
-                for field in fieldnames:
-                    value = row.get(field, "")
-                    try:
-                        # Try to convert to float, fallback to string
-                        if value.strip():
-                            try:
-                                data_dict[field].append(float(value))
-                            except ValueError:
-                                data_dict[field].append(value)
-                        else:
-                            data_dict[field].append(np.nan)
-                    except Exception:
-                        data_dict[field].append(np.nan)
-
-        # Convert lists to numpy arrays
-        for field in fieldnames:
-            if field:
+            # Convert to dictionary with numpy arrays
+            data_dict: Dict[str, np.ndarray] = {}
+            for col in df.columns:
+                # Try to convert to float, keep as object if fails
                 try:
-                    data_dict[field] = np.array(data_dict[field])
-                except Exception:
-                    # Keep as list if conversion fails
-                    pass
+                    data_dict[col] = df[col].to_numpy(dtype=float, na_value=np.nan)
+                except (ValueError, TypeError):
+                    # Keep as string/object array
+                    data_dict[col] = df[col].to_numpy()
 
-        return data_dict
+            return data_dict
+
+        elif PANDAS_AVAILABLE and chunksize is not None:
+            # Block processing for large files
+            chunk_data_dict: Dict[str, list] = {}
+            first_chunk = True
+
+            for chunk in pd.read_csv(
+                file_path,
+                encoding="utf-8",
+                comment="#",
+                skipinitialspace=True,
+                chunksize=chunksize,
+            ):
+                if first_chunk:
+                    # Initialize with column names
+                    for col in chunk.columns:
+                        chunk_data_dict[col] = []
+                    first_chunk = False
+
+                # Append chunk data
+                for col in chunk.columns:
+                    chunk_data_dict[col].extend(chunk[col].tolist())
+
+            # Convert lists to numpy arrays
+            result_dict: Dict[str, np.ndarray] = {}
+            for col, values in chunk_data_dict.items():
+                try:
+                    result_dict[col] = np.array(values, dtype=float)
+                except (ValueError, TypeError):
+                    result_dict[col] = np.array(values, dtype=object)
+
+            return result_dict
+
+        else:
+            # Fallback to original csv.DictReader approach
+            fallback_data_dict: Dict[str, Any] = {}
+            with open(file_path, "r", encoding="utf-8") as f:
+                reader = csv.DictReader(f)
+                fieldnames = reader.fieldnames
+
+                if fieldnames is None:
+                    raise ValueError("CSV file has no header row")
+
+                # Initialize lists for each column
+                for field in fieldnames:
+                    fallback_data_dict[field] = []
+
+                # Read rows
+                for row in reader:
+                    for field in fieldnames:
+                        value = row.get(field, "")
+                        try:
+                            # Try to convert to float, fallback to string
+                            if value.strip():
+                                try:
+                                    fallback_data_dict[field].append(float(value))
+                                except ValueError:
+                                    fallback_data_dict[field].append(value)
+                            else:
+                                fallback_data_dict[field].append(np.nan)
+                        except Exception:
+                            fallback_data_dict[field].append(np.nan)
+
+            # Convert lists to numpy arrays
+            for field in fieldnames:
+                if field:
+                    try:
+                        fallback_data_dict[field] = np.array(
+                            fallback_data_dict[field]
+                        )
+                    except Exception:
+                        # Keep as list if conversion fails
+                        pass
+
+            return fallback_data_dict
 
     except csv.Error as e:
         raise ValueError(f"Failed to parse CSV file {file_path}: {e}") from e

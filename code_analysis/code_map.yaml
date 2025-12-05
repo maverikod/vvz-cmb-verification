@@ -7026,12 +7026,16 @@ functions:
   utils/io/data_loader.py:load_csv_data:
     args:
     - file_path
-    docstring: "Load CSV data file.\n\nArgs:\n    file_path: Path to CSV file\n\n\
-      Returns:\n    Dictionary with column names as keys and arrays as values\n\n\
+    - chunksize
+    docstring: "Load CSV data file.\n\nUses pandas for optimized vectorized parsing\
+      \ if available,\nwith optional block processing for large files.\n\nArgs:\n\
+      \    file_path: Path to CSV file\n    chunksize: Optional chunk size for block\
+      \ processing large files.\n               If None, loads entire file at once.\n\
+      \nReturns:\n    Dictionary with column names as keys and arrays as values\n\n\
       Raises:\n    FileNotFoundError: If file doesn't exist\n    ValueError: If CSV\
       \ format is invalid"
     file: utils/io/data_loader.py
-    line: 155
+    line: 206
     name: load_csv_data
   utils/io/data_loader.py:load_healpix_map:
     args:
@@ -7044,7 +7048,7 @@ functions:
       \    FileNotFoundError: If file doesn't exist\n    ValueError: If file format\
       \ is invalid"
     file: utils/io/data_loader.py
-    line: 20
+    line: 29
     name: load_healpix_map
   utils/io/data_loader.py:load_json_data:
     args:
@@ -7053,7 +7057,7 @@ functions:
       Returns:\n    Dictionary with JSON data\n\nRaises:\n    FileNotFoundError: If\
       \ file doesn't exist\n    json.JSONDecodeError: If JSON is invalid"
     file: utils/io/data_loader.py
-    line: 218
+    line: 329
     name: load_json_data
   utils/io/data_loader.py:load_power_spectrum_from_tar:
     args:
@@ -7065,7 +7069,7 @@ functions:
       \nRaises:\n    FileNotFoundError: If archive or file doesn't exist\n    ValueError:\
       \ If data format is invalid"
     file: utils/io/data_loader.py
-    line: 51
+    line: 60
     name: load_power_spectrum_from_tar
   utils/io/data_loader.py:validate_healpix_map:
     args:
@@ -7075,7 +7079,7 @@ functions:
       \    nside: Expected NSIDE value (optional)\n\nReturns:\n    True if map is\
       \ valid\n\nRaises:\n    ValueError: If map is invalid"
     file: utils/io/data_loader.py
-    line: 247
+    line: 358
     name: validate_healpix_map
   utils/io/data_saver.py:convert_to_serializable:
     args:
@@ -7084,7 +7088,7 @@ functions:
       \ to convert (can be numpy array, dict, list, etc.)\n\nReturns:\n    JSON-serializable\
       \ representation of the object"
     file: utils/io/data_saver.py
-    line: 164
+    line: 214
     name: convert_to_serializable
   utils/io/data_saver.py:convert_to_yaml_serializable:
     args:
@@ -7093,7 +7097,7 @@ functions:
       \ to convert (can be numpy array, dict, list, etc.)\n\nReturns:\n    YAML-serializable\
       \ representation of the object"
     file: utils/io/data_saver.py
-    line: 201
+    line: 251
     name: convert_to_yaml_serializable
   utils/io/data_saver.py:ensure_output_directory:
     args:
@@ -7102,7 +7106,7 @@ functions:
       \ Path to output file or directory\n\nRaises:\n    PermissionError: If directory\
       \ cannot be created"
     file: utils/io/data_saver.py
-    line: 233
+    line: 283
     name: ensure_output_directory
   utils/io/data_saver.py:save_analysis_results:
     args:
@@ -7113,7 +7117,7 @@ functions:
       \ analysis results\n    file_path: Path to output file\n    format: Output format\
       \ ('json', 'yaml')\n\nRaises:\n    ValueError: If format is invalid"
     file: utils/io/data_saver.py
-    line: 144
+    line: 194
     name: save_analysis_results
   utils/io/data_saver.py:save_healpix_map:
     args:
@@ -7126,7 +7130,7 @@ functions:
       \    overwrite: Whether to overwrite existing file\n\nRaises:\n    FileExistsError:\
       \ If file exists and overwrite=False\n    ValueError: If map data is invalid"
     file: utils/io/data_saver.py
-    line: 18
+    line: 27
     name: save_healpix_map
   utils/io/data_saver.py:save_power_spectrum:
     args:
@@ -7138,18 +7142,19 @@ functions:
       \ file\n    format: Output format ('json', 'csv', 'npy')\n\nRaises:\n    ValueError:\
       \ If format is invalid or data is missing"
     file: utils/io/data_saver.py
-    line: 68
+    line: 77
     name: save_power_spectrum
   utils/math/frequency_conversion.py:frequency_to_multipole:
     args:
     - frequency
     - D
     docstring: "Convert frequency to multipole using l ≈ π D ω.\n\nArgs:\n    frequency:\
-      \ Frequency in Hz\n    D: Distance parameter (if None, uses config value)\n\n\
-      Returns:\n    Multipole l value(s)\n\nRaises:\n    ValueError: If frequency\
+      \ Frequency in Hz (can be CudaArray for GPU acceleration)\n    D: Distance parameter\
+      \ (if None, uses config value)\n\nReturns:\n    Multipole l value(s) (returns\
+      \ CudaArray if input was CudaArray)\n\nRaises:\n    ValueError: If frequency\
       \ is negative or zero"
     file: utils/math/frequency_conversion.py
-    line: 16
+    line: 27
     name: frequency_to_multipole
   utils/math/frequency_conversion.py:get_frequency_range_for_multipole_range:
     args:
@@ -7162,18 +7167,19 @@ functions:
       \ frequency_max) in Hz\n\nRaises:\n    ValueError: If l_min >= l_max or values\
       \ are invalid"
     file: utils/math/frequency_conversion.py
-    line: 110
+    line: 155
     name: get_frequency_range_for_multipole_range
   utils/math/frequency_conversion.py:multipole_to_frequency:
     args:
     - multipole
     - D
     docstring: "Convert multipole to frequency using inverse of l ≈ π D ω.\n\nArgs:\n\
-      \    multipole: Multipole l value(s)\n    D: Distance parameter (if None, uses\
-      \ config value)\n\nReturns:\n    Frequency in Hz\n\nRaises:\n    ValueError:\
+      \    multipole: Multipole l value(s) (can be CudaArray for GPU acceleration)\n\
+      \    D: Distance parameter (if None, uses config value)\n\nReturns:\n    Frequency\
+      \ in Hz (returns CudaArray if input was CudaArray)\n\nRaises:\n    ValueError:\
       \ If multipole is negative or zero"
     file: utils/math/frequency_conversion.py
-    line: 63
+    line: 92
     name: multipole_to_frequency
   utils/math/spherical_harmonics.py:calculate_power_spectrum_from_alm:
     args:
@@ -7184,7 +7190,7 @@ functions:
       \ uses data limit)\n\nReturns:\n    Tuple of (multipoles, C_l values)\n\nRaises:\n\
       \    ValueError: If coefficients are invalid"
     file: utils/math/spherical_harmonics.py
-    line: 90
+    line: 188
     name: calculate_power_spectrum_from_alm
   utils/math/spherical_harmonics.py:convert_healpix_to_alm:
     args:
@@ -7195,29 +7201,35 @@ functions:
       \    map_data: HEALPix map array\n    nside: HEALPix NSIDE parameter\n    l_max:\
       \ Maximum multipole\n\nReturns:\n    Array of harmonic coefficients a_lm"
     file: utils/math/spherical_harmonics.py
-    line: 131
+    line: 229
     name: convert_healpix_to_alm
   utils/math/spherical_harmonics.py:decompose_map:
     args:
     - map_data
     - nside
     - l_max
+    - use_cuda
     docstring: "Decompose HEALPix map into spherical harmonics.\n\nArgs:\n    map_data:\
-      \ HEALPix map array\n    nside: HEALPix NSIDE parameter\n    l_max: Maximum\
-      \ multipole (if None, uses default)\n\nReturns:\n    Array of harmonic coefficients\
-      \ a_lm\n\nRaises:\n    ValueError: If map data is invalid"
+      \ HEALPix map array (can be CudaArray for GPU acceleration)\n    nside: HEALPix\
+      \ NSIDE parameter\n    l_max: Maximum multipole (if None, uses default)\n  \
+      \  use_cuda: Use CUDA acceleration if available (only if map_data is CudaArray)\n\
+      \nReturns:\n    Array of harmonic coefficients a_lm (returns CudaArray if input\
+      \ was CudaArray)\n\nRaises:\n    ValueError: If map data is invalid"
     file: utils/math/spherical_harmonics.py
-    line: 15
+    line: 26
     name: decompose_map
   utils/math/spherical_harmonics.py:synthesize_map:
     args:
     - alm
     - nside
+    - use_cuda
     docstring: "Synthesize HEALPix map from spherical harmonics.\n\nArgs:\n    alm:\
-      \ Harmonic coefficients a_lm\n    nside: HEALPix NSIDE parameter\n\nReturns:\n\
-      \    HEALPix map array\n\nRaises:\n    ValueError: If coefficients are invalid"
+      \ Harmonic coefficients a_lm (can be CudaArray for GPU acceleration)\n    nside:\
+      \ HEALPix NSIDE parameter\n    use_cuda: Use CUDA acceleration if available\
+      \ (only if alm is CudaArray)\n\nReturns:\n    HEALPix map array (returns CudaArray\
+      \ if input was CudaArray)\n\nRaises:\n    ValueError: If coefficients are invalid"
     file: utils/math/spherical_harmonics.py
-    line: 59
+    line: 116
     name: synthesize_map
   utils/visualization/cmb_plots.py:plot_healpix_map:
     args:
@@ -10730,6 +10742,12 @@ imports:
     module: pathlib
     name: Path
     type: import_from
+  utils/io/data_loader.py:StringIO:
+    file: utils/io/data_loader.py
+    line: 137
+    module: io
+    name: StringIO
+    type: import_from
   utils/io/data_loader.py:csv:
     file: utils/io/data_loader.py
     line: 17
@@ -10755,6 +10773,11 @@ imports:
     file: utils/io/data_loader.py
     line: 12
     name: numpy
+    type: import
+  utils/io/data_loader.py:pandas:
+    file: utils/io/data_loader.py
+    line: 21
+    name: pandas
     type: import
   utils/io/data_loader.py:tarfile:
     file: utils/io/data_loader.py
@@ -10799,9 +10822,14 @@ imports:
     line: 12
     name: numpy
     type: import
+  utils/io/data_saver.py:pandas:
+    file: utils/io/data_saver.py
+    line: 19
+    name: pandas
+    type: import
   utils/io/data_saver.py:yaml:
     file: utils/io/data_saver.py
-    line: 194
+    line: 244
     name: yaml
     type: import
   utils/math/__init__.py:calculate_power_spectrum_from_alm:
@@ -10852,6 +10880,18 @@ imports:
     module: config.settings
     name: Config
     type: import_from
+  utils/math/frequency_conversion.py:CudaArray:
+    file: utils/math/frequency_conversion.py
+    line: 17
+    module: utils.cuda.array_model
+    name: CudaArray
+    type: import_from
+  utils/math/frequency_conversion.py:ElementWiseVectorizer:
+    file: utils/math/frequency_conversion.py
+    line: 18
+    module: utils.cuda.elementwise_vectorizer
+    name: ElementWiseVectorizer
+    type: import_from
   utils/math/frequency_conversion.py:Optional:
     file: utils/math/frequency_conversion.py
     line: 11
@@ -10875,17 +10915,35 @@ imports:
     line: 12
     name: numpy
     type: import
+  utils/math/spherical_harmonics.py:CudaArray:
+    file: utils/math/spherical_harmonics.py
+    line: 159
+    module: utils.cuda.array_model
+    name: CudaArray
+    type: import_from
   utils/math/spherical_harmonics.py:Optional:
     file: utils/math/spherical_harmonics.py
     line: 10
     module: typing
     name: Optional
     type: import_from
+  utils/math/spherical_harmonics.py:TransformVectorizer:
+    file: utils/math/spherical_harmonics.py
+    line: 17
+    module: utils.cuda.transform_vectorizer
+    name: TransformVectorizer
+    type: import_from
   utils/math/spherical_harmonics.py:Tuple:
     file: utils/math/spherical_harmonics.py
     line: 10
     module: typing
     name: Tuple
+    type: import_from
+  utils/math/spherical_harmonics.py:Union:
+    file: utils/math/spherical_harmonics.py
+    line: 10
+    module: typing
+    name: Union
     type: import_from
   utils/math/spherical_harmonics.py:healpy:
     file: utils/math/spherical_harmonics.py

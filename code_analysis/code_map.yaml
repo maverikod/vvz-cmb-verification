@@ -1286,7 +1286,7 @@ classes:
     bases: []
     docstring: Tests for evolution statistics functionality.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 430
+    line: 428
     methods:
     - test_get_evolution_statistics
     - test_get_evolution_statistics_not_processed
@@ -1295,7 +1295,7 @@ classes:
     bases: []
     docstring: Tests for process_evolution_data function.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 385
+    line: 383
     methods:
     - test_process_evolution_data
     - test_process_evolution_data_invalid
@@ -1304,7 +1304,7 @@ classes:
     bases: []
     docstring: Tests for quality report generation.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 553
+    line: 551
     methods:
     - test_generate_quality_report
     - test_generate_quality_report_with_gaps
@@ -1339,7 +1339,7 @@ classes:
     bases: []
     docstring: Tests for time array completeness verification.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 660
+    line: 658
     methods:
     - test_verify_time_array_completeness_complete
     - test_verify_time_array_completeness_incomplete
@@ -1350,7 +1350,7 @@ classes:
     bases: []
     docstring: Tests for time coverage gap detection.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 486
+    line: 484
     methods:
     - test_check_time_coverage_gaps_no_gaps
     - test_check_time_coverage_gaps_with_gaps
@@ -1360,7 +1360,7 @@ classes:
     bases: []
     docstring: Tests for validate_against_config functionality.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 755
+    line: 751
     methods:
     - test_validate_against_config_no_config_requirements
     - test_validate_against_config_with_valid_range
@@ -1913,7 +1913,7 @@ functions:
       \nArgs:\n    times: Time array (must be sorted)\n    values: Value array\n\n\
       Returns:\n    Derivative array"
     file: cmb/theta_evolution_processor.py
-    line: 173
+    line: 174
     name: _calculate_derivative_central
   cmb/theta_evolution_processor.py:_check_time_coverage_gaps:
     args:
@@ -1924,7 +1924,7 @@ functions:
       \ array\n    max_gap_ratio: Maximum allowed gap ratio (gap / median_interval)\n\
       \nReturns:\n    List of (gap_start, gap_end) tuples for gaps exceeding threshold"
     file: cmb/theta_evolution_processor.py
-    line: 222
+    line: 223
     name: _check_time_coverage_gaps
   cmb/theta_evolution_processor.py:_compute_statistics:
     args:
@@ -1938,7 +1938,7 @@ functions:
       \  omega_min: ω_min values\n    omega_macro: ω_macro values\n    domega_min_dt:\
       \ Evolution rates for ω_min\n    domega_macro_dt: Evolution rates for ω_macro"
     file: cmb/theta_evolution_processor.py
-    line: 255
+    line: 256
     name: _compute_statistics
   cmb/theta_evolution_processor.py:check_time_coverage_gaps:
     args:
@@ -1948,7 +1948,7 @@ functions:
       \ allowed gap ratio.\n                  If None, uses default (5.0)\n\nReturns:\n\
       \    List of (gap_start, gap_end) tuples for gaps exceeding threshold"
     file: cmb/theta_evolution_processor.py
-    line: 471
+    line: 465
     name: check_time_coverage_gaps
   cmb/theta_evolution_processor.py:generate_quality_report:
     args:
@@ -1958,7 +1958,7 @@ functions:
       - Data quality issues\n\nReturns:\n    Dictionary with quality issues, warnings,\
       \ and statistics"
     file: cmb/theta_evolution_processor.py
-    line: 572
+    line: 562
     name: generate_quality_report
   cmb/theta_evolution_processor.py:get_evolution_rate_macro:
     args:
@@ -1966,9 +1966,9 @@ functions:
     - time
     docstring: "Calculate evolution rate d(ω_macro)/dt at given time.\n\nArgs:\n \
       \   time: Time value\n\nReturns:\n    Evolution rate\n\nRaises:\n    ValueError:\
-      \ If time is out of range or processor not initialized"
+      \ If time is out of range or processor\n        not initialized"
     file: cmb/theta_evolution_processor.py
-    line: 380
+    line: 378
     name: get_evolution_rate_macro
   cmb/theta_evolution_processor.py:get_evolution_rate_min:
     args:
@@ -1976,9 +1976,9 @@ functions:
     - time
     docstring: "Calculate evolution rate d(ω_min)/dt at given time.\n\nArgs:\n   \
       \ time: Time value\n\nReturns:\n    Evolution rate\n\nRaises:\n    ValueError:\
-      \ If time is out of range or processor not initialized"
+      \ If time is out of range or processor\n        not initialized"
     file: cmb/theta_evolution_processor.py
-    line: 357
+    line: 356
     name: get_evolution_rate_min
   cmb/theta_evolution_processor.py:get_evolution_statistics:
     args:
@@ -1986,7 +1986,7 @@ functions:
     docstring: "Get evolution statistics.\n\nReturns:\n    Dictionary with statistics\
       \ about evolution data\n\nRaises:\n    ValueError: If processor not initialized"
     file: cmb/theta_evolution_processor.py
-    line: 455
+    line: 451
     name: get_evolution_statistics
   cmb/theta_evolution_processor.py:get_omega_macro:
     args:
@@ -1994,7 +1994,7 @@ functions:
     - time
     docstring: "Get ω_macro value at given time.\n\nArgs:\n    time: Time value\n\n\
       Returns:\n    ω_macro(t) value\n\nRaises:\n    ValueError: If time is out of\
-      \ range or processor not initialized"
+      \ range or processor\n        not initialized"
     file: cmb/theta_evolution_processor.py
     line: 334
     name: get_omega_macro
@@ -2004,9 +2004,9 @@ functions:
     - time
     docstring: "Get ω_min value at given time.\n\nArgs:\n    time: Time value\n\n\
       Returns:\n    ω_min(t) value\n\nRaises:\n    ValueError: If time is out of range\
-      \ or processor not initialized"
+      \ or processor\n        not initialized"
     file: cmb/theta_evolution_processor.py
-    line: 311
+    line: 312
     name: get_omega_min
   cmb/theta_evolution_processor.py:process:
     args:
@@ -2016,7 +2016,7 @@ functions:
       \ rate calculations.\nAlso computes evolution statistics and checks data quality.\n\
       \nRaises:\n    ValueError: If processing fails"
     file: cmb/theta_evolution_processor.py
-    line: 72
+    line: 74
     name: process
   cmb/theta_evolution_processor.py:process_evolution_data:
     args:
@@ -2027,7 +2027,7 @@ functions:
       Returns:\n    ThetaEvolutionProcessor instance with processed data\n\nRaises:\n\
       \    ValueError: If processing fails"
     file: cmb/theta_evolution_processor.py
-    line: 656
+    line: 646
     name: process_evolution_data
   cmb/theta_evolution_processor.py:validate_against_config:
     args:
@@ -2037,7 +2037,7 @@ functions:
       \ data meets configuration requirements\n\nRaises:\n    ValueError: If data\
       \ does not meet requirements"
     file: cmb/theta_evolution_processor.py
-    line: 423
+    line: 419
     name: validate_against_config
   cmb/theta_evolution_processor.py:validate_time_range:
     args:
@@ -2047,7 +2047,7 @@ functions:
       \ value to validate\n\nReturns:\n    True if time is within range\n\nRaises:\n\
       \    ValueError: If time is out of range"
     file: cmb/theta_evolution_processor.py
-    line: 403
+    line: 400
     name: validate_time_range
   cmb/theta_evolution_processor.py:verify_time_array_completeness:
     args:
@@ -2055,13 +2055,13 @@ functions:
     - expected_interval
     docstring: "Verify time array completeness.\n\nChecks if time array has expected\
       \ coverage and no missing points.\n\nArgs:\n    expected_interval: Expected\
-      \ time interval between points.\n                     If None, uses mean interval\
-      \ from data.\n\nReturns:\n    Dictionary with completeness check results:\n\
-      \    - is_complete: bool - Whether array appears complete\n    - missing_points:\
-      \ List[float] - List of expected but missing times\n    - coverage_ratio: float\
-      \ - Ratio of actual to expected points"
+      \ time interval between\n        points. If None, uses mean interval from data.\n\
+      \nReturns:\n    Dictionary with completeness check results:\n    - is_complete:\
+      \ bool - Whether array appears complete\n    - missing_points: List[float] -\
+      \ List of expected but missing times\n    - coverage_ratio: float - Ratio of\
+      \ actual to expected points"
     file: cmb/theta_evolution_processor.py
-    line: 496
+    line: 488
     name: verify_time_array_completeness
   cmb/theta_node_loader.py:load_node_depths:
     args:
@@ -5400,140 +5400,140 @@ functions:
     - self
     docstring: Test check_time_coverage_gaps() with no gaps.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 489
+    line: 487
     name: test_check_time_coverage_gaps_no_gaps
   tests/unit/test_theta_evolution_processor.py:test_check_time_coverage_gaps_not_processed:
     args:
     - self
     docstring: Test check_time_coverage_gaps() raises error if not processed.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 533
+    line: 531
     name: test_check_time_coverage_gaps_not_processed
   tests/unit/test_theta_evolution_processor.py:test_check_time_coverage_gaps_with_gaps:
     args:
     - self
     docstring: Test check_time_coverage_gaps() detects gaps.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 509
+    line: 507
     name: test_check_time_coverage_gaps_with_gaps
   tests/unit/test_theta_evolution_processor.py:test_generate_quality_report:
     args:
     - self
     docstring: Test generate_quality_report() creates report.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 556
+    line: 554
     name: test_generate_quality_report
   tests/unit/test_theta_evolution_processor.py:test_generate_quality_report_includes_completeness:
     args:
     - self
     docstring: Test generate_quality_report() includes completeness check.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 608
+    line: 606
     name: test_generate_quality_report_includes_completeness
   tests/unit/test_theta_evolution_processor.py:test_generate_quality_report_includes_physical_constraints:
     args:
     - self
     docstring: Test generate_quality_report() includes physical constraints.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 631
+    line: 629
     name: test_generate_quality_report_includes_physical_constraints
   tests/unit/test_theta_evolution_processor.py:test_generate_quality_report_with_gaps:
     args:
     - self
     docstring: Test generate_quality_report() includes gap warnings.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 585
+    line: 583
     name: test_generate_quality_report_with_gaps
   tests/unit/test_theta_evolution_processor.py:test_get_evolution_rate_macro:
     args:
     - self
     docstring: Test get_evolution_rate_macro() calculates d(ω_macro)/dt.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 299
+    line: 297
     name: test_get_evolution_rate_macro
   tests/unit/test_theta_evolution_processor.py:test_get_evolution_rate_macro_not_processed:
     args:
     - self
     docstring: Test get_evolution_rate_macro() raises ValueError.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 322
+    line: 320
     name: test_get_evolution_rate_macro_not_processed
   tests/unit/test_theta_evolution_processor.py:test_get_evolution_rate_min:
     args:
     - self
     docstring: Test get_evolution_rate_min() calculates d(ω_min)/dt correctly.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 257
+    line: 255
     name: test_get_evolution_rate_min
   tests/unit/test_theta_evolution_processor.py:test_get_evolution_rate_min_not_processed:
     args:
     - self
     docstring: Test get_evolution_rate_min() raises ValueError if not processed.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 280
+    line: 278
     name: test_get_evolution_rate_min_not_processed
   tests/unit/test_theta_evolution_processor.py:test_get_evolution_statistics:
     args:
     - self
     docstring: Test get_evolution_statistics() returns correct statistics.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 433
+    line: 431
     name: test_get_evolution_statistics
   tests/unit/test_theta_evolution_processor.py:test_get_evolution_statistics_not_processed:
     args:
     - self
     docstring: Test get_evolution_statistics() raises error if not processed.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 466
+    line: 464
     name: test_get_evolution_statistics_not_processed
   tests/unit/test_theta_evolution_processor.py:test_get_omega_macro_at_data_points:
     args:
     - self
     docstring: Test get_omega_macro() returns exact values at data points.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 192
+    line: 190
     name: test_get_omega_macro_at_data_points
   tests/unit/test_theta_evolution_processor.py:test_get_omega_macro_interpolated:
     args:
     - self
     docstring: Test get_omega_macro() interpolates between data points.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 214
+    line: 212
     name: test_get_omega_macro_interpolated
   tests/unit/test_theta_evolution_processor.py:test_get_omega_macro_out_of_range:
     args:
     - self
     docstring: Test get_omega_macro() raises ValueError for out-of-range times.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 237
+    line: 235
     name: test_get_omega_macro_out_of_range
   tests/unit/test_theta_evolution_processor.py:test_get_omega_min_at_data_points:
     args:
     - self
     docstring: Test get_omega_min() returns exact values at data points.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 105
+    line: 103
     name: test_get_omega_min_at_data_points
   tests/unit/test_theta_evolution_processor.py:test_get_omega_min_interpolated:
     args:
     - self
     docstring: Test get_omega_min() interpolates correctly between data points.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 127
+    line: 125
     name: test_get_omega_min_interpolated
   tests/unit/test_theta_evolution_processor.py:test_get_omega_min_not_processed:
     args:
     - self
     docstring: Test get_omega_min() raises ValueError if process() not called.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 173
+    line: 171
     name: test_get_omega_min_not_processed
   tests/unit/test_theta_evolution_processor.py:test_get_omega_min_out_of_range:
     args:
     - self
     docstring: Test get_omega_min() raises ValueError for out-of-range times.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 150
+    line: 148
     name: test_get_omega_min_out_of_range
   tests/unit/test_theta_evolution_processor.py:test_init_invalid_evolution:
     args:
@@ -5554,98 +5554,98 @@ functions:
     - self
     docstring: Test that process() creates interpolation functions.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 61
+    line: 59
     name: test_process_creates_interpolators
   tests/unit/test_theta_evolution_processor.py:test_process_evolution_data:
     args:
     - self
     docstring: Test process_evolution_data() creates and processes processor.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 388
+    line: 386
     name: test_process_evolution_data
   tests/unit/test_theta_evolution_processor.py:test_process_evolution_data_invalid:
     args:
     - self
     docstring: Test process_evolution_data() raises ValueError for invalid data.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 412
+    line: 410
     name: test_process_evolution_data_invalid
   tests/unit/test_theta_evolution_processor.py:test_process_handles_unsorted_times:
     args:
     - self
     docstring: Test that process() handles unsorted time arrays.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 83
+    line: 81
     name: test_process_handles_unsorted_times
   tests/unit/test_theta_evolution_processor.py:test_validate_against_config_no_config_requirements:
     args:
     - self
     docstring: Test validate_against_config() with no config requirements.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 758
+    line: 754
     name: test_validate_against_config_no_config_requirements
   tests/unit/test_theta_evolution_processor.py:test_validate_against_config_with_invalid_max:
     args:
     - self
     docstring: Test validate_against_config() raises error for invalid max time.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 849
+    line: 843
     name: test_validate_against_config_with_invalid_max
   tests/unit/test_theta_evolution_processor.py:test_validate_against_config_with_invalid_min:
     args:
     - self
     docstring: Test validate_against_config() raises error for invalid min time.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 814
+    line: 808
     name: test_validate_against_config_with_invalid_min
   tests/unit/test_theta_evolution_processor.py:test_validate_against_config_with_valid_range:
     args:
     - self
     docstring: Test validate_against_config() with valid time range.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 778
+    line: 774
     name: test_validate_against_config_with_valid_range
   tests/unit/test_theta_evolution_processor.py:test_validate_time_range_invalid:
     args:
     - self
     docstring: Test validate_time_range() raises ValueError for invalid times.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 362
+    line: 360
     name: test_validate_time_range_invalid
   tests/unit/test_theta_evolution_processor.py:test_validate_time_range_valid:
     args:
     - self
     docstring: Test validate_time_range() returns True for valid times.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 341
+    line: 339
     name: test_validate_time_range_valid
   tests/unit/test_theta_evolution_processor.py:test_verify_time_array_completeness_complete:
     args:
     - self
     docstring: Test verify_time_array_completeness() with complete array.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 663
+    line: 661
     name: test_verify_time_array_completeness_complete
   tests/unit/test_theta_evolution_processor.py:test_verify_time_array_completeness_incomplete:
     args:
     - self
     docstring: Test verify_time_array_completeness() with incomplete array.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 686
+    line: 684
     name: test_verify_time_array_completeness_incomplete
   tests/unit/test_theta_evolution_processor.py:test_verify_time_array_completeness_not_processed:
     args:
     - self
     docstring: Test verify_time_array_completeness() raises error.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 735
+    line: 731
     name: test_verify_time_array_completeness_not_processed
   tests/unit/test_theta_evolution_processor.py:test_verify_time_array_completeness_with_expected_interval:
     args:
     - self
     docstring: Test verify_time_array_completeness() with specified interval.
     file: tests/unit/test_theta_evolution_processor.py
-    line: 711
+    line: 709
     name: test_verify_time_array_completeness_with_expected_interval
   tests/unit/test_theta_node_processor.py:sample_config:
     args: []
@@ -9820,7 +9820,7 @@ imports:
     type: import_from
   tests/unit/test_theta_evolution_processor.py:Config:
     file: tests/unit/test_theta_evolution_processor.py
-    line: 851
+    line: 845
     module: config.settings
     name: Config
     type: import_from

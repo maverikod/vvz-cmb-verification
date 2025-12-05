@@ -53,9 +53,7 @@ class TestThetaEvolutionProcessor:
             metadata=metadata,
         )
 
-        with pytest.raises(
-            ValueError, match="All omega_min values must be positive"
-        ):
+        with pytest.raises(ValueError, match="All omega_min values must be positive"):
             ThetaEvolutionProcessor(evolution)
 
     def test_process_creates_interpolators(self):
@@ -725,9 +723,7 @@ class TestTimeArrayCompleteness:
         processor = ThetaEvolutionProcessor(evolution)
         processor.process()
 
-        completeness = processor.verify_time_array_completeness(
-            expected_interval=1.0
-        )
+        completeness = processor.verify_time_array_completeness(expected_interval=1.0)
 
         assert completeness["is_complete"] is True
         assert completeness["coverage_ratio"] > 0.9
@@ -777,13 +773,11 @@ class TestValidateAgainstConfig:
 
     def test_validate_against_config_with_valid_range(self):
         """Test validate_against_config() with valid time range."""
-        from config.settings import Config
+        from config.settings import Config  # noqa: E501
 
         # Create data that fully covers the required range
         times = np.array([-1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0])
-        omega_min = np.array(
-            [1.0e10, 1.1e10, 1.2e10, 1.3e10, 1.4e10, 1.5e10, 1.6e10]
-        )
+        omega_min = np.array([1.0e10, 1.1e10, 1.2e10, 1.3e10, 1.4e10, 1.5e10, 1.6e10])
         omega_macro = np.array(
             [10.0e10, 10.1e10, 10.2e10, 10.3e10, 10.4e10, 10.5e10, 10.6e10]
         )

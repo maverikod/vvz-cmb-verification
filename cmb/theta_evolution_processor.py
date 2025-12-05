@@ -24,7 +24,9 @@ class ThetaEvolutionProcessor:
     """
 
     def __init__(
-        self, evolution: ThetaEvolution, config: Optional[Config] = None
+        self,
+        evolution: ThetaEvolution,
+        config: Optional[Config] = None,
     ):
         """
         Initialize evolution processor.
@@ -93,11 +95,11 @@ class ThetaEvolutionProcessor:
             omega_macro_sorted = self.evolution.omega_macro
 
         # Check for gaps in time coverage
-        gaps = self._check_time_coverage_gaps(times_sorted)
+        gaps = self._check_time_coverage_gaps(
+            times_sorted
+        )
         if gaps:
-            self._quality_issues.append(
-                f"Found {len(gaps)} gap(s) in time coverage"
-            )
+            self._quality_issues.append(f"Found {len(gaps)} gap(s) in time coverage")
 
         # Create interpolation functions for values
         # Use cubic interpolation for smooth derivatives if enough points
@@ -109,8 +111,7 @@ class ThetaEvolutionProcessor:
             interp_kind = "linear"
         else:
             raise ValueError(
-                f"Need at least 2 data points for interpolation, "
-                f"got {n_points}"
+                f"Need at least 2 data points for interpolation, " f"got {n_points}"
             )
 
         self._omega_min_interp = interp1d(
@@ -319,12 +320,11 @@ class ThetaEvolutionProcessor:
             ω_min(t) value
 
         Raises:
-            ValueError: If time is out of range or processor not initialized
+            ValueError: If time is out of range or processor
+                not initialized
         """
         if self._omega_min_interp is None:
-            raise ValueError(
-                "Processor not initialized. Call process() first."
-            )
+            raise ValueError("Processor not initialized. Call process() first.")
 
         self.validate_time_range(time)
 
@@ -342,12 +342,11 @@ class ThetaEvolutionProcessor:
             ω_macro(t) value
 
         Raises:
-            ValueError: If time is out of range or processor not initialized
+            ValueError: If time is out of range or processor
+                not initialized
         """
         if self._omega_macro_interp is None:
-            raise ValueError(
-                "Processor not initialized. Call process() first."
-            )
+            raise ValueError("Processor not initialized. Call process() first.")
 
         self.validate_time_range(time)
 
@@ -365,12 +364,11 @@ class ThetaEvolutionProcessor:
             Evolution rate
 
         Raises:
-            ValueError: If time is out of range or processor not initialized
+            ValueError: If time is out of range or processor
+                not initialized
         """
         if self._omega_min_rate_interp is None:
-            raise ValueError(
-                "Processor not initialized. Call process() first."
-            )
+            raise ValueError("Processor not initialized. Call process() first.")
 
         self.validate_time_range(time)
 
@@ -388,12 +386,11 @@ class ThetaEvolutionProcessor:
             Evolution rate
 
         Raises:
-            ValueError: If time is out of range or processor not initialized
+            ValueError: If time is out of range or processor
+                not initialized
         """
         if self._omega_macro_rate_interp is None:
-            raise ValueError(
-                "Processor not initialized. Call process() first."
-            )
+            raise ValueError("Processor not initialized. Call process() first.")
 
         self.validate_time_range(time)
 
@@ -415,8 +412,7 @@ class ThetaEvolutionProcessor:
         """
         if time < self._time_min or time > self._time_max:
             raise ValueError(
-                f"Time {time} is out of range "
-                f"[{self._time_min}, {self._time_max}]"
+                f"Time {time} is out of range " f"[{self._time_min}, {self._time_max}]"
             )
         return True
 
@@ -463,9 +459,7 @@ class ThetaEvolutionProcessor:
             ValueError: If processor not initialized
         """
         if self._statistics is None:
-            raise ValueError(
-                "Processor not initialized. Call process() first."
-            )
+            raise ValueError("Processor not initialized. Call process() first.")
         return self._statistics.copy()
 
     def check_time_coverage_gaps(
@@ -482,9 +476,7 @@ class ThetaEvolutionProcessor:
             List of (gap_start, gap_end) tuples for gaps exceeding threshold
         """
         if self._omega_min_interp is None:
-            raise ValueError(
-                "Processor not initialized. Call process() first."
-            )
+            raise ValueError("Processor not initialized. Call process() first.")
 
         if max_gap_ratio is None:
             max_gap_ratio = 5.0
@@ -502,8 +494,8 @@ class ThetaEvolutionProcessor:
         Checks if time array has expected coverage and no missing points.
 
         Args:
-            expected_interval: Expected time interval between points.
-                             If None, uses mean interval from data.
+            expected_interval: Expected time interval between
+                points. If None, uses mean interval from data.
 
         Returns:
             Dictionary with completeness check results:
@@ -512,9 +504,7 @@ class ThetaEvolutionProcessor:
             - coverage_ratio: float - Ratio of actual to expected points
         """
         if self._omega_min_interp is None:
-            raise ValueError(
-                "Processor not initialized. Call process() first."
-            )
+            raise ValueError("Processor not initialized. Call process() first.")
 
         times = np.sort(self.evolution.times)
         n_points = len(times)
@@ -583,7 +573,9 @@ class ThetaEvolutionProcessor:
             Dictionary with quality issues, warnings, and statistics
         """
         report: Dict[str, Any] = {
-            "quality_issues": self._quality_issues.copy(),
+            "quality_issues": (
+                self._quality_issues.copy()
+            ),
             "statistics": None,
             "time_coverage": {
                 "min": self._time_min,
@@ -604,9 +596,7 @@ class ThetaEvolutionProcessor:
         gaps = self.check_time_coverage_gaps()
         report["gaps"] = gaps
         if gaps:
-            report["warnings"].append(
-                f"Found {len(gaps)} gap(s) in time coverage"
-            )
+            report["warnings"].append(f"Found {len(gaps)} gap(s) in time coverage")
 
         # Check time coverage completeness
         completeness = self.verify_time_array_completeness()

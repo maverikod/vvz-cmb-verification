@@ -6,10 +6,10 @@ issues:
     file: cmb/theta_node_loader.py
     limit: 400
     lines: 466
-  - exceeds_limit: 697
+  - exceeds_limit: 835
     file: cmb/theta_evolution_processor.py
     limit: 400
-    lines: 1097
+    lines: 1235
   - exceeds_limit: 175
     file: cmb/theta_data_loader.py
     limit: 400

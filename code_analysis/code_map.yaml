@@ -1921,7 +1921,7 @@ functions:
       \   use_cuda: Use CUDA acceleration for large arrays\n\nReturns:\n    Derivative\
       \ array"
     file: cmb/theta_evolution_processor.py
-    line: 215
+    line: 236
     name: _calculate_derivative_central
   cmb/theta_evolution_processor.py:_calculate_derivative_central_cuda:
     args:
@@ -1933,7 +1933,7 @@ functions:
       \ Time array (must be sorted)\n    values: Value array\n\nReturns:\n    Derivative\
       \ array"
     file: cmb/theta_evolution_processor.py
-    line: 260
+    line: 281
     name: _calculate_derivative_central_cuda
   cmb/theta_evolution_processor.py:_check_time_coverage_gaps:
     args:
@@ -1946,7 +1946,7 @@ functions:
       \    max_gap_ratio: Maximum allowed gap ratio (gap / median_interval)\n\nReturns:\n\
       \    List of (gap_start, gap_end) tuples for gaps exceeding threshold"
     file: cmb/theta_evolution_processor.py
-    line: 397
+    line: 430
     name: _check_time_coverage_gaps
   cmb/theta_evolution_processor.py:_compute_statistics:
     args:
@@ -1960,7 +1960,7 @@ functions:
       \  omega_min: ω_min values\n    omega_macro: ω_macro values\n    domega_min_dt:\
       \ Evolution rates for ω_min\n    domega_macro_dt: Evolution rates for ω_macro"
     file: cmb/theta_evolution_processor.py
-    line: 461
+    line: 524
     name: _compute_statistics
   cmb/theta_evolution_processor.py:_to_float:
     args:
@@ -1979,7 +1979,7 @@ functions:
       \ allowed gap ratio.\n                  If None, uses default (5.0)\n\nReturns:\n\
       \    List of (gap_start, gap_end) tuples for gaps exceeding threshold"
     file: cmb/theta_evolution_processor.py
-    line: 759
+    line: 870
     name: check_time_coverage_gaps
   cmb/theta_evolution_processor.py:generate_quality_report:
     args:
@@ -1989,7 +1989,7 @@ functions:
       - Data quality issues\n\nReturns:\n    Dictionary with quality issues, warnings,\
       \ and statistics"
     file: cmb/theta_evolution_processor.py
-    line: 979
+    line: 1113
     name: generate_quality_report
   cmb/theta_evolution_processor.py:get_evolution_rate_macro:
     args:
@@ -1999,7 +1999,7 @@ functions:
       \   time: Time value\n\nReturns:\n    Evolution rate\n\nRaises:\n    ValueError:\
       \ If time is out of range or processor\n        not initialized"
     file: cmb/theta_evolution_processor.py
-    line: 672
+    line: 778
     name: get_evolution_rate_macro
   cmb/theta_evolution_processor.py:get_evolution_rate_min:
     args:
@@ -2009,7 +2009,7 @@ functions:
       \ time: Time value\n\nReturns:\n    Evolution rate\n\nRaises:\n    ValueError:\
       \ If time is out of range or processor\n        not initialized"
     file: cmb/theta_evolution_processor.py
-    line: 650
+    line: 754
     name: get_evolution_rate_min
   cmb/theta_evolution_processor.py:get_evolution_statistics:
     args:
@@ -2017,7 +2017,7 @@ functions:
     docstring: "Get evolution statistics.\n\nReturns:\n    Dictionary with statistics\
       \ about evolution data\n\nRaises:\n    ValueError: If processor not initialized"
     file: cmb/theta_evolution_processor.py
-    line: 745
+    line: 854
     name: get_evolution_statistics
   cmb/theta_evolution_processor.py:get_omega_macro:
     args:
@@ -2027,7 +2027,7 @@ functions:
       Returns:\n    ω_macro(t) value\n\nRaises:\n    ValueError: If time is out of\
       \ range or processor\n        not initialized"
     file: cmb/theta_evolution_processor.py
-    line: 628
+    line: 730
     name: get_omega_macro
   cmb/theta_evolution_processor.py:get_omega_min:
     args:
@@ -2037,7 +2037,7 @@ functions:
       Returns:\n    ω_min(t) value\n\nRaises:\n    ValueError: If time is out of range\
       \ or processor\n        not initialized"
     file: cmb/theta_evolution_processor.py
-    line: 606
+    line: 706
     name: get_omega_min
   cmb/theta_evolution_processor.py:process:
     args:
@@ -2058,7 +2058,7 @@ functions:
       Returns:\n    ThetaEvolutionProcessor instance with processed data\n\nRaises:\n\
       \    ValueError: If processing fails"
     file: cmb/theta_evolution_processor.py
-    line: 1078
+    line: 1216
     name: process_evolution_data
   cmb/theta_evolution_processor.py:validate_against_config:
     args:
@@ -2068,7 +2068,7 @@ functions:
       \ data meets configuration requirements\n\nRaises:\n    ValueError: If data\
       \ does not meet requirements"
     file: cmb/theta_evolution_processor.py
-    line: 713
+    line: 822
     name: validate_against_config
   cmb/theta_evolution_processor.py:validate_time_range:
     args:
@@ -2078,7 +2078,7 @@ functions:
       \ value to validate\n\nReturns:\n    True if time is within range\n\nRaises:\n\
       \    ValueError: If time is out of range"
     file: cmb/theta_evolution_processor.py
-    line: 694
+    line: 802
     name: validate_time_range
   cmb/theta_evolution_processor.py:verify_time_array_completeness:
     args:
@@ -2092,7 +2092,7 @@ functions:
       \    - missing_points: List[float] - List of expected but missing times\n  \
       \  - coverage_ratio: float - Ratio of actual to expected points"
     file: cmb/theta_evolution_processor.py
-    line: 782
+    line: 895
     name: verify_time_array_completeness
   cmb/theta_node_loader.py:load_node_depths:
     args:

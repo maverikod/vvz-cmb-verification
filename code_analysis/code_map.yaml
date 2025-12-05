@@ -1,4 +1,48 @@
 classes:
+  cmb/nodes/theta_node_map.py:NodeClassification:
+    bases: []
+    docstring: "Node classification data.\n\nAttributes:\n    node_id: Node identifier\n\
+      \    depth: Node depth (Δω/ω)\n    area: Node area (spatial extent)\n    curvature:\
+      \ Local curvature at node\n    position: Node position (x, y, z or sky coordinates)"
+    file: cmb/nodes/theta_node_map.py
+    line: 28
+    methods: []
+    name: NodeClassification
+  cmb/nodes/theta_node_map.py:ThetaNodeMap:
+    bases: []
+    docstring: "Θ-node map data.\n\nAttributes:\n    omega_min_map: Map of ω_min(x)\
+      \ values\n    node_mask: Binary mask of node locations\n    node_classifications:\
+      \ List of node classifications\n    grid_shape: Shape of input grid\n    metadata:\
+      \ Additional metadata"
+    file: cmb/nodes/theta_node_map.py
+    line: 48
+    methods: []
+    name: ThetaNodeMap
+  cmb/nodes/theta_node_map.py:ThetaNodeMapGenerator:
+    bases: []
+    docstring: 'Θ-node map generator.
+
+
+      Finds nodes as points of local minima ω_min(x) and classifies them
+
+      by depth, area, and local curvature.
+
+
+      Implements Module C from tech_spec-new.md.'
+    file: cmb/nodes/theta_node_map.py
+    line: 67
+    methods:
+    - __init__
+    - find_nodes
+    - classify_nodes
+    - calculate_node_depth
+    - calculate_node_area
+    - calculate_local_curvature
+    - generate_node_map
+    - create_omega_min_map
+    - create_node_mask
+    - validate_node_map
+    name: ThetaNodeMapGenerator
   cmb/theta_data_loader.py:ThetaEvolution:
     bases: []
     docstring: "Θ-field temporal evolution data.\n\nAttributes:\n    times: Time array\
@@ -1625,6 +1669,8 @@ classes:
 
       - Local minimum/maximum detection
 
+      - Minimum/maximum filters
+
       - Gradient calculations
 
       - Laplacian calculations
@@ -1643,6 +1689,7 @@ classes:
     - _local_maxima
     - _gradient
     - _laplacian
+    - _minimum_filter
     - _curvature
     name: GridVectorizer
   utils/cuda/memory_safety.py:MemorySafetyGuard:
@@ -1798,6 +1845,109 @@ classes:
 dependencies: {}
 files: {}
 functions:
+  cmb/nodes/theta_node_map.py:__init__:
+    args:
+    - self
+    - omega_field
+    - grid_spacing
+    - config
+    docstring: "Initialize node map generator.\n\nArgs:\n    omega_field: Field ω(x)\
+      \ on grid\n    grid_spacing: Grid spacing (if None, uses config)\n    config:\
+      \ Configuration instance (uses global if None)"
+    file: cmb/nodes/theta_node_map.py
+    line: 77
+    name: __init__
+  cmb/nodes/theta_node_map.py:calculate_local_curvature:
+    args:
+    - self
+    - node_position
+    docstring: "Calculate local curvature at node position.\n\nArgs:\n    node_position:\
+      \ Node position (grid indices)\n\nReturns:\n    Local curvature value"
+    file: cmb/nodes/theta_node_map.py
+    line: 349
+    name: calculate_local_curvature
+  cmb/nodes/theta_node_map.py:calculate_node_area:
+    args:
+    - self
+    - node_position
+    docstring: "Calculate node area (spatial extent).\n\nArgs:\n    node_position:\
+      \ Node position (grid indices)\n\nReturns:\n    Node area in grid units or physical\
+      \ units"
+    file: cmb/nodes/theta_node_map.py
+    line: 286
+    name: calculate_node_area
+  cmb/nodes/theta_node_map.py:calculate_node_depth:
+    args:
+    - self
+    - node_position
+    docstring: "Calculate node depth (Δω/ω).\n\nFormula: Δω = ω - ω_min\nwhere ω_min\
+      \ is local minimum at node position.\n\nArgs:\n    node_position: Node position\
+      \ (grid indices)\n\nReturns:\n    Node depth (Δω/ω)"
+    file: cmb/nodes/theta_node_map.py
+    line: 216
+    name: calculate_node_depth
+  cmb/nodes/theta_node_map.py:classify_nodes:
+    args:
+    - self
+    - node_positions
+    docstring: "Classify nodes by depth, area, and local curvature.\n\nArgs:\n   \
+      \ node_positions: Array of node positions\n\nReturns:\n    List of NodeClassification\
+      \ instances\n\nRaises:\n    ValueError: If classification fails"
+    file: cmb/nodes/theta_node_map.py
+    line: 160
+    name: classify_nodes
+  cmb/nodes/theta_node_map.py:create_node_mask:
+    args:
+    - self
+    - node_positions
+    docstring: "Create binary mask of node locations.\n\nArgs:\n    node_positions:\
+      \ Array of node positions\n\nReturns:\n    Binary mask (1 at nodes, 0 elsewhere)"
+    file: cmb/nodes/theta_node_map.py
+    line: 581
+    name: create_node_mask
+  cmb/nodes/theta_node_map.py:create_omega_min_map:
+    args:
+    - self
+    - node_positions
+    docstring: "Create map of ω_min(x) values.\n\nArgs:\n    node_positions: Array\
+      \ of node positions\n\nReturns:\n    Map of ω_min(x) values at each grid point"
+    file: cmb/nodes/theta_node_map.py
+    line: 463
+    name: create_omega_min_map
+  cmb/nodes/theta_node_map.py:find_nodes:
+    args:
+    - self
+    - neighborhood_size
+    docstring: "Find nodes as points of local minima.\n\nNode definition: x_node =\
+      \ {x : ω(x) = ω_min(x)}\n\nUses local minimum detection to find points where\n\
+      ω(x) = ω_min(x) locally.\n\nArgs:\n    neighborhood_size: Size of neighborhood\
+      \ for local minimum detection\n\nReturns:\n    Array of node positions (indices\
+      \ or coordinates)\n\nRaises:\n    ValueError: If node detection fails"
+    file: cmb/nodes/theta_node_map.py
+    line: 103
+    name: find_nodes
+  cmb/nodes/theta_node_map.py:generate_node_map:
+    args:
+    - self
+    - neighborhood_size
+    docstring: "Generate complete Θ-node map.\n\nFinds nodes, classifies them, and\
+      \ creates maps.\n\nArgs:\n    neighborhood_size: Size of neighborhood for local\
+      \ minimum detection\n\nReturns:\n    ThetaNodeMap instance with:\n    - ω_min(x)\
+      \ map\n    - Node mask\n    - Node classifications\n\nRaises:\n    ValueError:\
+      \ If map generation fails"
+    file: cmb/nodes/theta_node_map.py
+    line: 408
+    name: generate_node_map
+  cmb/nodes/theta_node_map.py:validate_node_map:
+    args:
+    - self
+    - node_map
+    docstring: "Validate generated node map.\n\nArgs:\n    node_map: ThetaNodeMap\
+      \ to validate\n\nReturns:\n    True if map is valid\n\nRaises:\n    ValueError:\
+      \ If map is invalid"
+    file: cmb/nodes/theta_node_map.py
+    line: 637
+    name: validate_node_map
   cmb/theta_data_loader.py:load_evolution_data:
     args:
     - data_path
@@ -1921,7 +2071,7 @@ functions:
       \   use_cuda: Use CUDA acceleration for large arrays\n\nReturns:\n    Derivative\
       \ array"
     file: cmb/theta_evolution_processor.py
-    line: 236
+    line: 233
     name: _calculate_derivative_central
   cmb/theta_evolution_processor.py:_calculate_derivative_central_cuda:
     args:
@@ -1933,7 +2083,7 @@ functions:
       \ Time array (must be sorted)\n    values: Value array\n\nReturns:\n    Derivative\
       \ array"
     file: cmb/theta_evolution_processor.py
-    line: 281
+    line: 278
     name: _calculate_derivative_central_cuda
   cmb/theta_evolution_processor.py:_check_time_coverage_gaps:
     args:
@@ -1946,7 +2096,7 @@ functions:
       \    max_gap_ratio: Maximum allowed gap ratio (gap / median_interval)\n\nReturns:\n\
       \    List of (gap_start, gap_end) tuples for gaps exceeding threshold"
     file: cmb/theta_evolution_processor.py
-    line: 430
+    line: 415
     name: _check_time_coverage_gaps
   cmb/theta_evolution_processor.py:_compute_statistics:
     args:
@@ -1960,7 +2110,7 @@ functions:
       \  omega_min: ω_min values\n    omega_macro: ω_macro values\n    domega_min_dt:\
       \ Evolution rates for ω_min\n    domega_macro_dt: Evolution rates for ω_macro"
     file: cmb/theta_evolution_processor.py
-    line: 524
+    line: 508
     name: _compute_statistics
   cmb/theta_evolution_processor.py:_to_float:
     args:
@@ -1979,7 +2129,7 @@ functions:
       \ allowed gap ratio.\n                  If None, uses default (5.0)\n\nReturns:\n\
       \    List of (gap_start, gap_end) tuples for gaps exceeding threshold"
     file: cmb/theta_evolution_processor.py
-    line: 870
+    line: 819
     name: check_time_coverage_gaps
   cmb/theta_evolution_processor.py:generate_quality_report:
     args:
@@ -1989,7 +2139,7 @@ functions:
       - Data quality issues\n\nReturns:\n    Dictionary with quality issues, warnings,\
       \ and statistics"
     file: cmb/theta_evolution_processor.py
-    line: 1113
+    line: 1050
     name: generate_quality_report
   cmb/theta_evolution_processor.py:get_evolution_rate_macro:
     args:
@@ -1999,7 +2149,7 @@ functions:
       \   time: Time value\n\nReturns:\n    Evolution rate\n\nRaises:\n    ValueError:\
       \ If time is out of range or processor\n        not initialized"
     file: cmb/theta_evolution_processor.py
-    line: 778
+    line: 732
     name: get_evolution_rate_macro
   cmb/theta_evolution_processor.py:get_evolution_rate_min:
     args:
@@ -2009,7 +2159,7 @@ functions:
       \ time: Time value\n\nReturns:\n    Evolution rate\n\nRaises:\n    ValueError:\
       \ If time is out of range or processor\n        not initialized"
     file: cmb/theta_evolution_processor.py
-    line: 754
+    line: 710
     name: get_evolution_rate_min
   cmb/theta_evolution_processor.py:get_evolution_statistics:
     args:
@@ -2017,7 +2167,7 @@ functions:
     docstring: "Get evolution statistics.\n\nReturns:\n    Dictionary with statistics\
       \ about evolution data\n\nRaises:\n    ValueError: If processor not initialized"
     file: cmb/theta_evolution_processor.py
-    line: 854
+    line: 805
     name: get_evolution_statistics
   cmb/theta_evolution_processor.py:get_omega_macro:
     args:
@@ -2027,7 +2177,7 @@ functions:
       Returns:\n    ω_macro(t) value\n\nRaises:\n    ValueError: If time is out of\
       \ range or processor\n        not initialized"
     file: cmb/theta_evolution_processor.py
-    line: 730
+    line: 688
     name: get_omega_macro
   cmb/theta_evolution_processor.py:get_omega_min:
     args:
@@ -2037,7 +2187,7 @@ functions:
       Returns:\n    ω_min(t) value\n\nRaises:\n    ValueError: If time is out of range\
       \ or processor\n        not initialized"
     file: cmb/theta_evolution_processor.py
-    line: 706
+    line: 666
     name: get_omega_min
   cmb/theta_evolution_processor.py:process:
     args:
@@ -2058,7 +2208,7 @@ functions:
       Returns:\n    ThetaEvolutionProcessor instance with processed data\n\nRaises:\n\
       \    ValueError: If processing fails"
     file: cmb/theta_evolution_processor.py
-    line: 1216
+    line: 1149
     name: process_evolution_data
   cmb/theta_evolution_processor.py:validate_against_config:
     args:
@@ -2068,7 +2218,7 @@ functions:
       \ data meets configuration requirements\n\nRaises:\n    ValueError: If data\
       \ does not meet requirements"
     file: cmb/theta_evolution_processor.py
-    line: 822
+    line: 773
     name: validate_against_config
   cmb/theta_evolution_processor.py:validate_time_range:
     args:
@@ -2078,7 +2228,7 @@ functions:
       \ value to validate\n\nReturns:\n    True if time is within range\n\nRaises:\n\
       \    ValueError: If time is out of range"
     file: cmb/theta_evolution_processor.py
-    line: 802
+    line: 754
     name: validate_time_range
   cmb/theta_evolution_processor.py:verify_time_array_completeness:
     args:
@@ -2092,7 +2242,7 @@ functions:
       \    - missing_points: List[float] - List of expected but missing times\n  \
       \  - coverage_ratio: float - Ratio of actual to expected points"
     file: cmb/theta_evolution_processor.py
-    line: 895
+    line: 842
     name: verify_time_array_completeness
   cmb/theta_node_loader.py:load_node_depths:
     args:
@@ -6453,7 +6603,7 @@ functions:
       \ if available\n    block_size: Block size (None = auto)\n    whole_array: Use\
       \ whole array mode (default: False)"
     file: utils/cuda/grid_vectorizer.py
-    line: 49
+    line: 50
     name: __init__
   utils/cuda/grid_vectorizer.py:_curvature:
     args:
@@ -6462,7 +6612,7 @@ functions:
     docstring: "Calculate curvature of grid.\n\nArgs:\n    grid: Input grid\n\nReturns:\n\
       \    Curvature array"
     file: utils/cuda/grid_vectorizer.py
-    line: 258
+    line: 305
     name: _curvature
   utils/cuda/grid_vectorizer.py:_gradient:
     args:
@@ -6471,7 +6621,7 @@ functions:
     docstring: "Calculate gradient of grid.\n\nArgs:\n    grid: Input grid\n\nReturns:\n\
       \    Gradient array (first component for 1D, tuple converted to array)"
     file: utils/cuda/grid_vectorizer.py
-    line: 203
+    line: 214
     name: _gradient
   utils/cuda/grid_vectorizer.py:_laplacian:
     args:
@@ -6480,7 +6630,7 @@ functions:
     docstring: "Calculate Laplacian of grid.\n\nArgs:\n    grid: Input grid\n\nReturns:\n\
       \    Laplacian array"
     file: utils/cuda/grid_vectorizer.py
-    line: 230
+    line: 241
     name: _laplacian
   utils/cuda/grid_vectorizer.py:_local_maxima:
     args:
@@ -6491,7 +6641,7 @@ functions:
       \ Size of neighborhood (default: 3)\n\nReturns:\n    Boolean array indicating\
       \ local maxima"
     file: utils/cuda/grid_vectorizer.py
-    line: 176
+    line: 185
     name: _local_maxima
   utils/cuda/grid_vectorizer.py:_local_minima:
     args:
@@ -6502,8 +6652,22 @@ functions:
       \ Size of neighborhood (default: 3)\n\nReturns:\n    Boolean array indicating\
       \ local minima"
     file: utils/cuda/grid_vectorizer.py
-    line: 149
+    line: 156
     name: _local_minima
+  utils/cuda/grid_vectorizer.py:_minimum_filter:
+    args:
+    - self
+    - grid
+    - size
+    - mode
+    - cval
+    docstring: "Apply minimum filter to grid.\n\nArgs:\n    grid: Input grid\n   \
+      \ size: Size of filter neighborhood (default: 5)\n    mode: Boundary mode (default:\
+      \ \"constant\")\n    cval: Constant value for boundary (default: inf)\n\nReturns:\n\
+      \    Filtered array with minimum values"
+    file: utils/cuda/grid_vectorizer.py
+    line: 273
+    name: _minimum_filter
   utils/cuda/grid_vectorizer.py:_process_block:
     args:
     - self
@@ -6512,7 +6676,7 @@ functions:
       \ data\n    *args: Additional arguments\n    **kwargs: Additional keyword arguments\n\
       \nReturns:\n    Processed block"
     file: utils/cuda/grid_vectorizer.py
-    line: 96
+    line: 98
     name: _process_block
   utils/cuda/grid_vectorizer.py:_process_whole_array:
     args:
@@ -6522,7 +6686,7 @@ functions:
       \ array data\n    *args: Additional arguments\n    **kwargs: Additional keyword\
       \ arguments\n\nReturns:\n    Processed array"
     file: utils/cuda/grid_vectorizer.py
-    line: 132
+    line: 139
     name: _process_whole_array
   utils/cuda/grid_vectorizer.py:vectorize_grid_operation:
     args:
@@ -6530,12 +6694,12 @@ functions:
     - array
     - operation
     docstring: "Apply grid-based operation.\n\nArgs:\n    array: Input grid array\n\
-      \    operation: Operation name (\"local_minima\", \"gradient\", \"curvature\"\
-      , etc.)\n    *args: Operation-specific arguments\n    **kwargs: Operation-specific\
-      \ keyword arguments\n\nReturns:\n    Result CudaArray\n\nRaises:\n    ValueError:\
-      \ If operation not supported"
+      \    operation: Operation name\n        (\"local_minima\", \"minimum_filter\"\
+      , \"gradient\", \"curvature\", etc.)\n    *args: Operation-specific arguments\n\
+      \    **kwargs: Operation-specific keyword arguments\n\nReturns:\n    Result\
+      \ CudaArray\n\nRaises:\n    ValueError: If operation not supported"
     file: utils/cuda/grid_vectorizer.py
-    line: 67
+    line: 68
     name: vectorize_grid_operation
   utils/cuda/memory_safety.py:__init__:
     args:
@@ -7389,6 +7553,83 @@ functions:
     line: 218
     name: plot_subpeaks
 imports:
+  cmb/nodes/__init__.py:NodeClassification:
+    file: cmb/nodes/__init__.py
+    line: 10
+    module: cmb.nodes.theta_node_map
+    name: NodeClassification
+    type: import_from
+  cmb/nodes/__init__.py:ThetaNodeMap:
+    file: cmb/nodes/__init__.py
+    line: 10
+    module: cmb.nodes.theta_node_map
+    name: ThetaNodeMap
+    type: import_from
+  cmb/nodes/__init__.py:ThetaNodeMapGenerator:
+    file: cmb/nodes/__init__.py
+    line: 10
+    module: cmb.nodes.theta_node_map
+    name: ThetaNodeMapGenerator
+    type: import_from
+  cmb/nodes/theta_node_map.py:Config:
+    file: cmb/nodes/theta_node_map.py
+    line: 24
+    module: config.settings
+    name: Config
+    type: import_from
+  cmb/nodes/theta_node_map.py:CudaArray:
+    file: cmb/nodes/theta_node_map.py
+    line: 18
+    module: utils.cuda
+    name: CudaArray
+    type: import_from
+  cmb/nodes/theta_node_map.py:ElementWiseVectorizer:
+    file: cmb/nodes/theta_node_map.py
+    line: 18
+    module: utils.cuda
+    name: ElementWiseVectorizer
+    type: import_from
+  cmb/nodes/theta_node_map.py:GridVectorizer:
+    file: cmb/nodes/theta_node_map.py
+    line: 18
+    module: utils.cuda
+    name: GridVectorizer
+    type: import_from
+  cmb/nodes/theta_node_map.py:List:
+    file: cmb/nodes/theta_node_map.py
+    line: 14
+    module: typing
+    name: List
+    type: import_from
+  cmb/nodes/theta_node_map.py:Optional:
+    file: cmb/nodes/theta_node_map.py
+    line: 14
+    module: typing
+    name: Optional
+    type: import_from
+  cmb/nodes/theta_node_map.py:ReductionVectorizer:
+    file: cmb/nodes/theta_node_map.py
+    line: 18
+    module: utils.cuda
+    name: ReductionVectorizer
+    type: import_from
+  cmb/nodes/theta_node_map.py:Tuple:
+    file: cmb/nodes/theta_node_map.py
+    line: 14
+    module: typing
+    name: Tuple
+    type: import_from
+  cmb/nodes/theta_node_map.py:dataclass:
+    file: cmb/nodes/theta_node_map.py
+    line: 16
+    module: dataclasses
+    name: dataclass
+    type: import_from
+  cmb/nodes/theta_node_map.py:numpy:
+    file: cmb/nodes/theta_node_map.py
+    line: 15
+    name: numpy
+    type: import
   cmb/theta_data_loader.py:Config:
     file: cmb/theta_data_loader.py
     line: 16
@@ -10442,13 +10683,13 @@ imports:
     type: import_from
   utils/cuda/grid_vectorizer.py:maximum_filter:
     file: utils/cuda/grid_vectorizer.py
-    line: 197
+    line: 208
     module: scipy.ndimage
     name: maximum_filter
     type: import_from
   utils/cuda/grid_vectorizer.py:minimum_filter:
     file: utils/cuda/grid_vectorizer.py
-    line: 170
+    line: 300
     module: scipy.ndimage
     name: minimum_filter
     type: import_from

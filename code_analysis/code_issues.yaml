@@ -6,14 +6,18 @@ issues:
     file: cmb/theta_node_loader.py
     limit: 400
     lines: 466
-  - exceeds_limit: 835
+  - exceeds_limit: 768
     file: cmb/theta_evolution_processor.py
     limit: 400
-    lines: 1235
+    lines: 1168
   - exceeds_limit: 175
     file: cmb/theta_data_loader.py
     limit: 400
     lines: 575
+  - exceeds_limit: 292
+    file: cmb/nodes/theta_node_map.py
+    limit: 400
+    lines: 692
   - exceeds_limit: 89
     file: utils/cuda/memory_watchdog.py
     limit: 400
@@ -300,7 +304,7 @@ issues:
 summary:
   any_type_usage: 0
   classes_without_docstrings: 0
-  files_too_large: 9
+  files_too_large: 10
   files_without_docstrings: 0
   generic_exception_usage: 0
   imports_in_middle: 0
@@ -309,4 +313,4 @@ summary:
   methods_with_pass: 0
   methods_without_docstrings: 5
   not_implemented_in_non_abstract: 1
-  total_issues: 55
+  total_issues: 56

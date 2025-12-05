@@ -40,6 +40,7 @@ class GridVectorizer(BaseVectorizer):
 
     Supports:
     - Local minimum/maximum detection
+    - Minimum/maximum filters
     - Gradient calculations
     - Laplacian calculations
     - Curvature calculations
@@ -76,7 +77,9 @@ class GridVectorizer(BaseVectorizer):
 
         Args:
             array: Input grid array
-            operation: Operation name ("local_minima", "gradient", "curvature", etc.)
+            operation: Operation name
+                ("local_minima", "minimum_filter", "gradient",
+                 "curvature", etc.)
             *args: Operation-specific arguments
             **kwargs: Operation-specific keyword arguments
 
@@ -120,6 +123,11 @@ class GridVectorizer(BaseVectorizer):
         elif operation == "local_maxima":
             neighborhood_size = kwargs.get("neighborhood_size", 3)
             return self._local_maxima(block, neighborhood_size)
+        elif operation == "minimum_filter":
+            size = kwargs.get("size", 5)
+            mode = kwargs.get("mode", "constant")
+            cval = kwargs.get("cval", np.inf)
+            return self._minimum_filter(block, size=size, mode=mode, cval=cval)
         elif operation == "gradient":
             return self._gradient(block)
         elif operation == "laplacian":
@@ -146,7 +154,9 @@ class GridVectorizer(BaseVectorizer):
         # For grid operations, whole array is same as block processing
         return self._process_block(array, *args, **kwargs)
 
-    def _local_minima(self, grid: np.ndarray, neighborhood_size: int = 3) -> np.ndarray:
+    def _local_minima(
+        self, grid: np.ndarray, neighborhood_size: int = 3
+    ) -> np.ndarray:
         """
         Find local minima in grid.
 
@@ -173,7 +183,9 @@ class GridVectorizer(BaseVectorizer):
             is_minimum = grid == neighborhood_min
             return is_minimum
 
-    def _local_maxima(self, grid: np.ndarray, neighborhood_size: int = 3) -> np.ndarray:
+    def _local_maxima(
+        self, grid: np.ndarray, neighborhood_size: int = 3
+    ) -> np.ndarray:
         """
         Find local maxima in grid.
 
@@ -248,12 +260,48 @@ class GridVectorizer(BaseVectorizer):
             laplacian = np.zeros_like(grid)
             # Second derivative in first dimension
             if grid.shape[0] > 2:
-                laplacian[1:-1, :] += grid[2:, :] - 2 * grid[1:-1, :] + grid[:-2, :]
+                laplacian[1:-1, :] += (
+                    grid[2:, :] - 2 * grid[1:-1, :] + grid[:-2, :]
+                )
             # Second derivative in second dimension
             if grid.shape[1] > 2:
-                laplacian[:, 1:-1] += grid[:, 2:] - 2 * grid[:, 1:-1] + grid[:, :-2]
+                laplacian[:, 1:-1] += (
+                    grid[:, 2:] - 2 * grid[:, 1:-1] + grid[:, :-2]
+                )
 
         return laplacian
+
+    def _minimum_filter(
+        self,
+        grid: np.ndarray,
+        size: int = 5,
+        mode: str = "constant",
+        cval: float = np.inf,
+    ) -> np.ndarray:
+        """
+        Apply minimum filter to grid.
+
+        Args:
+            grid: Input grid
+            size: Size of filter neighborhood (default: 5)
+            mode: Boundary mode (default: "constant")
+            cval: Constant value for boundary (default: inf)
+
+        Returns:
+            Filtered array with minimum values
+        """
+        if self.use_gpu and CUPY_AVAILABLE and minimum_filter is not None:
+            if not isinstance(grid, cp.ndarray):
+                grid = cp.asarray(grid)
+            # Apply minimum filter
+            filtered = minimum_filter(grid, size=size, mode=mode, cval=cval)
+            return filtered
+        else:
+            # CPU implementation using scipy
+            from scipy.ndimage import minimum_filter as scipy_min_filter
+
+            filtered = scipy_min_filter(grid, size=size, mode=mode, cval=cval)
+            return filtered
 
     def _curvature(self, grid: np.ndarray) -> np.ndarray:
         """

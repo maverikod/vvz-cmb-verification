@@ -151,6 +151,7 @@ GridVectorizer:
 - _local_maxima
 - _gradient
 - _laplacian
+- _minimum_filter
 - _curvature
 HighlPeakPredictor:
 - __init__
@@ -650,6 +651,16 @@ ThetaFrequencySpectrum: []
 ThetaNodeData: []
 ThetaNodeMap: []
 ThetaNodeMapGenerator:
+- __init__
+- find_nodes
+- classify_nodes
+- calculate_node_depth
+- calculate_node_area
+- calculate_local_curvature
+- generate_node_map
+- create_omega_min_map
+- create_node_mask
+- validate_node_map
 - __init__
 - find_nodes
 - classify_nodes

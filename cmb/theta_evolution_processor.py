@@ -157,9 +157,7 @@ class ThetaEvolutionProcessor:
         # Check for gaps in time coverage
         gaps = self._check_time_coverage_gaps(times_sorted)
         if gaps:
-            self._quality_issues.append(
-                f"Found {len(gaps)} gap(s) in time coverage"
-            )
+            self._quality_issues.append(f"Found {len(gaps)} gap(s) in time coverage")
 
         # Create interpolation functions for values
         # Use cubic interpolation for smooth derivatives if enough points
@@ -171,8 +169,7 @@ class ThetaEvolutionProcessor:
             interp_kind = "linear"
         else:
             raise ValueError(
-                f"Need at least 2 data points for interpolation, "
-                f"got {n_points}"
+                f"Need at least 2 data points for interpolation, " f"got {n_points}"
             )
 
         self._omega_min_interp = interp1d(
@@ -316,9 +313,7 @@ class ThetaEvolutionProcessor:
 
             values_forward = CudaArray(values_np[2:], device="cpu")
             values_backward = CudaArray(values_np[:-2], device="cpu")
-            dv_central_cuda = elem_vec.subtract(
-                values_forward, values_backward
-            )
+            dv_central_cuda = elem_vec.subtract(values_forward, values_backward)
 
             # derivatives[1:-1] = dv_central / dt_central
             # Check for zero division using CudaArray operations
@@ -330,12 +325,8 @@ class ThetaEvolutionProcessor:
                 dv_valid_cuda = CudaArray(
                     dv_central_cuda.to_numpy()[valid_mask], device="cpu"
                 )
-                dt_valid_cuda = CudaArray(
-                    dt_central_np[valid_mask], device="cpu"
-                )
-                derivatives_cuda = elem_vec.divide(
-                    dv_valid_cuda, dt_valid_cuda
-                )
+                dt_valid_cuda = CudaArray(dt_central_np[valid_mask], device="cpu")
+                derivatives_cuda = elem_vec.divide(dv_valid_cuda, dt_valid_cuda)
                 derivatives[1:-1][valid_mask] = derivatives_cuda.to_numpy()
 
             # Cleanup GPU memory
@@ -384,19 +375,13 @@ class ThetaEvolutionProcessor:
                 dv0_diff_cuda.swap_to_cpu()
 
         # Last point: backward difference
-        dt_last_cuda = CudaArray(
-            times_np[n - 1:n], device="cpu"
-        )
-        dt_last_base_cuda = CudaArray(
-            times_np[n - 2:n - 1], device="cpu"
-        )
+        dt_last_cuda = CudaArray(times_np[n - 1:n], device="cpu")
+        dt_last_base_cuda = CudaArray(times_np[n - 2:n - 1], device="cpu")
         dt_last_diff_cuda = elem_vec.subtract(dt_last_cuda, dt_last_base_cuda)
         dt_last = dt_last_diff_cuda.to_numpy()[0]
 
         if dt_last > 0:
-            dv_last_cuda = CudaArray(
-                values_np[n - 1:n], device="cpu"
-            )
+            dv_last_cuda = CudaArray(values_np[n - 1:n], device="cpu")
             dv_last_base_cuda = CudaArray(
                 values_np[n - 2:n - 1], device="cpu"
             )
@@ -511,11 +496,10 @@ class ThetaEvolutionProcessor:
             gap_starts_np = times_np[gap_start_indices]
             gap_ends_np = times_np[gap_end_indices]
 
-            # Convert to list of tuples
-            gaps = [
-                (float(gap_starts_np[i]), float(gap_ends_np[i]))
-                for i in range(len(gap_indices))
-            ]
+            # Convert to list of tuples using vectorized zip
+            # Use numpy column_stack for vectorized tuple creation
+            gap_pairs = np.column_stack([gap_starts_np, gap_ends_np])
+            gaps = [(float(pair[0]), float(pair[1])) for pair in gap_pairs]
         else:
             gaps = []
 
@@ -551,46 +535,24 @@ class ThetaEvolutionProcessor:
         times_cuda = CudaArray(times, device="cpu")
 
         # Compute omega_min statistics
-        omega_min_mean = reduction_vec.vectorize_reduction(
-            omega_min_cuda, "mean"
-        )
-        omega_min_std = reduction_vec.vectorize_reduction(
-            omega_min_cuda, "std"
-        )
-        omega_min_min = reduction_vec.vectorize_reduction(
-            omega_min_cuda, "min"
-        )
-        omega_min_max = reduction_vec.vectorize_reduction(
-            omega_min_cuda, "max"
-        )
+        omega_min_mean = reduction_vec.vectorize_reduction(omega_min_cuda, "mean")
+        omega_min_std = reduction_vec.vectorize_reduction(omega_min_cuda, "std")
+        omega_min_min = reduction_vec.vectorize_reduction(omega_min_cuda, "min")
+        omega_min_max = reduction_vec.vectorize_reduction(omega_min_cuda, "max")
 
         # Compute omega_macro statistics
-        omega_macro_mean = reduction_vec.vectorize_reduction(
-            omega_macro_cuda, "mean"
-        )
-        omega_macro_std = reduction_vec.vectorize_reduction(
-            omega_macro_cuda, "std"
-        )
-        omega_macro_min = reduction_vec.vectorize_reduction(
-            omega_macro_cuda, "min"
-        )
-        omega_macro_max = reduction_vec.vectorize_reduction(
-            omega_macro_cuda, "max"
-        )
+        omega_macro_mean = reduction_vec.vectorize_reduction(omega_macro_cuda, "mean")
+        omega_macro_std = reduction_vec.vectorize_reduction(omega_macro_cuda, "std")
+        omega_macro_min = reduction_vec.vectorize_reduction(omega_macro_cuda, "min")
+        omega_macro_max = reduction_vec.vectorize_reduction(omega_macro_cuda, "max")
 
         # Compute evolution rate statistics
         domega_min_dt_mean = reduction_vec.vectorize_reduction(
             domega_min_dt_cuda, "mean"
         )
-        domega_min_dt_std = reduction_vec.vectorize_reduction(
-            domega_min_dt_cuda, "std"
-        )
-        domega_min_dt_min = reduction_vec.vectorize_reduction(
-            domega_min_dt_cuda, "min"
-        )
-        domega_min_dt_max = reduction_vec.vectorize_reduction(
-            domega_min_dt_cuda, "max"
-        )
+        domega_min_dt_std = reduction_vec.vectorize_reduction(domega_min_dt_cuda, "std")
+        domega_min_dt_min = reduction_vec.vectorize_reduction(domega_min_dt_cuda, "min")
+        domega_min_dt_max = reduction_vec.vectorize_reduction(domega_min_dt_cuda, "max")
 
         domega_macro_dt_mean = reduction_vec.vectorize_reduction(
             domega_macro_dt_cuda, "mean"
@@ -616,9 +578,7 @@ class ThetaEvolutionProcessor:
             times_forward = CudaArray(times_np[1:], device="cpu")
             times_backward = CudaArray(times_np[:-1], device="cpu")
             times_diff_cuda = elem_vec.subtract(times_forward, times_backward)
-            mean_interval = reduction_vec.vectorize_reduction(
-                times_diff_cuda, "mean"
-            )
+            mean_interval = reduction_vec.vectorize_reduction(times_diff_cuda, "mean")
 
             # Cleanup intermediate arrays
             if times_forward.device == "cuda":
@@ -718,9 +678,7 @@ class ThetaEvolutionProcessor:
                 not initialized
         """
         if self._omega_min_interp is None:
-            raise ValueError(
-                "Processor not initialized. Call process() first."
-            )
+            raise ValueError("Processor not initialized. Call process() first.")
 
         self.validate_time_range(time)
 
@@ -742,9 +700,7 @@ class ThetaEvolutionProcessor:
                 not initialized
         """
         if self._omega_macro_interp is None:
-            raise ValueError(
-                "Processor not initialized. Call process() first."
-            )
+            raise ValueError("Processor not initialized. Call process() first.")
 
         self.validate_time_range(time)
 
@@ -766,9 +722,7 @@ class ThetaEvolutionProcessor:
                 not initialized
         """
         if self._omega_min_rate_interp is None:
-            raise ValueError(
-                "Processor not initialized. Call process() first."
-            )
+            raise ValueError("Processor not initialized. Call process() first.")
 
         self.validate_time_range(time)
 
@@ -790,9 +744,7 @@ class ThetaEvolutionProcessor:
                 not initialized
         """
         if self._omega_macro_rate_interp is None:
-            raise ValueError(
-                "Processor not initialized. Call process() first."
-            )
+            raise ValueError("Processor not initialized. Call process() first.")
 
         self.validate_time_range(time)
 
@@ -814,8 +766,7 @@ class ThetaEvolutionProcessor:
         """
         if time < self._time_min or time > self._time_max:
             raise ValueError(
-                f"Time {time} is out of range "
-                f"[{self._time_min}, {self._time_max}]"
+                f"Time {time} is out of range " f"[{self._time_min}, {self._time_max}]"
             )
         return True
 
@@ -862,9 +813,7 @@ class ThetaEvolutionProcessor:
             ValueError: If processor not initialized
         """
         if self._statistics is None:
-            raise ValueError(
-                "Processor not initialized. Call process() first."
-            )
+            raise ValueError("Processor not initialized. Call process() first.")
         return self._statistics.copy()
 
     def check_time_coverage_gaps(
@@ -881,9 +830,7 @@ class ThetaEvolutionProcessor:
             List of (gap_start, gap_end) tuples for gaps exceeding threshold
         """
         if self._omega_min_interp is None:
-            raise ValueError(
-                "Processor not initialized. Call process() first."
-            )
+            raise ValueError("Processor not initialized. Call process() first.")
 
         if max_gap_ratio is None:
             max_gap_ratio = 5.0
@@ -912,9 +859,7 @@ class ThetaEvolutionProcessor:
             - coverage_ratio: float - Ratio of actual to expected points
         """
         if self._omega_min_interp is None:
-            raise ValueError(
-                "Processor not initialized. Call process() first."
-            )
+            raise ValueError("Processor not initialized. Call process() first.")
 
         times = np.sort(self.evolution.times)
         n_points = len(times)
@@ -938,9 +883,7 @@ class ThetaEvolutionProcessor:
             if len(times_np) >= 2:
                 times_forward = CudaArray(times_np[1:], device="cpu")
                 times_backward = CudaArray(times_np[:-1], device="cpu")
-                intervals_cuda = elem_vec.subtract(
-                    times_forward, times_backward
-                )
+                intervals_cuda = elem_vec.subtract(times_forward, times_backward)
                 intervals_np = intervals_cuda.to_numpy()
                 # Median requires sorting, so use numpy for median
                 # but use CUDA for other operations
@@ -974,9 +917,7 @@ class ThetaEvolutionProcessor:
             times_backward_np = times_np[:-1]
             times_forward_cuda = CudaArray(times_forward_np, device="cpu")
             times_backward_cuda = CudaArray(times_backward_np, device="cpu")
-            intervals_cuda = elem_vec.subtract(
-                times_forward_cuda, times_backward_cuda
-            )
+            intervals_cuda = elem_vec.subtract(times_forward_cuda, times_backward_cuda)
 
             # Calculate threshold: expected_interval * 1.5
             threshold = expected_interval * 1.5
@@ -1035,9 +976,7 @@ class ThetaEvolutionProcessor:
                         # Convert to list of floats using numpy tolist()
                         # instead of list comprehension
                         expected_times_np = expected_times_cuda.to_numpy()
-                        missing_points.extend(
-                            [float(x) for x in expected_times_np]
-                        )
+                        missing_points.extend([float(x) for x in expected_times_np])
                         # Cleanup
                         if j_cuda.device == "cuda":
                             j_cuda.swap_to_cpu()
@@ -1071,9 +1010,7 @@ class ThetaEvolutionProcessor:
                         # Convert to list of floats using numpy tolist()
                         # instead of list comprehension
                         expected_times_np = expected_times_cuda.to_numpy()
-                        missing_points.extend(
-                            [float(x) for x in expected_times_np]
-                        )
+                        missing_points.extend([float(x) for x in expected_times_np])
                         # Cleanup
                         if j_cuda.device == "cuda":
                             j_cuda.swap_to_cpu()
@@ -1145,9 +1082,7 @@ class ThetaEvolutionProcessor:
         gaps = self.check_time_coverage_gaps()
         report["gaps"] = gaps
         if gaps:
-            report["warnings"].append(
-                f"Found {len(gaps)} gap(s) in time coverage"
-            )
+            report["warnings"].append(f"Found {len(gaps)} gap(s) in time coverage")
 
         # Check time coverage completeness
         completeness = self.verify_time_array_completeness()
@@ -1176,9 +1111,7 @@ class ThetaEvolutionProcessor:
         omega_min_ge_macro = elem_vec.vectorize_operation(
             omega_min_cuda, "greater_equal", omega_macro_cuda.to_numpy()
         )
-        violations_result = reduction_vec.vectorize_reduction(
-            omega_min_ge_macro, "sum"
-        )
+        violations_result = reduction_vec.vectorize_reduction(omega_min_ge_macro, "sum")
         violations = int(_to_float(violations_result))
 
         # Cleanup GPU memory

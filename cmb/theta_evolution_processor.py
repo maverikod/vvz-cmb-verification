@@ -14,19 +14,26 @@ from scipy.interpolate import interp1d
 from cmb.theta_data_loader import ThetaEvolution, validate_evolution_data
 from config.settings import Config
 
-# Try to import CUDA utilities for large array processing
-try:
-    from utils.cuda.array_model import CudaArray
-    from utils.cuda.elementwise_vectorizer import ElementWiseVectorizer
+# Import CUDA utilities for acceleration
+from utils.cuda import CudaArray, ElementWiseVectorizer, ReductionVectorizer
 
-    CUDA_AVAILABLE = True
-except ImportError:
-    CUDA_AVAILABLE = False
-    CudaArray = None  # type: ignore
-    ElementWiseVectorizer = None  # type: ignore
 
-# Threshold for using CUDA acceleration (array size)
-CUDA_THRESHOLD = 100000  # 100K elements
+def _to_float(value: Any) -> float:
+    """
+    Convert reduction result to float.
+
+    Args:
+        value: Result from vectorize_reduction (Union[CudaArray, float, int])
+
+    Returns:
+        Float value
+    """
+    if isinstance(value, (int, float)):
+        return float(value)
+    # If it's CudaArray, convert to numpy first
+    if isinstance(value, CudaArray):
+        return float(value.to_numpy().item())
+    return float(value)
 
 
 class ThetaEvolutionProcessor:
@@ -75,9 +82,15 @@ class ThetaEvolutionProcessor:
         self._omega_min_rate_interp: Optional[Callable] = None
         self._omega_macro_rate_interp: Optional[Callable] = None
 
-        # Store time range
-        self._time_min = float(np.min(evolution.times))
-        self._time_max = float(np.max(evolution.times))
+        # Store time range using CUDA-accelerated reduction
+        times_cuda = CudaArray(evolution.times, device="cpu")
+        reduction_vec = ReductionVectorizer(use_gpu=True)
+        time_min_result = reduction_vec.vectorize_reduction(times_cuda, "min")
+        time_max_result = reduction_vec.vectorize_reduction(times_cuda, "max")
+        self._time_min = _to_float(time_min_result)
+        self._time_max = _to_float(time_max_result)
+        if times_cuda.device == "cuda":
+            times_cuda.swap_to_cpu()
 
         # Statistics (computed during process())
         self._statistics: Optional[Dict[str, Any]] = None
@@ -96,8 +109,23 @@ class ThetaEvolutionProcessor:
         Raises:
             ValueError: If processing fails
         """
-        # Check that times are sorted (required for interpolation)
-        if not np.all(np.diff(self.evolution.times) >= 0):
+        # Check that times are sorted (required for interpolation) using CUDA
+        times_diff = np.diff(self.evolution.times)
+        times_diff_cuda = CudaArray(times_diff, device="cpu")
+        elem_vec = ElementWiseVectorizer(use_gpu=True)
+        reduction_vec = ReductionVectorizer(use_gpu=True)
+
+        # Check if all differences >= 0
+        diff_ge_zero = elem_vec.vectorize_operation(
+            times_diff_cuda, "greater_equal", 0.0
+        )
+        all_sorted = reduction_vec.vectorize_reduction(diff_ge_zero, "all")
+
+        # Cleanup GPU memory
+        if times_diff_cuda.device == "cuda":
+            times_diff_cuda.swap_to_cpu()
+
+        if not all_sorted:
             # Sort if not already sorted
             sort_indices = np.argsort(self.evolution.times)
             times_sorted = self.evolution.times[sort_indices]
@@ -111,9 +139,7 @@ class ThetaEvolutionProcessor:
         # Check for gaps in time coverage
         gaps = self._check_time_coverage_gaps(times_sorted)
         if gaps:
-            self._quality_issues.append(
-                f"Found {len(gaps)} gap(s) in time coverage"
-            )
+            self._quality_issues.append(f"Found {len(gaps)} gap(s) in time coverage")
 
         # Create interpolation functions for values
         # Use cubic interpolation for smooth derivatives if enough points
@@ -125,8 +151,7 @@ class ThetaEvolutionProcessor:
             interp_kind = "linear"
         else:
             raise ValueError(
-                f"Need at least 2 data points for interpolation, "
-                f"got {n_points}"
+                f"Need at least 2 data points for interpolation, " f"got {n_points}"
             )
 
         self._omega_min_interp = interp1d(
@@ -218,25 +243,14 @@ class ThetaEvolutionProcessor:
                 derivatives[1] = derivatives[0]  # Same for both
             return derivatives
 
-        # Use CUDA acceleration for large arrays
+        # Use numpy.gradient for vectorized calculation
+        # (numpy.gradient is already optimized and vectorized)
         # Note: numpy.gradient is already highly optimized and vectorized.
         # For very large arrays, we could use CUDA, but the overhead
         # of GPU transfer may not be worth it unless array is extremely large.
         # For now, use numpy.gradient which handles edge cases well.
-        if (
-            use_cuda
-            and CUDA_AVAILABLE
-            and n > CUDA_THRESHOLD
-            and CudaArray is not None
-        ):
-            # Use numpy.gradient for vectorized calculation
-            # (numpy.gradient is already optimized and vectorized)
-            derivatives = np.gradient(values, times, edge_order=2)
-            return derivatives
-
-        # Vectorized interior points: central differences
-        # Calculate time differences for interior points
-        dt_central = times[2:] - times[:-2]
+        derivatives = np.gradient(values, times, edge_order=2)
+        return derivatives
         # Create mask for valid (positive) time differences
         valid_mask = dt_central > 0
         # Vectorized calculation for interior points
@@ -308,41 +322,130 @@ class ThetaEvolutionProcessor:
             domega_min_dt: Evolution rates for ω_min
             domega_macro_dt: Evolution rates for ω_macro
         """
+        # Compute statistics using CUDA-accelerated reductions
+        reduction_vec = ReductionVectorizer(use_gpu=True)
+
+        # Convert arrays to CudaArray for CUDA processing
+        omega_min_cuda = CudaArray(omega_min, device="cpu")
+        omega_macro_cuda = CudaArray(omega_macro, device="cpu")
+        domega_min_dt_cuda = CudaArray(domega_min_dt, device="cpu")
+        domega_macro_dt_cuda = CudaArray(domega_macro_dt, device="cpu")
+        times_cuda = CudaArray(times, device="cpu")
+
+        # Compute omega_min statistics
+        omega_min_mean = reduction_vec.vectorize_reduction(omega_min_cuda, "mean")
+        omega_min_std = reduction_vec.vectorize_reduction(omega_min_cuda, "std")
+        omega_min_min = reduction_vec.vectorize_reduction(omega_min_cuda, "min")
+        omega_min_max = reduction_vec.vectorize_reduction(omega_min_cuda, "max")
+
+        # Compute omega_macro statistics
+        omega_macro_mean = reduction_vec.vectorize_reduction(omega_macro_cuda, "mean")
+        omega_macro_std = reduction_vec.vectorize_reduction(omega_macro_cuda, "std")
+        omega_macro_min = reduction_vec.vectorize_reduction(omega_macro_cuda, "min")
+        omega_macro_max = reduction_vec.vectorize_reduction(omega_macro_cuda, "max")
+
+        # Compute evolution rate statistics
+        domega_min_dt_mean = reduction_vec.vectorize_reduction(
+            domega_min_dt_cuda, "mean"
+        )
+        domega_min_dt_std = reduction_vec.vectorize_reduction(domega_min_dt_cuda, "std")
+        domega_min_dt_min = reduction_vec.vectorize_reduction(domega_min_dt_cuda, "min")
+        domega_min_dt_max = reduction_vec.vectorize_reduction(domega_min_dt_cuda, "max")
+
+        domega_macro_dt_mean = reduction_vec.vectorize_reduction(
+            domega_macro_dt_cuda, "mean"
+        )
+        domega_macro_dt_std = reduction_vec.vectorize_reduction(
+            domega_macro_dt_cuda, "std"
+        )
+        domega_macro_dt_min = reduction_vec.vectorize_reduction(
+            domega_macro_dt_cuda, "min"
+        )
+        domega_macro_dt_max = reduction_vec.vectorize_reduction(
+            domega_macro_dt_cuda, "max"
+        )
+
+        # Compute time coverage statistics
+        times_min = reduction_vec.vectorize_reduction(times_cuda, "min")
+        times_max = reduction_vec.vectorize_reduction(times_cuda, "max")
+
+        # Compute mean interval using CUDA (diff and mean)
+        times_diff = np.diff(times)
+        times_diff_cuda = CudaArray(times_diff, device="cpu")
+        mean_interval = reduction_vec.vectorize_reduction(times_diff_cuda, "mean")
+
+        # Cleanup GPU memory
+        for arr in [
+            omega_min_cuda,
+            omega_macro_cuda,
+            domega_min_dt_cuda,
+            domega_macro_dt_cuda,
+            times_cuda,
+            times_diff_cuda,
+        ]:
+            if arr.device == "cuda":
+                arr.swap_to_cpu()
+
+        # Convert all results to float
+        omega_min_mean_f = _to_float(omega_min_mean)
+        omega_min_std_f = _to_float(omega_min_std)
+        omega_min_min_f = _to_float(omega_min_min)
+        omega_min_max_f = _to_float(omega_min_max)
+
+        omega_macro_mean_f = _to_float(omega_macro_mean)
+        omega_macro_std_f = _to_float(omega_macro_std)
+        omega_macro_min_f = _to_float(omega_macro_min)
+        omega_macro_max_f = _to_float(omega_macro_max)
+
+        domega_min_dt_mean_f = _to_float(domega_min_dt_mean)
+        domega_min_dt_std_f = _to_float(domega_min_dt_std)
+        domega_min_dt_min_f = _to_float(domega_min_dt_min)
+        domega_min_dt_max_f = _to_float(domega_min_dt_max)
+
+        domega_macro_dt_mean_f = _to_float(domega_macro_dt_mean)
+        domega_macro_dt_std_f = _to_float(domega_macro_dt_std)
+        domega_macro_dt_min_f = _to_float(domega_macro_dt_min)
+        domega_macro_dt_max_f = _to_float(domega_macro_dt_max)
+
+        times_min_f = _to_float(times_min)
+        times_max_f = _to_float(times_max)
+        mean_interval_f = _to_float(mean_interval)
+
         self._statistics = {
             "omega_min": {
-                "mean": float(np.mean(omega_min)),
-                "std": float(np.std(omega_min)),
-                "min": float(np.min(omega_min)),
-                "max": float(np.max(omega_min)),
-                "range": float(np.max(omega_min) - np.min(omega_min)),
+                "mean": omega_min_mean_f,
+                "std": omega_min_std_f,
+                "min": omega_min_min_f,
+                "max": omega_min_max_f,
+                "range": omega_min_max_f - omega_min_min_f,
             },
             "omega_macro": {
-                "mean": float(np.mean(omega_macro)),
-                "std": float(np.std(omega_macro)),
-                "min": float(np.min(omega_macro)),
-                "max": float(np.max(omega_macro)),
-                "range": float(np.max(omega_macro) - np.min(omega_macro)),
+                "mean": omega_macro_mean_f,
+                "std": omega_macro_std_f,
+                "min": omega_macro_min_f,
+                "max": omega_macro_max_f,
+                "range": omega_macro_max_f - omega_macro_min_f,
             },
             "evolution_rates": {
                 "omega_min_rate": {
-                    "mean": float(np.mean(domega_min_dt)),
-                    "std": float(np.std(domega_min_dt)),
-                    "min": float(np.min(domega_min_dt)),
-                    "max": float(np.max(domega_min_dt)),
+                    "mean": domega_min_dt_mean_f,
+                    "std": domega_min_dt_std_f,
+                    "min": domega_min_dt_min_f,
+                    "max": domega_min_dt_max_f,
                 },
                 "omega_macro_rate": {
-                    "mean": float(np.mean(domega_macro_dt)),
-                    "std": float(np.std(domega_macro_dt)),
-                    "min": float(np.min(domega_macro_dt)),
-                    "max": float(np.max(domega_macro_dt)),
+                    "mean": domega_macro_dt_mean_f,
+                    "std": domega_macro_dt_std_f,
+                    "min": domega_macro_dt_min_f,
+                    "max": domega_macro_dt_max_f,
                 },
             },
             "time_coverage": {
-                "min": float(np.min(times)),
-                "max": float(np.max(times)),
-                "span": float(np.max(times) - np.min(times)),
+                "min": times_min_f,
+                "max": times_max_f,
+                "span": times_max_f - times_min_f,
                 "n_points": len(times),
-                "mean_interval": float(np.mean(np.diff(times))),
+                "mean_interval": mean_interval_f,
             },
         }
 
@@ -361,9 +464,7 @@ class ThetaEvolutionProcessor:
                 not initialized
         """
         if self._omega_min_interp is None:
-            raise ValueError(
-                "Processor not initialized. Call process() first."
-            )
+            raise ValueError("Processor not initialized. Call process() first.")
 
         self.validate_time_range(time)
 
@@ -385,9 +486,7 @@ class ThetaEvolutionProcessor:
                 not initialized
         """
         if self._omega_macro_interp is None:
-            raise ValueError(
-                "Processor not initialized. Call process() first."
-            )
+            raise ValueError("Processor not initialized. Call process() first.")
 
         self.validate_time_range(time)
 
@@ -409,9 +508,7 @@ class ThetaEvolutionProcessor:
                 not initialized
         """
         if self._omega_min_rate_interp is None:
-            raise ValueError(
-                "Processor not initialized. Call process() first."
-            )
+            raise ValueError("Processor not initialized. Call process() first.")
 
         self.validate_time_range(time)
 
@@ -433,9 +530,7 @@ class ThetaEvolutionProcessor:
                 not initialized
         """
         if self._omega_macro_rate_interp is None:
-            raise ValueError(
-                "Processor not initialized. Call process() first."
-            )
+            raise ValueError("Processor not initialized. Call process() first.")
 
         self.validate_time_range(time)
 
@@ -457,8 +552,7 @@ class ThetaEvolutionProcessor:
         """
         if time < self._time_min or time > self._time_max:
             raise ValueError(
-                f"Time {time} is out of range "
-                f"[{self._time_min}, {self._time_max}]"
+                f"Time {time} is out of range " f"[{self._time_min}, {self._time_max}]"
             )
         return True
 
@@ -505,9 +599,7 @@ class ThetaEvolutionProcessor:
             ValueError: If processor not initialized
         """
         if self._statistics is None:
-            raise ValueError(
-                "Processor not initialized. Call process() first."
-            )
+            raise ValueError("Processor not initialized. Call process() first.")
         return self._statistics.copy()
 
     def check_time_coverage_gaps(
@@ -524,9 +616,7 @@ class ThetaEvolutionProcessor:
             List of (gap_start, gap_end) tuples for gaps exceeding threshold
         """
         if self._omega_min_interp is None:
-            raise ValueError(
-                "Processor not initialized. Call process() first."
-            )
+            raise ValueError("Processor not initialized. Call process() first.")
 
         if max_gap_ratio is None:
             max_gap_ratio = 5.0
@@ -554,9 +644,7 @@ class ThetaEvolutionProcessor:
             - coverage_ratio: float - Ratio of actual to expected points
         """
         if self._omega_min_interp is None:
-            raise ValueError(
-                "Processor not initialized. Call process() first."
-            )
+            raise ValueError("Processor not initialized. Call process() first.")
 
         times = np.sort(self.evolution.times)
         n_points = len(times)
@@ -646,9 +734,7 @@ class ThetaEvolutionProcessor:
         gaps = self.check_time_coverage_gaps()
         report["gaps"] = gaps
         if gaps:
-            report["warnings"].append(
-                f"Found {len(gaps)} gap(s) in time coverage"
-            )
+            report["warnings"].append(f"Found {len(gaps)} gap(s) in time coverage")
 
         # Check time coverage completeness
         completeness = self.verify_time_array_completeness()
@@ -667,7 +753,24 @@ class ThetaEvolutionProcessor:
         omega_min_sorted = self.evolution.omega_min[sort_indices]
         omega_macro_sorted = self.evolution.omega_macro[sort_indices]
 
-        violations = np.sum(omega_min_sorted >= omega_macro_sorted)
+        # Check physical constraints using CUDA
+        omega_min_cuda = CudaArray(omega_min_sorted, device="cpu")
+        omega_macro_cuda = CudaArray(omega_macro_sorted, device="cpu")
+        elem_vec = ElementWiseVectorizer(use_gpu=True)
+        reduction_vec = ReductionVectorizer(use_gpu=True)
+
+        # Check omega_min >= omega_macro (violations)
+        omega_min_ge_macro = elem_vec.vectorize_operation(
+            omega_min_cuda, "greater_equal", omega_macro_cuda.to_numpy()
+        )
+        violations_result = reduction_vec.vectorize_reduction(omega_min_ge_macro, "sum")
+        violations = int(_to_float(violations_result))
+
+        # Cleanup GPU memory
+        if omega_min_cuda.device == "cuda":
+            omega_min_cuda.swap_to_cpu()
+        if omega_macro_cuda.device == "cuda":
+            omega_macro_cuda.swap_to_cpu()
         report["physical_constraints"] = {
             "omega_min_lt_omega_macro": {
                 "valid": violations == 0,

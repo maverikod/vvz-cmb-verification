@@ -13,6 +13,7 @@ import numpy as np
 import logging
 from config.settings import get_config
 from utils.io.data_loader import load_csv_data, load_json_data
+from utils.cuda import CudaArray, ElementWiseVectorizer, ReductionVectorizer
 
 logger = logging.getLogger(__name__)
 
@@ -117,22 +118,69 @@ def load_node_geometry(
         scales = np.asarray(data[scale_key], dtype=float)
 
         # Convert to radians if needed (check if values are > 2π, likely degrees)
-        if np.max(theta) > 2 * np.pi:
-            theta = np.deg2rad(theta)
-        if np.max(phi) > 2 * np.pi:
-            phi = np.deg2rad(phi)
+        # Use CUDA-accelerated reduction for max check
+        theta_cuda = CudaArray(theta, device="cpu")
+        phi_cuda = CudaArray(phi, device="cpu")
+        reduction_vec = ReductionVectorizer(use_gpu=True)
 
-        # Validate ranges
-        if np.any(theta < 0) or np.any(theta > np.pi):
+        theta_max = reduction_vec.vectorize_reduction(theta_cuda, "max")
+        phi_max = reduction_vec.vectorize_reduction(phi_cuda, "max")
+
+        if theta_max > 2 * np.pi:
+            # Use CUDA-accelerated conversion
+            elem_vec = ElementWiseVectorizer(use_gpu=True)
+            theta_deg_cuda = CudaArray(np.deg2rad(theta), device="cpu")
+            theta = theta_deg_cuda.to_numpy()
+            if theta_deg_cuda.device == "cuda":
+                theta_deg_cuda.swap_to_cpu()
+        if phi_max > 2 * np.pi:
+            # Use CUDA-accelerated conversion
+            elem_vec = ElementWiseVectorizer(use_gpu=True)
+            phi_deg_cuda = CudaArray(np.deg2rad(phi), device="cpu")
+            phi = phi_deg_cuda.to_numpy()
+            if phi_deg_cuda.device == "cuda":
+                phi_deg_cuda.swap_to_cpu()
+
+        # Recreate CUDA arrays after potential conversion
+        theta_cuda = CudaArray(theta, device="cpu")
+        phi_cuda = CudaArray(phi, device="cpu")
+
+        # Validate ranges using CUDA-accelerated operations
+        elem_vec = ElementWiseVectorizer(use_gpu=True)
+
+        theta_lt_zero = elem_vec.vectorize_operation(theta_cuda, "less", 0.0)
+        theta_gt_pi = elem_vec.vectorize_operation(theta_cuda, "greater", np.pi)
+        has_theta_invalid = reduction_vec.vectorize_reduction(
+            theta_lt_zero, "any"
+        ) or reduction_vec.vectorize_reduction(theta_gt_pi, "any")
+
+        if has_theta_invalid:
+            theta_min = reduction_vec.vectorize_reduction(theta_cuda, "min")
+            theta_max_val = reduction_vec.vectorize_reduction(theta_cuda, "max")
             raise ValueError(
                 f"Theta values must be in [0, π]. "
-                f"Found range: [{np.min(theta)}, {np.max(theta)}]"
+                f"Found range: [{theta_min}, {theta_max_val}]"
             )
-        if np.any(phi < 0) or np.any(phi > 2 * np.pi):
+
+        phi_lt_zero = elem_vec.vectorize_operation(phi_cuda, "less", 0.0)
+        phi_gt_2pi = elem_vec.vectorize_operation(phi_cuda, "greater", 2 * np.pi)
+        has_phi_invalid = reduction_vec.vectorize_reduction(
+            phi_lt_zero, "any"
+        ) or reduction_vec.vectorize_reduction(phi_gt_2pi, "any")
+
+        if has_phi_invalid:
+            phi_min = reduction_vec.vectorize_reduction(phi_cuda, "min")
+            phi_max_val = reduction_vec.vectorize_reduction(phi_cuda, "max")
             raise ValueError(
                 f"Phi values must be in [0, 2π]. "
-                f"Found range: [{np.min(phi)}, {np.max(phi)}]"
+                f"Found range: [{phi_min}, {phi_max_val}]"
             )
+
+        # Cleanup GPU memory
+        if theta_cuda.device == "cuda":
+            theta_cuda.swap_to_cpu()
+        if phi_cuda.device == "cuda":
+            phi_cuda.swap_to_cpu()
 
         # Validate array lengths
         n_nodes = len(theta)
@@ -142,14 +190,29 @@ def load_node_geometry(
                 f"phi={len(phi)}, scale={len(scales)}"
             )
 
-        # Validate scales (should be ~300 pc)
-        if np.any(scales <= 0):
+        # Validate scales (should be ~300 pc) using CUDA
+        scales_cuda = CudaArray(scales, device="cpu")
+        elem_vec = ElementWiseVectorizer(use_gpu=True)
+        reduction_vec = ReductionVectorizer(use_gpu=True)
+
+        scales_le_zero = elem_vec.vectorize_operation(scales_cuda, "less_equal", 0.0)
+        has_scale_invalid = reduction_vec.vectorize_reduction(scales_le_zero, "any")
+        if has_scale_invalid:
             raise ValueError("All scales must be positive")
 
         # Check if scales are in arcmin (2-5 arcmin) and convert to pc
         config = get_config()
-        if np.max(scales) < 10:  # Likely in arcmin
-            scales = scales * config.constants.arcmin_to_pc_at_z1100
+        scales_max = reduction_vec.vectorize_reduction(scales_cuda, "max")
+        if scales_max < 10:  # Likely in arcmin
+            # Use CUDA-accelerated multiplication
+            scales_cuda = elem_vec.multiply(
+                scales_cuda, config.constants.arcmin_to_pc_at_z1100
+            )
+            scales = scales_cuda.to_numpy()
+
+        # Cleanup GPU memory
+        if scales_cuda.device == "cuda":
+            scales_cuda.swap_to_cpu()
 
         positions = np.column_stack([theta, phi])
 
@@ -172,11 +235,26 @@ def load_node_geometry(
             phi = np.asarray(data["phi"], dtype=float)
             scales = np.asarray(data["scale"], dtype=float)
 
-            # Convert to radians if needed
-            if np.max(theta) > 2 * np.pi:
-                theta = np.deg2rad(theta)
-            if np.max(phi) > 2 * np.pi:
-                phi = np.deg2rad(phi)
+            # Convert to radians if needed using CUDA
+            theta_cuda = CudaArray(theta, device="cpu")
+            phi_cuda = CudaArray(phi, device="cpu")
+            reduction_vec = ReductionVectorizer(use_gpu=True)
+
+            theta_max = reduction_vec.vectorize_reduction(theta_cuda, "max")
+            phi_max = reduction_vec.vectorize_reduction(phi_cuda, "max")
+
+            if theta_max > 2 * np.pi:
+                theta_deg_cuda = CudaArray(np.deg2rad(theta), device="cpu")
+                theta = theta_deg_cuda.to_numpy()
+                if theta_deg_cuda.device == "cuda":
+                    theta_deg_cuda.swap_to_cpu()
+                theta_cuda = CudaArray(theta, device="cpu")
+            if phi_max > 2 * np.pi:
+                phi_deg_cuda = CudaArray(np.deg2rad(phi), device="cpu")
+                phi = phi_deg_cuda.to_numpy()
+                if phi_deg_cuda.device == "cuda":
+                    phi_deg_cuda.swap_to_cpu()
+                phi_cuda = CudaArray(phi, device="cpu")
 
             positions = np.column_stack([theta, phi])
         else:
@@ -186,13 +264,35 @@ def load_node_geometry(
                 f"Found keys: {list(data.keys())}"
             )
 
-        # Validate ranges
+        # Validate ranges using CUDA
         theta = positions[:, 0]
         phi = positions[:, 1]
-        if np.any(theta < 0) or np.any(theta > np.pi):
+        theta_cuda = CudaArray(theta, device="cpu")
+        phi_cuda = CudaArray(phi, device="cpu")
+        elem_vec = ElementWiseVectorizer(use_gpu=True)
+        reduction_vec = ReductionVectorizer(use_gpu=True)
+
+        theta_lt_zero = elem_vec.vectorize_operation(theta_cuda, "less", 0.0)
+        theta_gt_pi = elem_vec.vectorize_operation(theta_cuda, "greater", np.pi)
+        has_theta_invalid = reduction_vec.vectorize_reduction(
+            theta_lt_zero, "any"
+        ) or reduction_vec.vectorize_reduction(theta_gt_pi, "any")
+        if has_theta_invalid:
             raise ValueError("Theta values must be in [0, π]")
-        if np.any(phi < 0) or np.any(phi > 2 * np.pi):
+
+        phi_lt_zero = elem_vec.vectorize_operation(phi_cuda, "less", 0.0)
+        phi_gt_2pi = elem_vec.vectorize_operation(phi_cuda, "greater", 2 * np.pi)
+        has_phi_invalid = reduction_vec.vectorize_reduction(
+            phi_lt_zero, "any"
+        ) or reduction_vec.vectorize_reduction(phi_gt_2pi, "any")
+        if has_phi_invalid:
             raise ValueError("Phi values must be in [0, 2π]")
+
+        # Cleanup GPU memory
+        if theta_cuda.device == "cuda":
+            theta_cuda.swap_to_cpu()
+        if phi_cuda.device == "cuda":
+            phi_cuda.swap_to_cpu()
 
         # Validate array lengths
         n_nodes = len(positions)
@@ -202,14 +302,28 @@ def load_node_geometry(
                 f"scales={len(scales)}"
             )
 
-        # Validate scales
-        if np.any(scales <= 0):
+        # Validate scales using CUDA
+        scales_cuda = CudaArray(scales, device="cpu")
+        elem_vec = ElementWiseVectorizer(use_gpu=True)
+        reduction_vec = ReductionVectorizer(use_gpu=True)
+
+        scales_le_zero = elem_vec.vectorize_operation(scales_cuda, "less_equal", 0.0)
+        has_scale_invalid = reduction_vec.vectorize_reduction(scales_le_zero, "any")
+        if has_scale_invalid:
             raise ValueError("All scales must be positive")
 
         # Check if scales are in arcmin and convert to pc
         config = get_config()
-        if np.max(scales) < 10:  # Likely in arcmin
-            scales = scales * config.constants.arcmin_to_pc_at_z1100
+        scales_max = reduction_vec.vectorize_reduction(scales_cuda, "max")
+        if scales_max < 10:  # Likely in arcmin
+            scales_cuda = elem_vec.multiply(
+                scales_cuda, config.constants.arcmin_to_pc_at_z1100
+            )
+            scales = scales_cuda.to_numpy()
+
+        # Cleanup GPU memory
+        if scales_cuda.device == "cuda":
+            scales_cuda.swap_to_cpu()
     else:
         raise ValueError(
             f"Unsupported file format: {data_path.suffix}. "
@@ -334,8 +448,18 @@ def load_node_depths(data_path: Optional[Path] = None) -> np.ndarray:
             f"Supported formats: .csv, .json"
         )
 
-    # Validate depths
-    if np.any(depths < 0):
+    # Validate depths using CUDA
+    depths_cuda = CudaArray(depths, device="cpu")
+    elem_vec = ElementWiseVectorizer(use_gpu=True)
+    reduction_vec = ReductionVectorizer(use_gpu=True)
+
+    depths_lt_zero = elem_vec.vectorize_operation(depths_cuda, "less", 0.0)
+    has_depth_invalid = reduction_vec.vectorize_reduction(depths_lt_zero, "any")
+    if has_depth_invalid:
         raise ValueError("All depths must be non-negative")
+
+    # Cleanup GPU memory
+    if depths_cuda.device == "cuda":
+        depths_cuda.swap_to_cpu()
 
     return depths

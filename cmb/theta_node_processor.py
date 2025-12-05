@@ -15,8 +15,28 @@ from dataclasses import dataclass
 import logging
 from config.settings import Config, get_config
 from cmb.theta_node_loader import load_node_geometry, load_node_depths
+from utils.cuda import CudaArray, ElementWiseVectorizer, ReductionVectorizer
+from typing import Any
 
 logger = logging.getLogger(__name__)
+
+
+def _to_float(value: Any) -> float:
+    """
+    Convert reduction result to float.
+
+    Args:
+        value: Result from vectorize_reduction (Union[CudaArray, float, int])
+
+    Returns:
+        Float value
+    """
+    if isinstance(value, (int, float)):
+        return float(value)
+    # If it's CudaArray, convert to numpy first
+    if isinstance(value, CudaArray):
+        return float(value.to_numpy().item())
+    return float(value)
 
 
 @dataclass
@@ -57,6 +77,9 @@ def map_depth_to_temperature(
 
     See ALL.md JW-CMB.6 and JW-CMB2.6 for derivation.
 
+    Uses CUDA acceleration with ElementWiseVectorizer for vectorized
+    multiplication operations.
+
     Args:
         depths: Node depths (Δω/ω) - dimensionless relative depth
         config: Configuration instance (uses global if None)
@@ -70,17 +93,42 @@ def map_depth_to_temperature(
     if config is None:
         config = get_config()
 
-    # Validate depths
+    # Validate depths using CUDA-accelerated reduction
     depths = np.asarray(depths, dtype=float)
-    if np.any(depths < 0):
+    depths_cuda = CudaArray(depths, device="cpu")
+
+    # Check if any negative values using CUDA-accelerated comparison
+    elem_vec = ElementWiseVectorizer(use_gpu=True)
+    reduction_vec = ReductionVectorizer(use_gpu=True)
+
+    # Compare depths < 0
+    depths_lt_zero = elem_vec.vectorize_operation(depths_cuda, "less", 0.0)
+    has_negative = reduction_vec.vectorize_reduction(depths_lt_zero, "any")
+
+    if has_negative:
         raise ValueError("All depths must be non-negative")
 
     # Formula: ΔT = (Δω/ω_CMB) T_0
     # depths is already Δω/ω, so we need to convert to ΔT
     # ΔT = depths * T_0 (in Kelvin)
     # Then convert to microKelvin
-    temperatures_K = depths * config.constants.T_0
-    temperatures_microK = temperatures_K * 1e6
+    # Use ElementWiseVectorizer for CUDA-accelerated multiplication
+    elem_vec = ElementWiseVectorizer(use_gpu=True)
+
+    # First multiply by T_0
+    temperatures_K_cuda = elem_vec.multiply(depths_cuda, config.constants.T_0)
+
+    # Then multiply by 1e6 to convert to microKelvin
+    temperatures_microK_cuda = elem_vec.multiply(temperatures_K_cuda, 1e6)
+
+    # Convert back to numpy array
+    temperatures_microK = temperatures_microK_cuda.to_numpy()
+
+    # Cleanup GPU memory if used
+    if temperatures_K_cuda.device == "cuda":
+        temperatures_K_cuda.swap_to_cpu()
+    if temperatures_microK_cuda.device == "cuda":
+        temperatures_microK_cuda.swap_to_cpu()
 
     return temperatures_microK
 
@@ -122,19 +170,52 @@ def process_node_data(
     # Map depths to temperatures
     temperatures = map_depth_to_temperature(depths)
 
-    # Create metadata
+    # Create metadata using CUDA-accelerated reductions
     config = get_config()
+    reduction_vec = ReductionVectorizer(use_gpu=True)
+
+    # Convert arrays to CudaArray for CUDA processing
+    scales_cuda = CudaArray(scales, device="cpu")
+    depths_cuda = CudaArray(depths, device="cpu")
+    temperatures_cuda = CudaArray(temperatures, device="cpu")
+
+    # Compute statistics using CUDA-accelerated reductions
+    scale_mean_result = reduction_vec.vectorize_reduction(scales_cuda, "mean")
+    scale_std_result = reduction_vec.vectorize_reduction(scales_cuda, "std")
+    depth_mean_result = reduction_vec.vectorize_reduction(depths_cuda, "mean")
+    depth_std_result = reduction_vec.vectorize_reduction(depths_cuda, "std")
+    temperature_mean_result = reduction_vec.vectorize_reduction(
+        temperatures_cuda, "mean"
+    )
+    temperature_std_result = reduction_vec.vectorize_reduction(temperatures_cuda, "std")
+
+    # Cleanup GPU memory if used
+    if scales_cuda.device == "cuda":
+        scales_cuda.swap_to_cpu()
+    if depths_cuda.device == "cuda":
+        depths_cuda.swap_to_cpu()
+    if temperatures_cuda.device == "cuda":
+        temperatures_cuda.swap_to_cpu()
+
+    # Convert results to float
+    scale_mean = _to_float(scale_mean_result)
+    scale_std = _to_float(scale_std_result)
+    depth_mean = _to_float(depth_mean_result)
+    depth_std = _to_float(depth_std_result)
+    temperature_mean = _to_float(temperature_mean_result)
+    temperature_std = _to_float(temperature_std_result)
+
     metadata = {
         "n_nodes": n_nodes,
         "z_CMB": config.constants.z_CMB,
         "T_0": config.constants.T_0,
         "omega_CMB": config.constants.omega_CMB,
-        "scale_mean_pc": float(np.mean(scales)),
-        "scale_std_pc": float(np.std(scales)),
-        "depth_mean": float(np.mean(depths)),
-        "depth_std": float(np.std(depths)),
-        "temperature_mean_microK": float(np.mean(temperatures)),
-        "temperature_std_microK": float(np.std(temperatures)),
+        "scale_mean_pc": scale_mean,
+        "scale_std_pc": scale_std,
+        "depth_mean": depth_mean,
+        "depth_std": depth_std,
+        "temperature_mean_microK": temperature_mean,
+        "temperature_std_microK": temperature_std,
     }
 
     return ThetaNodeData(
@@ -184,38 +265,82 @@ def validate_node_data(node_data: ThetaNodeData) -> bool:
             f"got {node_data.temperatures.shape}"
         )
 
-    # Validate positions
+    # Validate positions using CUDA-accelerated operations
     theta = node_data.positions[:, 0]
     phi = node_data.positions[:, 1]
 
-    if np.any(theta < 0) or np.any(theta > np.pi):
+    # Convert to CudaArray for CUDA processing
+    theta_cuda = CudaArray(theta, device="cpu")
+    phi_cuda = CudaArray(phi, device="cpu")
+    scales_cuda = CudaArray(node_data.scales, device="cpu")
+    depths_cuda = CudaArray(node_data.depths, device="cpu")
+    temperatures_cuda = CudaArray(node_data.temperatures, device="cpu")
+
+    elem_vec = ElementWiseVectorizer(use_gpu=True)
+    reduction_vec = ReductionVectorizer(use_gpu=True)
+
+    # Validate theta range [0, π]
+    theta_lt_zero = elem_vec.vectorize_operation(theta_cuda, "less", 0.0)
+    theta_gt_pi = elem_vec.vectorize_operation(theta_cuda, "greater", np.pi)
+    has_theta_invalid = reduction_vec.vectorize_reduction(
+        theta_lt_zero, "any"
+    ) or reduction_vec.vectorize_reduction(theta_gt_pi, "any")
+
+    if has_theta_invalid:
+        theta_min_result = reduction_vec.vectorize_reduction(theta_cuda, "min")
+        theta_max_result = reduction_vec.vectorize_reduction(theta_cuda, "max")
+        theta_min = _to_float(theta_min_result)
+        theta_max = _to_float(theta_max_result)
         raise ValueError(
             f"Theta values must be in [0, π]. "
-            f"Found range: [{np.min(theta)}, {np.max(theta)}]"
+            f"Found range: [{theta_min}, {theta_max}]"
         )
 
-    if np.any(phi < 0) or np.any(phi > 2 * np.pi):
+    # Validate phi range [0, 2π]
+    phi_lt_zero = elem_vec.vectorize_operation(phi_cuda, "less", 0.0)
+    phi_gt_2pi = elem_vec.vectorize_operation(phi_cuda, "greater", 2 * np.pi)
+    has_phi_invalid = reduction_vec.vectorize_reduction(
+        phi_lt_zero, "any"
+    ) or reduction_vec.vectorize_reduction(phi_gt_2pi, "any")
+
+    if has_phi_invalid:
+        phi_min_result = reduction_vec.vectorize_reduction(phi_cuda, "min")
+        phi_max_result = reduction_vec.vectorize_reduction(phi_cuda, "max")
+        phi_min = _to_float(phi_min_result)
+        phi_max = _to_float(phi_max_result)
         raise ValueError(
-            f"Phi values must be in [0, 2π]. "
-            f"Found range: [{np.min(phi)}, {np.max(phi)}]"
+            f"Phi values must be in [0, 2π]. " f"Found range: [{phi_min}, {phi_max}]"
         )
 
-    # Validate scales
-    if np.any(node_data.scales <= 0):
+    # Validate scales (must be positive)
+    scales_le_zero = elem_vec.vectorize_operation(scales_cuda, "less_equal", 0.0)
+    has_scale_invalid = reduction_vec.vectorize_reduction(scales_le_zero, "any")
+    if has_scale_invalid:
         raise ValueError("All scales must be positive")
 
-    # Validate depths
-    if np.any(node_data.depths < 0):
+    # Validate depths (must be non-negative)
+    depths_lt_zero = elem_vec.vectorize_operation(depths_cuda, "less", 0.0)
+    has_depth_invalid = reduction_vec.vectorize_reduction(depths_lt_zero, "any")
+    if has_depth_invalid:
         raise ValueError("All depths must be non-negative")
 
-    # Validate temperatures
+    # Validate temperatures (must be non-negative)
     config = get_config()
-    if np.any(node_data.temperatures < 0):
+    temps_lt_zero = elem_vec.vectorize_operation(temperatures_cuda, "less", 0.0)
+    has_temp_invalid = reduction_vec.vectorize_reduction(temps_lt_zero, "any")
+    if has_temp_invalid:
         raise ValueError("All temperatures must be non-negative")
 
-    # Check temperature range (20-30 μK expected)
-    temp_min = np.min(node_data.temperatures)
-    temp_max = np.max(node_data.temperatures)
+    # Check temperature range (20-30 μK expected) using CUDA reductions
+    temp_min_result = reduction_vec.vectorize_reduction(temperatures_cuda, "min")
+    temp_max_result = reduction_vec.vectorize_reduction(temperatures_cuda, "max")
+    temp_min = _to_float(temp_min_result)
+    temp_max = _to_float(temp_max_result)
+
+    # Cleanup GPU memory if used
+    for arr in [theta_cuda, phi_cuda, scales_cuda, depths_cuda, temperatures_cuda]:
+        if arr.device == "cuda":
+            arr.swap_to_cpu()
 
     if (
         temp_min < config.constants.delta_T_min * 0.5

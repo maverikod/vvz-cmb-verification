@@ -26,7 +26,7 @@ classes:
 
       ω_min(t) and ω_macro(t).'
     file: cmb/theta_evolution_processor.py
-    line: 32
+    line: 39
     methods:
     - __init__
     - process
@@ -51,7 +51,7 @@ classes:
       \    depths: Node depths (Δω/ω)\n    temperatures: Temperature fluctuations\
       \ (ΔT in μK)\n    metadata: Additional metadata"
     file: cmb/theta_node_processor.py
-    line: 23
+    line: 43
     methods: []
     name: ThetaNodeData
   config/settings.py:Config:
@@ -1905,7 +1905,7 @@ functions:
       \ data instance\n    config: Configuration instance (uses global if None)\n\n\
       Raises:\n    ValueError: If evolution data is invalid"
     file: cmb/theta_evolution_processor.py
-    line: 40
+    line: 47
     name: __init__
   cmb/theta_evolution_processor.py:_calculate_derivative_central:
     args:
@@ -1919,7 +1919,7 @@ functions:
       \ Value array\n    use_cuda: Use CUDA acceleration for large arrays\n\nReturns:\n\
       \    Derivative array"
     file: cmb/theta_evolution_processor.py
-    line: 190
+    line: 215
     name: _calculate_derivative_central
   cmb/theta_evolution_processor.py:_check_time_coverage_gaps:
     args:
@@ -1930,7 +1930,7 @@ functions:
       \ Sorted time array\n    max_gap_ratio: Maximum allowed gap ratio (gap / median_interval)\n\
       \nReturns:\n    List of (gap_start, gap_end) tuples for gaps exceeding threshold"
     file: cmb/theta_evolution_processor.py
-    line: 260
+    line: 274
     name: _check_time_coverage_gaps
   cmb/theta_evolution_processor.py:_compute_statistics:
     args:
@@ -1944,8 +1944,17 @@ functions:
       \  omega_min: ω_min values\n    omega_macro: ω_macro values\n    domega_min_dt:\
       \ Evolution rates for ω_min\n    domega_macro_dt: Evolution rates for ω_macro"
     file: cmb/theta_evolution_processor.py
-    line: 293
+    line: 307
     name: _compute_statistics
+  cmb/theta_evolution_processor.py:_to_float:
+    args:
+    - value
+    docstring: "Convert reduction result to float.\n\nArgs:\n    value: Result from\
+      \ vectorize_reduction (Union[CudaArray, float, int])\n\nReturns:\n    Float\
+      \ value"
+    file: cmb/theta_evolution_processor.py
+    line: 21
+    name: _to_float
   cmb/theta_evolution_processor.py:check_time_coverage_gaps:
     args:
     - self
@@ -1954,7 +1963,7 @@ functions:
       \ allowed gap ratio.\n                  If None, uses default (5.0)\n\nReturns:\n\
       \    List of (gap_start, gap_end) tuples for gaps exceeding threshold"
     file: cmb/theta_evolution_processor.py
-    line: 513
+    line: 605
     name: check_time_coverage_gaps
   cmb/theta_evolution_processor.py:generate_quality_report:
     args:
@@ -1964,7 +1973,7 @@ functions:
       - Data quality issues\n\nReturns:\n    Dictionary with quality issues, warnings,\
       \ and statistics"
     file: cmb/theta_evolution_processor.py
-    line: 614
+    line: 702
     name: generate_quality_report
   cmb/theta_evolution_processor.py:get_evolution_rate_macro:
     args:
@@ -1974,7 +1983,7 @@ functions:
       \   time: Time value\n\nReturns:\n    Evolution rate\n\nRaises:\n    ValueError:\
       \ If time is out of range or processor\n        not initialized"
     file: cmb/theta_evolution_processor.py
-    line: 421
+    line: 518
     name: get_evolution_rate_macro
   cmb/theta_evolution_processor.py:get_evolution_rate_min:
     args:
@@ -1984,7 +1993,7 @@ functions:
       \ time: Time value\n\nReturns:\n    Evolution rate\n\nRaises:\n    ValueError:\
       \ If time is out of range or processor\n        not initialized"
     file: cmb/theta_evolution_processor.py
-    line: 397
+    line: 496
     name: get_evolution_rate_min
   cmb/theta_evolution_processor.py:get_evolution_statistics:
     args:
@@ -1992,7 +2001,7 @@ functions:
     docstring: "Get evolution statistics.\n\nReturns:\n    Dictionary with statistics\
       \ about evolution data\n\nRaises:\n    ValueError: If processor not initialized"
     file: cmb/theta_evolution_processor.py
-    line: 497
+    line: 591
     name: get_evolution_statistics
   cmb/theta_evolution_processor.py:get_omega_macro:
     args:
@@ -2002,7 +2011,7 @@ functions:
       Returns:\n    ω_macro(t) value\n\nRaises:\n    ValueError: If time is out of\
       \ range or processor\n        not initialized"
     file: cmb/theta_evolution_processor.py
-    line: 373
+    line: 474
     name: get_omega_macro
   cmb/theta_evolution_processor.py:get_omega_min:
     args:
@@ -2012,7 +2021,7 @@ functions:
       Returns:\n    ω_min(t) value\n\nRaises:\n    ValueError: If time is out of range\
       \ or processor\n        not initialized"
     file: cmb/theta_evolution_processor.py
-    line: 349
+    line: 452
     name: get_omega_min
   cmb/theta_evolution_processor.py:process:
     args:
@@ -2022,7 +2031,7 @@ functions:
       \ rate calculations.\nAlso computes evolution statistics and checks data quality.\n\
       \nRaises:\n    ValueError: If processing fails"
     file: cmb/theta_evolution_processor.py
-    line: 88
+    line: 101
     name: process
   cmb/theta_evolution_processor.py:process_evolution_data:
     args:
@@ -2033,7 +2042,7 @@ functions:
       Returns:\n    ThetaEvolutionProcessor instance with processed data\n\nRaises:\n\
       \    ValueError: If processing fails"
     file: cmb/theta_evolution_processor.py
-    line: 698
+    line: 801
     name: process_evolution_data
   cmb/theta_evolution_processor.py:validate_against_config:
     args:
@@ -2043,7 +2052,7 @@ functions:
       \ data meets configuration requirements\n\nRaises:\n    ValueError: If data\
       \ does not meet requirements"
     file: cmb/theta_evolution_processor.py
-    line: 465
+    line: 559
     name: validate_against_config
   cmb/theta_evolution_processor.py:validate_time_range:
     args:
@@ -2053,7 +2062,7 @@ functions:
       \ value to validate\n\nReturns:\n    True if time is within range\n\nRaises:\n\
       \    ValueError: If time is out of range"
     file: cmb/theta_evolution_processor.py
-    line: 445
+    line: 540
     name: validate_time_range
   cmb/theta_evolution_processor.py:verify_time_array_completeness:
     args:
@@ -2067,7 +2076,7 @@ functions:
       \ List of expected but missing times\n    - coverage_ratio: float - Ratio of\
       \ actual to expected points"
     file: cmb/theta_evolution_processor.py
-    line: 538
+    line: 628
     name: verify_time_array_completeness
   cmb/theta_node_loader.py:load_node_depths:
     args:
@@ -2077,7 +2086,7 @@ functions:
       \ location.\n\nReturns:\n    Array of node depths (Δω/ω)\n\nRaises:\n    FileNotFoundError:\
       \ If data file doesn't exist\n    ValueError: If data format is invalid"
     file: cmb/theta_node_loader.py
-    line: 222
+    line: 336
     name: load_node_depths
   cmb/theta_node_loader.py:load_node_geometry:
     args:
@@ -2089,8 +2098,17 @@ functions:
       \nRaises:\n    FileNotFoundError: If data file doesn't exist\n    ValueError:\
       \ If data format is invalid"
     file: cmb/theta_node_loader.py
-    line: 20
+    line: 21
     name: load_node_geometry
+  cmb/theta_node_processor.py:_to_float:
+    args:
+    - value
+    docstring: "Convert reduction result to float.\n\nArgs:\n    value: Result from\
+      \ vectorize_reduction (Union[CudaArray, float, int])\n\nReturns:\n    Float\
+      \ value"
+    file: cmb/theta_node_processor.py
+    line: 24
+    name: _to_float
   cmb/theta_node_processor.py:map_depth_to_temperature:
     args:
     - depths
@@ -2100,12 +2118,13 @@ functions:
       \ K (CMB temperature)\n    ω_CMB ~ 10^11 Hz\n    Δω = ω - ω_min (depth of node)\n\
       Result: ΔT ≈ 20-30 μK\n\nThis is direct conversion from node depth, NOT linear\
       \ approximation\nor classical thermodynamic formula.\n\nSee ALL.md JW-CMB.6\
-      \ and JW-CMB2.6 for derivation.\n\nArgs:\n    depths: Node depths (Δω/ω) - dimensionless\
-      \ relative depth\n    config: Configuration instance (uses global if None)\n\
-      \nReturns:\n    Array of temperature fluctuations in μK\n\nRaises:\n    ValueError:\
-      \ If depths are invalid"
+      \ and JW-CMB2.6 for derivation.\n\nUses CUDA acceleration with ElementWiseVectorizer\
+      \ for vectorized\nmultiplication operations.\n\nArgs:\n    depths: Node depths\
+      \ (Δω/ω) - dimensionless relative depth\n    config: Configuration instance\
+      \ (uses global if None)\n\nReturns:\n    Array of temperature fluctuations in\
+      \ μK\n\nRaises:\n    ValueError: If depths are invalid"
     file: cmb/theta_node_processor.py
-    line: 42
+    line: 62
     name: map_depth_to_temperature
   cmb/theta_node_processor.py:process_node_data:
     args:
@@ -2117,7 +2136,7 @@ functions:
       \    ThetaNodeData instance with all processed data\n\nRaises:\n    FileNotFoundError:\
       \ If data files don't exist\n    ValueError: If data processing fails"
     file: cmb/theta_node_processor.py
-    line: 88
+    line: 136
     name: process_node_data
   cmb/theta_node_processor.py:validate_node_data:
     args:
@@ -2125,7 +2144,7 @@ functions:
     docstring: "Validate Θ-node data.\n\nArgs:\n    node_data: ThetaNodeData to validate\n\
       \nReturns:\n    True if valid\n\nRaises:\n    ValueError: If data is invalid"
     file: cmb/theta_node_processor.py
-    line: 149
+    line: 230
     name: validate_node_data
   config/settings.py:__init__:
     args:
@@ -7515,8 +7534,8 @@ imports:
     type: import_from
   cmb/theta_evolution_processor.py:CudaArray:
     file: cmb/theta_evolution_processor.py
-    line: 19
-    module: utils.cuda.array_model
+    line: 18
+    module: utils.cuda
     name: CudaArray
     type: import_from
   cmb/theta_evolution_processor.py:Dict:
@@ -7527,8 +7546,8 @@ imports:
     type: import_from
   cmb/theta_evolution_processor.py:ElementWiseVectorizer:
     file: cmb/theta_evolution_processor.py
-    line: 20
-    module: utils.cuda.elementwise_vectorizer
+    line: 18
+    module: utils.cuda
     name: ElementWiseVectorizer
     type: import_from
   cmb/theta_evolution_processor.py:List:
@@ -7542,6 +7561,12 @@ imports:
     line: 11
     module: typing
     name: Optional
+    type: import_from
+  cmb/theta_evolution_processor.py:ReductionVectorizer:
+    file: cmb/theta_evolution_processor.py
+    line: 18
+    module: utils.cuda
+    name: ReductionVectorizer
     type: import_from
   cmb/theta_evolution_processor.py:ThetaEvolution:
     file: cmb/theta_evolution_processor.py
@@ -7572,6 +7597,18 @@ imports:
     module: cmb.theta_data_loader
     name: validate_evolution_data
     type: import_from
+  cmb/theta_node_loader.py:CudaArray:
+    file: cmb/theta_node_loader.py
+    line: 16
+    module: utils.cuda
+    name: CudaArray
+    type: import_from
+  cmb/theta_node_loader.py:ElementWiseVectorizer:
+    file: cmb/theta_node_loader.py
+    line: 16
+    module: utils.cuda
+    name: ElementWiseVectorizer
+    type: import_from
   cmb/theta_node_loader.py:Optional:
     file: cmb/theta_node_loader.py
     line: 11
@@ -7583,6 +7620,12 @@ imports:
     line: 10
     module: pathlib
     name: Path
+    type: import_from
+  cmb/theta_node_loader.py:ReductionVectorizer:
+    file: cmb/theta_node_loader.py
+    line: 16
+    module: utils.cuda
+    name: ReductionVectorizer
     type: import_from
   cmb/theta_node_loader.py:Tuple:
     file: cmb/theta_node_loader.py
@@ -7618,11 +7661,29 @@ imports:
     line: 12
     name: numpy
     type: import
+  cmb/theta_node_processor.py:Any:
+    file: cmb/theta_node_processor.py
+    line: 19
+    module: typing
+    name: Any
+    type: import_from
   cmb/theta_node_processor.py:Config:
     file: cmb/theta_node_processor.py
     line: 16
     module: config.settings
     name: Config
+    type: import_from
+  cmb/theta_node_processor.py:CudaArray:
+    file: cmb/theta_node_processor.py
+    line: 18
+    module: utils.cuda
+    name: CudaArray
+    type: import_from
+  cmb/theta_node_processor.py:ElementWiseVectorizer:
+    file: cmb/theta_node_processor.py
+    line: 18
+    module: utils.cuda
+    name: ElementWiseVectorizer
     type: import_from
   cmb/theta_node_processor.py:Optional:
     file: cmb/theta_node_processor.py
@@ -7635,6 +7696,12 @@ imports:
     line: 11
     module: pathlib
     name: Path
+    type: import_from
+  cmb/theta_node_processor.py:ReductionVectorizer:
+    file: cmb/theta_node_processor.py
+    line: 18
+    module: utils.cuda
+    name: ReductionVectorizer
     type: import_from
   cmb/theta_node_processor.py:dataclass:
     file: cmb/theta_node_processor.py

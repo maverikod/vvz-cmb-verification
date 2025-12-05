@@ -656,6 +656,7 @@ ThetaNodeMapGenerator:
 - classify_nodes
 - calculate_node_depth
 - calculate_node_area
+- _calculate_node_properties_batch
 - calculate_local_curvature
 - generate_node_map
 - create_omega_min_map

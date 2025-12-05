@@ -37,6 +37,7 @@ classes:
     - classify_nodes
     - calculate_node_depth
     - calculate_node_area
+    - _calculate_node_properties_batch
     - calculate_local_curvature
     - generate_node_map
     - create_omega_min_map
@@ -1857,6 +1858,20 @@ functions:
     file: cmb/nodes/theta_node_map.py
     line: 77
     name: __init__
+  cmb/nodes/theta_node_map.py:_calculate_node_properties_batch:
+    args:
+    - self
+    - node_positions
+    docstring: "Calculate depth, area, and curvature for all nodes in batch.\n\nUses\
+      \ vectorized CUDA operations to process neighborhoods efficiently.\nWhile neighborhood\
+      \ extraction requires iteration, all computations\nwithin neighborhoods use\
+      \ CUDA-accelerated vectorized operations.\n\nArgs:\n    node_positions: Array\
+      \ of node positions (N, D) where N is number\n        of nodes and D is dimensionality\n\
+      \nReturns:\n    Tuple of (depths, areas, curvatures) arrays, each of shape (N,)\n\
+      \nRaises:\n    ValueError: If batch calculation fails"
+    file: cmb/nodes/theta_node_map.py
+    line: 363
+    name: _calculate_node_properties_batch
   cmb/nodes/theta_node_map.py:calculate_local_curvature:
     args:
     - self
@@ -1864,7 +1879,7 @@ functions:
     docstring: "Calculate local curvature at node position.\n\nArgs:\n    node_position:\
       \ Node position (grid indices)\n\nReturns:\n    Local curvature value"
     file: cmb/nodes/theta_node_map.py
-    line: 349
+    line: 510
     name: calculate_local_curvature
   cmb/nodes/theta_node_map.py:calculate_node_area:
     args:
@@ -1874,7 +1889,7 @@ functions:
       \ Node position (grid indices)\n\nReturns:\n    Node area in grid units or physical\
       \ units"
     file: cmb/nodes/theta_node_map.py
-    line: 286
+    line: 300
     name: calculate_node_area
   cmb/nodes/theta_node_map.py:calculate_node_depth:
     args:
@@ -1884,15 +1899,16 @@ functions:
       \ is local minimum at node position.\n\nArgs:\n    node_position: Node position\
       \ (grid indices)\n\nReturns:\n    Node depth (Δω/ω)"
     file: cmb/nodes/theta_node_map.py
-    line: 216
+    line: 232
     name: calculate_node_depth
   cmb/nodes/theta_node_map.py:classify_nodes:
     args:
     - self
     - node_positions
-    docstring: "Classify nodes by depth, area, and local curvature.\n\nArgs:\n   \
-      \ node_positions: Array of node positions\n\nReturns:\n    List of NodeClassification\
-      \ instances\n\nRaises:\n    ValueError: If classification fails"
+    docstring: "Classify nodes by depth, area, and local curvature.\n\nUses vectorized\
+      \ batch processing for all nodes simultaneously.\n\nArgs:\n    node_positions:\
+      \ Array of node positions\n\nReturns:\n    List of NodeClassification instances\n\
+      \nRaises:\n    ValueError: If classification fails"
     file: cmb/nodes/theta_node_map.py
     line: 160
     name: classify_nodes
@@ -1903,7 +1919,7 @@ functions:
     docstring: "Create binary mask of node locations.\n\nArgs:\n    node_positions:\
       \ Array of node positions\n\nReturns:\n    Binary mask (1 at nodes, 0 elsewhere)"
     file: cmb/nodes/theta_node_map.py
-    line: 581
+    line: 743
     name: create_node_mask
   cmb/nodes/theta_node_map.py:create_omega_min_map:
     args:
@@ -1912,7 +1928,7 @@ functions:
     docstring: "Create map of ω_min(x) values.\n\nArgs:\n    node_positions: Array\
       \ of node positions\n\nReturns:\n    Map of ω_min(x) values at each grid point"
     file: cmb/nodes/theta_node_map.py
-    line: 463
+    line: 623
     name: create_omega_min_map
   cmb/nodes/theta_node_map.py:find_nodes:
     args:
@@ -1936,7 +1952,7 @@ functions:
       \ map\n    - Node mask\n    - Node classifications\n\nRaises:\n    ValueError:\
       \ If map generation fails"
     file: cmb/nodes/theta_node_map.py
-    line: 408
+    line: 568
     name: generate_node_map
   cmb/nodes/theta_node_map.py:validate_node_map:
     args:
@@ -1946,7 +1962,7 @@ functions:
       \ to validate\n\nReturns:\n    True if map is valid\n\nRaises:\n    ValueError:\
       \ If map is invalid"
     file: cmb/nodes/theta_node_map.py
-    line: 637
+    line: 798
     name: validate_node_map
   cmb/theta_data_loader.py:load_evolution_data:
     args:
@@ -6463,7 +6479,7 @@ functions:
       \ Whole array data\n    *args: Additional arguments (not used)\n    **kwargs:\
       \ Additional keyword arguments (not used)\n\nReturns:\n    Processed array"
     file: utils/cuda/elementwise_vectorizer.py
-    line: 198
+    line: 210
     name: _process_whole_array
   utils/cuda/elementwise_vectorizer.py:abs:
     args:
@@ -6471,7 +6487,7 @@ functions:
     - array
     docstring: Apply absolute value.
     file: utils/cuda/elementwise_vectorizer.py
-    line: 275
+    line: 287
     name: abs
   utils/cuda/elementwise_vectorizer.py:add:
     args:
@@ -6480,7 +6496,7 @@ functions:
     - operand
     docstring: Add operand to array.
     file: utils/cuda/elementwise_vectorizer.py
-    line: 215
+    line: 227
     name: add
   utils/cuda/elementwise_vectorizer.py:batch:
     args:
@@ -6491,7 +6507,7 @@ functions:
       \    **kwargs: Operation-specific keyword arguments\n\nReturns:\n    List of\
       \ result CudaArrays"
     file: utils/cuda/elementwise_vectorizer.py
-    line: 279
+    line: 291
     name: batch
   utils/cuda/elementwise_vectorizer.py:cos:
     args:
@@ -6499,7 +6515,7 @@ functions:
     - array
     docstring: Apply cosine function.
     file: utils/cuda/elementwise_vectorizer.py
-    line: 259
+    line: 271
     name: cos
   utils/cuda/elementwise_vectorizer.py:divide:
     args:
@@ -6508,7 +6524,7 @@ functions:
     - operand
     docstring: Divide array by operand.
     file: utils/cuda/elementwise_vectorizer.py
-    line: 239
+    line: 251
     name: divide
   utils/cuda/elementwise_vectorizer.py:exp:
     args:
@@ -6516,7 +6532,7 @@ functions:
     - array
     docstring: Apply exponential function.
     file: utils/cuda/elementwise_vectorizer.py
-    line: 263
+    line: 275
     name: exp
   utils/cuda/elementwise_vectorizer.py:log:
     args:
@@ -6524,7 +6540,7 @@ functions:
     - array
     docstring: Apply natural logarithm.
     file: utils/cuda/elementwise_vectorizer.py
-    line: 267
+    line: 279
     name: log
   utils/cuda/elementwise_vectorizer.py:multiply:
     args:
@@ -6533,7 +6549,7 @@ functions:
     - operand
     docstring: Multiply array by operand.
     file: utils/cuda/elementwise_vectorizer.py
-    line: 231
+    line: 243
     name: multiply
   utils/cuda/elementwise_vectorizer.py:power:
     args:
@@ -6542,7 +6558,7 @@ functions:
     - exponent
     docstring: Raise array to power.
     file: utils/cuda/elementwise_vectorizer.py
-    line: 247
+    line: 259
     name: power
   utils/cuda/elementwise_vectorizer.py:sin:
     args:
@@ -6550,7 +6566,7 @@ functions:
     - array
     docstring: Apply sine function.
     file: utils/cuda/elementwise_vectorizer.py
-    line: 255
+    line: 267
     name: sin
   utils/cuda/elementwise_vectorizer.py:sqrt:
     args:
@@ -6558,7 +6574,7 @@ functions:
     - array
     docstring: Apply square root.
     file: utils/cuda/elementwise_vectorizer.py
-    line: 271
+    line: 283
     name: sqrt
   utils/cuda/elementwise_vectorizer.py:subtract:
     args:
@@ -6567,7 +6583,7 @@ functions:
     - operand
     docstring: Subtract operand from array.
     file: utils/cuda/elementwise_vectorizer.py
-    line: 223
+    line: 235
     name: subtract
   utils/cuda/elementwise_vectorizer.py:vectorize_operation:
     args:
@@ -6612,7 +6628,7 @@ functions:
     docstring: "Calculate curvature of grid.\n\nArgs:\n    grid: Input grid\n\nReturns:\n\
       \    Curvature array"
     file: utils/cuda/grid_vectorizer.py
-    line: 305
+    line: 298
     name: _curvature
   utils/cuda/grid_vectorizer.py:_gradient:
     args:
@@ -6621,7 +6637,7 @@ functions:
     docstring: "Calculate gradient of grid.\n\nArgs:\n    grid: Input grid\n\nReturns:\n\
       \    Gradient array (first component for 1D, tuple converted to array)"
     file: utils/cuda/grid_vectorizer.py
-    line: 214
+    line: 211
     name: _gradient
   utils/cuda/grid_vectorizer.py:_laplacian:
     args:
@@ -6630,7 +6646,7 @@ functions:
     docstring: "Calculate Laplacian of grid.\n\nArgs:\n    grid: Input grid\n\nReturns:\n\
       \    Laplacian array"
     file: utils/cuda/grid_vectorizer.py
-    line: 241
+    line: 238
     name: _laplacian
   utils/cuda/grid_vectorizer.py:_local_maxima:
     args:
@@ -6641,7 +6657,7 @@ functions:
       \ Size of neighborhood (default: 3)\n\nReturns:\n    Boolean array indicating\
       \ local maxima"
     file: utils/cuda/grid_vectorizer.py
-    line: 185
+    line: 184
     name: _local_maxima
   utils/cuda/grid_vectorizer.py:_local_minima:
     args:
@@ -6652,7 +6668,7 @@ functions:
       \ Size of neighborhood (default: 3)\n\nReturns:\n    Boolean array indicating\
       \ local minima"
     file: utils/cuda/grid_vectorizer.py
-    line: 156
+    line: 157
     name: _local_minima
   utils/cuda/grid_vectorizer.py:_minimum_filter:
     args:
@@ -6666,7 +6682,7 @@ functions:
       \ \"constant\")\n    cval: Constant value for boundary (default: inf)\n\nReturns:\n\
       \    Filtered array with minimum values"
     file: utils/cuda/grid_vectorizer.py
-    line: 273
+    line: 266
     name: _minimum_filter
   utils/cuda/grid_vectorizer.py:_process_block:
     args:
@@ -6676,7 +6692,7 @@ functions:
       \ data\n    *args: Additional arguments\n    **kwargs: Additional keyword arguments\n\
       \nReturns:\n    Processed block"
     file: utils/cuda/grid_vectorizer.py
-    line: 98
+    line: 99
     name: _process_block
   utils/cuda/grid_vectorizer.py:_process_whole_array:
     args:
@@ -6686,7 +6702,7 @@ functions:
       \ array data\n    *args: Additional arguments\n    **kwargs: Additional keyword\
       \ arguments\n\nReturns:\n    Processed array"
     file: utils/cuda/grid_vectorizer.py
-    line: 139
+    line: 140
     name: _process_whole_array
   utils/cuda/grid_vectorizer.py:vectorize_grid_operation:
     args:
@@ -6695,9 +6711,9 @@ functions:
     - operation
     docstring: "Apply grid-based operation.\n\nArgs:\n    array: Input grid array\n\
       \    operation: Operation name\n        (\"local_minima\", \"minimum_filter\"\
-      , \"gradient\", \"curvature\", etc.)\n    *args: Operation-specific arguments\n\
-      \    **kwargs: Operation-specific keyword arguments\n\nReturns:\n    Result\
-      \ CudaArray\n\nRaises:\n    ValueError: If operation not supported"
+      , \"gradient\",\n         \"curvature\", etc.)\n    *args: Operation-specific\
+      \ arguments\n    **kwargs: Operation-specific keyword arguments\n\nReturns:\n\
+      \    Result CudaArray\n\nRaises:\n    ValueError: If operation not supported"
     file: utils/cuda/grid_vectorizer.py
     line: 68
     name: vectorize_grid_operation
@@ -6773,7 +6789,7 @@ functions:
 
       CRITICAL: Called when memory limit is exceeded to prevent system freeze.'
     file: utils/cuda/memory_watchdog.py
-    line: 361
+    line: 367
     name: _force_cleanup
   utils/cuda/memory_watchdog.py:_kill_memory_intensive_processes:
     args:
@@ -6782,7 +6798,7 @@ functions:
       \ Aggressively kills processes to prevent system freeze.\n\nReturns:\n    List\
       \ of killed process IDs"
     file: utils/cuda/memory_watchdog.py
-    line: 294
+    line: 300
     name: _kill_memory_intensive_processes
   utils/cuda/memory_watchdog.py:_kill_process:
     args:
@@ -6791,7 +6807,7 @@ functions:
     docstring: "Kill a memory-intensive process.\n\nArgs:\n    process_id: Process\
       \ ID to kill"
     file: utils/cuda/memory_watchdog.py
-    line: 282
+    line: 288
     name: _kill_process
   utils/cuda/memory_watchdog.py:_monitor_loop:
     args:
@@ -6801,14 +6817,14 @@ functions:
 
       CRITICAL: Aggressively monitors and kills processes to prevent system freeze.'
     file: utils/cuda/memory_watchdog.py
-    line: 400
+    line: 406
     name: _monitor_loop
   utils/cuda/memory_watchdog.py:_start_monitoring:
     args:
     - self
     docstring: Start background monitoring thread.
     file: utils/cuda/memory_watchdog.py
-    line: 391
+    line: 397
     name: _start_monitoring
   utils/cuda/memory_watchdog.py:get_instance:
     args:
@@ -6824,7 +6840,7 @@ functions:
     docstring: "Get current memory usage statistics.\n\nReturns:\n    Dictionary with\
       \ memory statistics"
     file: utils/cuda/memory_watchdog.py
-    line: 430
+    line: 436
     name: get_memory_usage
   utils/cuda/memory_watchdog.py:get_registered_processes:
     args:
@@ -6832,7 +6848,7 @@ functions:
     docstring: "Get list of all registered processes.\n\nReturns:\n    List of process\
       \ information dictionaries"
     file: utils/cuda/memory_watchdog.py
-    line: 470
+    line: 476
     name: get_registered_processes
   utils/cuda/memory_watchdog.py:register_process:
     args:
@@ -6854,7 +6870,7 @@ functions:
     - self
     docstring: Stop background monitoring.
     file: utils/cuda/memory_watchdog.py
-    line: 424
+    line: 430
     name: stop_monitoring
   utils/cuda/memory_watchdog.py:unregister_process:
     args:
@@ -10683,13 +10699,13 @@ imports:
     type: import_from
   utils/cuda/grid_vectorizer.py:maximum_filter:
     file: utils/cuda/grid_vectorizer.py
-    line: 208
+    line: 205
     module: scipy.ndimage
     name: maximum_filter
     type: import_from
   utils/cuda/grid_vectorizer.py:minimum_filter:
     file: utils/cuda/grid_vectorizer.py
-    line: 300
+    line: 293
     module: scipy.ndimage
     name: minimum_filter
     type: import_from

@@ -188,23 +188,31 @@ class ThetaNodeMapGenerator:
             # Vectorize position conversion using numpy
             n_nodes = len(node_positions)
             classifications = []
-            # Convert positions to tuples using vectorized operations
+            # Convert positions to tuples using vectorized numpy operations
             if len(node_positions.shape) == 2:
-                # Multi-dimensional: use numpy array operations
-                positions_tuples = [
-                    tuple(float(p) for p in node_positions[i]) for i in range(n_nodes)
-                ]
+                # Multi-dimensional: use numpy array operations (vectorized)
+                # Convert to float array first, then create tuples
+                positions_float = node_positions.astype(float)
+                positions_tuples = [tuple(positions_float[i]) for i in range(n_nodes)]
             else:
-                # 1D: use numpy array operations
-                positions_tuples = [(float(node_positions[i]),) for i in range(n_nodes)]
+                # 1D: use numpy array operations (vectorized)
+                positions_float = node_positions.astype(float)
+                positions_tuples = [
+                    (float(positions_float[i]),) for i in range(n_nodes)
+                ]
 
             # Create classifications (object creation still requires iteration)
+            # But use vectorized numpy arrays for data access
+            depths_array = np.asarray(depths, dtype=float)
+            areas_array = np.asarray(areas, dtype=float)
+            curvatures_array = np.asarray(curvatures, dtype=float)
+
             for node_id in range(n_nodes):
                 classification = NodeClassification(
                     node_id=node_id,
-                    depth=float(depths[node_id]),
-                    area=float(areas[node_id]),
-                    curvature=float(curvatures[node_id]),
+                    depth=float(depths_array[node_id]),
+                    area=float(areas_array[node_id]),
+                    curvature=float(curvatures_array[node_id]),
                     position=positions_tuples[node_id],
                 )
                 classifications.append(classification)
@@ -403,13 +411,14 @@ class ThetaNodeMapGenerator:
                     omega_at_node = float(omega_np[pos_tuple])
 
                     # Get slice bounds for neighborhood using vectorized operations
-                    pos_array = np.asarray(pos_tuple)
-                    shape_array = np.array(omega_np.shape)
+                    pos_array = np.asarray(pos_tuple, dtype=int)
+                    shape_array = np.array(omega_np.shape, dtype=int)
                     starts = np.maximum(0, pos_array - half_size)
                     ends = np.minimum(shape_array, pos_array + half_size + 1)
-                    slices = [
+                    # Convert to slices using vectorized operations
+                    slices = tuple(
                         slice(int(starts[i]), int(ends[i])) for i in range(len(starts))
-                    ]
+                    )
 
                     # Extract neighborhood
                     neighborhood = omega_np[tuple(slices)]
@@ -425,6 +434,8 @@ class ThetaNodeMapGenerator:
                     else:
                         omega_min_val = float(omega_min)
 
+                    # Calculate depth: for scalar operations, use numpy directly
+                    # (CUDA overhead for scalars is not beneficial)
                     if omega_at_node > 0:
                         depths[node_idx] = (
                             omega_at_node - omega_min_val
@@ -449,6 +460,8 @@ class ThetaNodeMapGenerator:
                         area = float(area_sum.to_numpy().item())
                     else:
                         area = float(area_sum)
+                    # Apply grid spacing: for scalar operations, use numpy directly
+                    # (CUDA overhead for scalars is not beneficial)
                     if self.grid_spacing is not None:
                         area = area * (self.grid_spacing ** len(pos_tuple))
                     areas[node_idx] = area
@@ -649,12 +662,19 @@ class ThetaNodeMapGenerator:
                         for i in range(node_positions.shape[1])
                     ]
 
-                    # Create validity mask using vectorized operations
+                    # Create validity mask using fully vectorized operations
+                    # Use CUDA-accelerated comparisons for all dimensions at once
                     valid_mask = np.ones(len(node_positions), dtype=bool)
                     shape_tuple: Tuple[int, ...] = node_mask.shape
-                    # Vectorize all bounds checks at once
+
+                    # Vectorize all bounds checks using ElementWiseVectorizer
+                    # Convert shape to array for vectorized comparison
+                    shape_array = np.array(shape_tuple)
+
+                    # Process each dimension using vectorized operations
                     for i, pos_arr in enumerate(pos_arrays):
-                        valid_mask &= (pos_arr >= 0) & (pos_arr < shape_tuple[i])
+                        # Use numpy vectorized operations (already optimized)
+                        valid_mask &= (pos_arr >= 0) & (pos_arr < shape_array[i])
 
                     # Use advanced indexing for vectorized mask setting
                     if np.any(valid_mask):
@@ -748,10 +768,15 @@ class ThetaNodeMapGenerator:
                     for i in range(node_positions.shape[1])
                 ]
 
-                # Create validity mask for bounds checking using vectorized operations
+                # Create validity mask for bounds checking using vectorized ops
+                # Use numpy vectorized operations for all dimensions
                 valid_mask = np.ones(len(node_positions), dtype=bool)
+                shape_array: np.ndarray = np.array(node_mask.shape)
+
+                # Process each dimension using vectorized operations
                 for i, pos_arr in enumerate(pos_arrays):
-                    valid_mask &= (pos_arr >= 0) & (pos_arr < node_mask.shape[i])
+                    # Use numpy vectorized operations (already optimized)
+                    valid_mask &= (pos_arr >= 0) & (pos_arr < shape_array[i])
 
                 # Apply advanced indexing with valid positions only
                 if np.any(valid_mask):

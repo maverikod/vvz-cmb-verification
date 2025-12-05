@@ -14,14 +14,14 @@ issues:
     file: cmb/theta_data_loader.py
     limit: 400
     lines: 575
-  - exceeds_limit: 292
+  - exceeds_limit: 494
     file: cmb/nodes/theta_node_map.py
     limit: 400
-    lines: 692
-  - exceeds_limit: 89
+    lines: 894
+  - exceeds_limit: 95
     file: utils/cuda/memory_watchdog.py
     limit: 400
-    lines: 489
+    lines: 495
   - exceeds_limit: 120
     file: utils/cuda/array_model.py
     limit: 400
@@ -46,81 +46,6 @@ issues:
   generic_exception_usage: []
   imports_in_middle: []
   invalid_imports:
-  - description: Module 'cupy' cannot be imported
-    file: utils/cuda/transform_vectorizer.py
-    line: 22
-    module: cupy
-    type: import
-  - description: Module 'cupyx.scipy' cannot be imported
-    file: utils/cuda/transform_vectorizer.py
-    imported: fft
-    line: 23
-    module: cupyx.scipy
-    type: import_from
-  - description: Module 'cupy' cannot be imported
-    file: utils/cuda/memory_watchdog.py
-    line: 26
-    module: cupy
-    type: import
-  - description: Module 'cupy' cannot be imported
-    file: utils/cuda/memory_safety.py
-    line: 19
-    module: cupy
-    type: import
-  - description: Module 'cupy' cannot be imported
-    file: utils/cuda/reduction_vectorizer.py
-    line: 21
-    module: cupy
-    type: import
-  - description: Module 'cupy' cannot be imported
-    file: utils/cuda/correlation_vectorizer.py
-    line: 22
-    module: cupy
-    type: import
-  - description: Module 'cupyx.scipy' cannot be imported
-    file: utils/cuda/correlation_vectorizer.py
-    imported: fft
-    line: 23
-    module: cupyx.scipy
-    type: import_from
-  - description: Module 'cupy' cannot be imported
-    file: utils/cuda/elementwise_vectorizer.py
-    line: 21
-    module: cupy
-    type: import
-  - description: Module 'cupy' cannot be imported
-    file: utils/cuda/vectorizer.py
-    line: 23
-    module: cupy
-    type: import
-  - description: Module 'cupy' cannot be imported
-    file: utils/cuda/array_model.py
-    line: 26
-    module: cupy
-    type: import
-  - description: Module 'cupy' cannot be imported
-    file: utils/cuda/grid_vectorizer.py
-    line: 21
-    module: cupy
-    type: import
-  - description: Module 'cupyx.scipy.ndimage' cannot be imported
-    file: utils/cuda/grid_vectorizer.py
-    imported: minimum_filter
-    line: 22
-    module: cupyx.scipy.ndimage
-    type: import_from
-  - description: Module 'cupyx.scipy.ndimage' cannot be imported
-    file: utils/cuda/grid_vectorizer.py
-    imported: maximum_filter
-    line: 22
-    module: cupyx.scipy.ndimage
-    type: import_from
-  - description: Module 'cupyx.scipy.ndimage' cannot be imported
-    file: utils/cuda/grid_vectorizer.py
-    imported: gaussian_filter
-    line: 22
-    module: cupyx.scipy.ndimage
-    type: import_from
   - description: Module 'pandas' cannot be imported
     file: utils/io/data_loader.py
     line: 21
@@ -130,11 +55,6 @@ issues:
     file: utils/io/data_saver.py
     line: 19
     module: pandas
-    type: import
-  - description: Module 'cupy' cannot be imported
-    file: tests/unit/test_cuda_array.py
-    line: 239
-    module: cupy
     type: import
   - description: Module 'cmb.spectrum.power_spectrum' cannot be imported
     file: docs/implementation_plan/phase_5_act_spt_predictions/step_5.1_highl_peak/highl_peak_predictor.py
@@ -308,9 +228,9 @@ summary:
   files_without_docstrings: 0
   generic_exception_usage: 0
   imports_in_middle: 0
-  invalid_imports: 40
+  invalid_imports: 25
   max_lines_limit: 400
   methods_with_pass: 0
   methods_without_docstrings: 5
   not_implemented_in_non_abstract: 1
-  total_issues: 56
+  total_issues: 41

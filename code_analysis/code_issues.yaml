@@ -25,14 +25,18 @@ issues:
     file: cmb/nodes/node_properties.py
     limit: 400
     lines: 546
-  - exceeds_limit: 141
+  - exceeds_limit: 176
     file: cmb/reconstruction/cmb_map_reconstructor.py
     limit: 400
-    lines: 541
+    lines: 576
   - exceeds_limit: 95
     file: utils/cuda/memory_watchdog.py
     limit: 400
     lines: 495
+  - exceeds_limit: 5
+    file: utils/cuda/elementwise_vectorizer.py
+    limit: 400
+    lines: 405
   - exceeds_limit: 120
     file: utils/cuda/array_model.py
     limit: 400
@@ -331,7 +335,7 @@ issues:
 summary:
   any_type_usage: 0
   classes_without_docstrings: 1
-  files_too_large: 14
+  files_too_large: 15
   files_without_docstrings: 0
   generic_exception_usage: 0
   imports_in_middle: 0
@@ -340,4 +344,4 @@ summary:
   methods_with_pass: 0
   methods_without_docstrings: 33
   not_implemented_in_non_abstract: 1
-  total_issues: 70
+  total_issues: 71

@@ -1,3 +1,10 @@
+AmplitudeValidator:
+- __init__
+- validate
+- _calculate_mean
+- _calculate_std
+- _calculate_in_range_fraction
+- _cleanup_arrays
 BaseVectorizer:
 - __init__
 - use_gpu
@@ -170,7 +177,25 @@ IndexData:
 InvarianceTestResult: []
 LoggingConfig: []
 LssStructure: []
+MapComparator:
+- __init__
+- compare
+- _calculate_difference
+- _calculate_mean
+- _calculate_std
+- _calculate_rms
+- _calculate_correlation
+- _cleanup_arrays
+MapLoader:
+- __init__
+- load_map
 MapValidator:
+- __init__
+- load_observed_map
+- compare_maps
+- validate_arcmin_structures
+- validate_amplitude
+- generate_validation_report
 - __init__
 - load_observed_map
 - compare_maps
@@ -275,6 +300,14 @@ SpectrumComparator:
 - validate_high_l_tail
 - calculate_chi_squared
 - generate_comparison_report
+StructureValidator:
+- __init__
+- validate
+- _filter_by_scale
+- _count_structures
+- _create_threshold_mask
+- _match_structures
+- _cleanup_arrays
 SubPeak: []
 SubPeakAnalysis: []
 SubpeaksAnalyzer:
@@ -493,6 +526,21 @@ TestMapDepthToTemperature:
 - test_map_depth_to_temperature_range
 - test_map_depth_to_temperature_negative
 - test_map_depth_to_temperature_custom_config
+TestMapValidator:
+- test_init
+- test_load_observed_map
+- test_load_observed_map_file_not_found
+- test_compare_maps
+- test_compare_maps_size_mismatch
+- test_validate_arcmin_structures
+- test_validate_arcmin_structures_invalid_scale
+- test_validate_amplitude
+- test_validate_amplitude_invalid_range
+- test_generate_validation_report
+- test_generate_validation_report_save_file
+- test_cuda_operations_used
+- test_identical_maps_high_correlation
+- test_opposite_maps_negative_correlation
 TestMemoryWatchdog:
 - setup_method
 - test_singleton

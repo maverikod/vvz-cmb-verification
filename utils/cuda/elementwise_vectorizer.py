@@ -171,23 +171,31 @@ class ElementWiseVectorizer(BaseVectorizer):
         if op_func is None:
             raise ValueError("Operation not set. Use vectorize_operation() method.")
 
+        # Convert block to CuPy if GPU is available
+        block_is_cupy = False
+        if self.use_gpu and CUPY_AVAILABLE:
+            # Convert block to CuPy if it's numpy
+            if isinstance(block, np.ndarray) and not isinstance(block, cp.ndarray):
+                block = cp.asarray(block)
+                block_is_cupy = True
+            elif isinstance(block, cp.ndarray):
+                block_is_cupy = True
+
         # Convert operand if needed
         if operand is not None:
             from utils.cuda.array_model import CudaArray
 
             if isinstance(operand, CudaArray):
                 # If operand is CudaArray, get data from same device as block
-                if self.use_gpu and CUPY_AVAILABLE and isinstance(block, cp.ndarray):
-                    # Block is on GPU, get operand from GPU if available
-                    if operand.device == "cuda":
-                        operand = operand.use_whole_array()
-                    else:
-                        # Operand is on CPU, convert to CuPy
-                        operand = cp.asarray(operand.to_numpy())
+                if block_is_cupy:
+                    # Block is on GPU, always convert operand to CuPy
+                    # Get numpy array first, then convert to CuPy
+                    operand_np = operand.to_numpy()
+                    operand = cp.asarray(operand_np)
                 else:
                     # Block is on CPU, get operand from CPU
                     operand = operand.to_numpy()
-            elif self.use_gpu and CUPY_AVAILABLE and isinstance(block, cp.ndarray):
+            elif block_is_cupy:
                 # Block is CuPy array, convert operand to CuPy
                 if isinstance(operand, np.ndarray):
                     operand = cp.asarray(operand)
@@ -196,6 +204,11 @@ class ElementWiseVectorizer(BaseVectorizer):
             elif isinstance(operand, np.ndarray):
                 # Block is numpy, operand is numpy - both on CPU, fine
                 pass
+
+        # Final check: ensure operand is correct type for CuPy operations
+        if block_is_cupy and operand is not None:
+            if isinstance(operand, np.ndarray) and not isinstance(operand, cp.ndarray):
+                operand = cp.asarray(operand)
 
         # Apply operation
         if operand is None:

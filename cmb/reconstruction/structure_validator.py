@@ -13,15 +13,6 @@ import healpy as hp
 from utils.cuda import CudaArray, ElementWiseVectorizer, ReductionVectorizer
 from utils.math.spherical_harmonics import decompose_map, synthesize_map
 
-# Try to import CuPy for CUDA operations
-try:
-    import cupy as cp
-
-    CUPY_AVAILABLE = True
-except ImportError:
-    CUPY_AVAILABLE = False
-    cp = None
-
 
 def _to_float(value) -> float:
     """Convert reduction result to float."""
@@ -179,47 +170,142 @@ class StructureValidator:
     def _create_threshold_mask(
         self, map_cuda: CudaArray, threshold: float, shape: tuple
     ) -> CudaArray:
-        """Create mask for values above threshold."""
+        """Create mask for values above threshold using ElementWiseVectorizer."""
         threshold_cuda = CudaArray(
             np.full(shape, threshold, dtype=np.float64), device="cpu", block_size=None
         )
-        map_whole = map_cuda.use_whole_array()
-        threshold_whole = threshold_cuda.use_whole_array()
-
-        if self.elem_vec.use_gpu and CUPY_AVAILABLE:
-            if not isinstance(map_whole, cp.ndarray):
-                map_whole = cp.asarray(map_whole)
-            if not isinstance(threshold_whole, cp.ndarray):
-                threshold_whole = cp.asarray(threshold_whole)
-            mask_whole = map_whole > threshold_whole
-            mask_np = cp.asnumpy(mask_whole).astype(np.float64)
-        else:
-            mask_np = (map_whole > threshold_whole).astype(np.float64)
-
-        self._cleanup_arrays([threshold_cuda])
+        # Compare: map > threshold
+        mask_cuda = self.elem_vec.vectorize_operation(
+            map_cuda, "greater", threshold_cuda
+        )
+        # Convert boolean mask to float64
+        mask_np = mask_cuda.to_numpy().astype(np.float64)
+        self._cleanup_arrays([threshold_cuda, mask_cuda])
         return CudaArray(mask_np, device="cpu", block_size=None)
 
     def _match_structures(
         self, recon_filtered: np.ndarray, obs_filtered: np.ndarray
     ) -> tuple:
-        """Match structures by position and amplitude."""
-        # This is a simplified implementation
-        # In production, would use angular distance matching
-        recon_pixels = np.where(recon_filtered > np.mean(recon_filtered))[0]
-        obs_pixels = np.where(obs_filtered > np.mean(obs_filtered))[0]
+        """Match structures by position and amplitude using CUDA utilities."""
+        # Convert to CudaArray
+        recon_cuda = CudaArray(recon_filtered, device="cpu", block_size=None)
+        obs_cuda = CudaArray(obs_filtered, device="cpu", block_size=None)
+
+        # Calculate means using ReductionVectorizer
+        recon_mean = _to_float(
+            self.reduction_vec.vectorize_reduction(recon_cuda, "mean")
+        )
+        obs_mean = _to_float(self.reduction_vec.vectorize_reduction(obs_cuda, "mean"))
+
+        # Create threshold masks using ElementWiseVectorizer
+        recon_mean_cuda = CudaArray(
+            np.full(recon_cuda.shape, recon_mean, dtype=np.float64),
+            device="cpu",
+            block_size=None,
+        )
+        obs_mean_cuda = CudaArray(
+            np.full(obs_cuda.shape, obs_mean, dtype=np.float64),
+            device="cpu",
+            block_size=None,
+        )
+
+        # Compare: array > mean using ElementWiseVectorizer
+        recon_mask_cuda = self.elem_vec.vectorize_operation(
+            recon_cuda, "greater", recon_mean_cuda
+        )
+        obs_mask_cuda = self.elem_vec.vectorize_operation(
+            obs_cuda, "greater", obs_mean_cuda
+        )
+
+        # Convert masks to numpy for np.where (index operations)
+        recon_mask = recon_mask_cuda.to_numpy()
+        obs_mask = obs_mask_cuda.to_numpy()
+
+        # Find pixel indices (np.where is acceptable for index operations)
+        recon_pixels = np.where(recon_mask > 0.5)[0]
+        obs_pixels = np.where(obs_mask > 0.5)[0]
         matching_pixels = np.intersect1d(recon_pixels, obs_pixels)
         position_matches = len(matching_pixels)
 
-        # Match amplitudes
+        # Match amplitudes using CUDA utilities
         amplitude_matches = 0
         if len(matching_pixels) > 0:
-            recon_values = recon_filtered[matching_pixels]
-            obs_values = obs_filtered[matching_pixels]
-            amplitude_tolerance = 0.2
-            mean_amp = (np.abs(recon_values).mean() + np.abs(obs_values).mean()) / 2.0
+            # Get values at matching pixels (numpy indexing is acceptable)
+            recon_values_np = recon_filtered[matching_pixels]
+            obs_values_np = obs_filtered[matching_pixels]
+
+            # Convert to CudaArray for calculations
+            recon_values_cuda = CudaArray(
+                recon_values_np, device="cpu", block_size=None
+            )
+            obs_values_cuda = CudaArray(obs_values_np, device="cpu", block_size=None)
+
+            # Calculate absolute values using ElementWiseVectorizer
+            recon_abs_cuda = self.elem_vec.abs(recon_values_cuda)
+            obs_abs_cuda = self.elem_vec.abs(obs_values_cuda)
+
+            # Calculate means using ReductionVectorizer
+            recon_abs_mean = _to_float(
+                self.reduction_vec.vectorize_reduction(recon_abs_cuda, "mean")
+            )
+            obs_abs_mean = _to_float(
+                self.reduction_vec.vectorize_reduction(obs_abs_cuda, "mean")
+            )
+            mean_amp = (recon_abs_mean + obs_abs_mean) / 2.0
+
             if mean_amp > 0:
-                rel_diff = np.abs(recon_values - obs_values) / mean_amp
-                amplitude_matches = int(np.sum(rel_diff <= amplitude_tolerance))
+                # Calculate relative difference: |recon - obs| / mean_amp
+                diff_cuda = self.elem_vec.subtract(recon_values_cuda, obs_values_cuda)
+                diff_abs_cuda = self.elem_vec.abs(diff_cuda)
+                rel_diff_cuda = self.elem_vec.divide(
+                    diff_abs_cuda, CudaArray(np.array([mean_amp]), device="cpu")
+                )
+
+                # Count pixels within tolerance using ElementWiseVectorizer
+                tolerance_cuda = CudaArray(
+                    np.full(rel_diff_cuda.shape, 0.2, dtype=np.float64),
+                    device="cpu",
+                    block_size=None,
+                )
+                in_tolerance_mask_cuda = self.elem_vec.vectorize_operation(
+                    rel_diff_cuda, "less_equal", tolerance_cuda
+                )
+
+                # Count matches using ReductionVectorizer
+                amplitude_matches = int(
+                    _to_float(
+                        self.reduction_vec.vectorize_reduction(
+                            in_tolerance_mask_cuda, "sum"
+                        )
+                    )
+                )
+
+            # Cleanup
+            self._cleanup_arrays(
+                [
+                    recon_values_cuda,
+                    obs_values_cuda,
+                    recon_abs_cuda,
+                    obs_abs_cuda,
+                    diff_cuda,
+                    diff_abs_cuda,
+                    rel_diff_cuda,
+                    tolerance_cuda,
+                    in_tolerance_mask_cuda,
+                ]
+            )
+
+        # Cleanup
+        self._cleanup_arrays(
+            [
+                recon_cuda,
+                obs_cuda,
+                recon_mean_cuda,
+                obs_mean_cuda,
+                recon_mask_cuda,
+                obs_mask_cuda,
+            ]
+        )
 
         return position_matches, amplitude_matches
 

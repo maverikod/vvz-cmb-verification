@@ -11,15 +11,6 @@ from typing import Dict, Any
 import numpy as np
 from utils.cuda import CudaArray, ElementWiseVectorizer, ReductionVectorizer
 
-# Try to import CuPy for CUDA operations
-try:
-    import cupy as cp
-
-    CUPY_AVAILABLE = True
-except ImportError:
-    CUPY_AVAILABLE = False
-    cp = None
-
 
 def _to_float(value) -> float:
     """Convert reduction result to float."""
@@ -100,17 +91,9 @@ class AmplitudeValidator:
     def _calculate_in_range_fraction(
         self, map_cuda: CudaArray, min_microK: float, max_microK: float
     ) -> float:
-        """Calculate fraction of pixels in range."""
-        # Calculate absolute values
-        map_whole = map_cuda.use_whole_array()
-        if self.elem_vec.use_gpu and CUPY_AVAILABLE:
-            if not isinstance(map_whole, cp.ndarray):
-                map_whole = cp.asarray(map_whole)
-            abs_map_whole = cp.abs(map_whole)
-            abs_map_np = cp.asnumpy(abs_map_whole)
-        else:
-            abs_map_np = np.abs(map_whole)
-        abs_map_cuda = CudaArray(abs_map_np, device="cpu", block_size=None)
+        """Calculate fraction of pixels in range using ElementWiseVectorizer."""
+        # Calculate absolute values using ElementWiseVectorizer
+        abs_map_cuda = self.elem_vec.abs(map_cuda)
 
         # Create threshold arrays
         min_cuda = CudaArray(
@@ -124,27 +107,19 @@ class AmplitudeValidator:
             block_size=None,
         )
 
-        # Check range
-        abs_map_whole = abs_map_cuda.use_whole_array()
-        min_whole = min_cuda.use_whole_array()
-        max_whole = max_cuda.use_whole_array()
-
-        if self.elem_vec.use_gpu and CUPY_AVAILABLE:
-            if not isinstance(abs_map_whole, cp.ndarray):
-                abs_map_whole = cp.asarray(abs_map_whole)
-            if not isinstance(min_whole, cp.ndarray):
-                min_whole = cp.asarray(min_whole)
-            if not isinstance(max_whole, cp.ndarray):
-                max_whole = cp.asarray(max_whole)
-            ge_min_whole = abs_map_whole >= min_whole
-            le_max_whole = abs_map_whole <= max_whole
-            in_range_whole = ge_min_whole * le_max_whole
-            in_range_np = cp.asnumpy(in_range_whole).astype(np.float64)
-        else:
-            ge_min_np = (abs_map_whole >= min_whole).astype(np.float64)
-            le_max_np = (abs_map_whole <= max_whole).astype(np.float64)
-            in_range_np = (ge_min_np * le_max_np).astype(np.float64)
-
+        # Check range using ElementWiseVectorizer
+        # abs_map >= min_microK
+        ge_min_cuda = self.elem_vec.vectorize_operation(
+            abs_map_cuda, "greater_equal", min_cuda
+        )
+        # abs_map <= max_microK
+        le_max_cuda = self.elem_vec.vectorize_operation(
+            abs_map_cuda, "less_equal", max_cuda
+        )
+        # in_range = (abs_map >= min) AND (abs_map <= max)
+        in_range_cuda = self.elem_vec.multiply(ge_min_cuda, le_max_cuda)
+        # Ensure float64 for reduction
+        in_range_np = in_range_cuda.to_numpy().astype(np.float64)
         in_range_cuda = CudaArray(in_range_np, device="cpu", block_size=None)
 
         # Count pixels in range
@@ -157,7 +132,9 @@ class AmplitudeValidator:
         )
 
         # Cleanup
-        self._cleanup_arrays([abs_map_cuda, min_cuda, max_cuda, in_range_cuda])
+        self._cleanup_arrays(
+            [abs_map_cuda, min_cuda, max_cuda, ge_min_cuda, le_max_cuda, in_range_cuda]
+        )
 
         return in_range_fraction
 

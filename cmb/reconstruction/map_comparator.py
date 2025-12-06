@@ -11,15 +11,6 @@ from typing import Dict
 import numpy as np
 from utils.cuda import CudaArray, ElementWiseVectorizer, ReductionVectorizer
 
-# Try to import CuPy for CUDA operations
-try:
-    import cupy as cp
-
-    CUPY_AVAILABLE = True
-except ImportError:
-    CUPY_AVAILABLE = False
-    cp = None
-
 
 def _to_float(value) -> float:
     """
@@ -109,21 +100,9 @@ class MapComparator:
     def _calculate_difference(
         self, recon_cuda: CudaArray, obs_cuda: CudaArray
     ) -> CudaArray:
-        """Calculate difference map."""
-        recon_whole = recon_cuda.use_whole_array()
-        obs_whole = obs_cuda.use_whole_array()
-
-        if self.elem_vec.use_gpu and CUPY_AVAILABLE:
-            if not isinstance(recon_whole, cp.ndarray):
-                recon_whole = cp.asarray(recon_whole)
-            if not isinstance(obs_whole, cp.ndarray):
-                obs_whole = cp.asarray(obs_whole)
-            diff_whole = recon_whole - obs_whole
-            diff_np = cp.asnumpy(diff_whole)
-        else:
-            diff_np = recon_whole - obs_whole
-
-        return CudaArray(diff_np, device="cpu", block_size=None)
+        """Calculate difference map using ElementWiseVectorizer."""
+        diff_cuda = self.elem_vec.subtract(recon_cuda, obs_cuda)
+        return diff_cuda
 
     def _calculate_mean(self, diff_cuda: CudaArray) -> float:
         """Calculate mean difference."""
@@ -131,44 +110,29 @@ class MapComparator:
         return _to_float(mean_result)
 
     def _calculate_std(self, diff_cuda: CudaArray, mean_diff: float) -> float:
-        """Calculate standard deviation of difference."""
+        """Calculate standard deviation of difference using ElementWiseVectorizer."""
         mean_diff_cuda = CudaArray(
             np.full(diff_cuda.shape, mean_diff, dtype=np.float64),
             device="cpu",
             block_size=None,
         )
-        diff_whole = diff_cuda.use_whole_array()
-        mean_diff_whole = mean_diff_cuda.use_whole_array()
-
-        if self.elem_vec.use_gpu and CUPY_AVAILABLE:
-            if not isinstance(diff_whole, cp.ndarray):
-                diff_whole = cp.asarray(diff_whole)
-            if not isinstance(mean_diff_whole, cp.ndarray):
-                mean_diff_whole = cp.asarray(mean_diff_whole)
-            diff_centered_whole = diff_whole - mean_diff_whole
-            diff_squared_whole = diff_centered_whole * diff_centered_whole
-            diff_squared_np = cp.asnumpy(diff_squared_whole)
-        else:
-            diff_centered_np = diff_whole - mean_diff_whole
-            diff_squared_np = diff_centered_np * diff_centered_np
-
-        diff_squared_cuda = CudaArray(diff_squared_np, device="cpu", block_size=None)
+        # Center array: diff - mean
+        diff_centered_cuda = self.elem_vec.subtract(diff_cuda, mean_diff_cuda)
+        # Square: (diff - mean)^2
+        diff_squared_cuda = self.elem_vec.multiply(
+            diff_centered_cuda, diff_centered_cuda
+        )
+        # Calculate variance
         var_result = self.reduction_vec.vectorize_reduction(diff_squared_cuda, "mean")
         variance = _to_float(var_result)
-        self._cleanup_arrays([mean_diff_cuda, diff_squared_cuda])
+        self._cleanup_arrays([mean_diff_cuda, diff_centered_cuda, diff_squared_cuda])
         return np.sqrt(variance)
 
     def _calculate_rms(self, diff_cuda: CudaArray) -> float:
-        """Calculate RMS difference."""
-        diff_whole = diff_cuda.use_whole_array()
-        if self.elem_vec.use_gpu and CUPY_AVAILABLE:
-            if not isinstance(diff_whole, cp.ndarray):
-                diff_whole = cp.asarray(diff_whole)
-            diff_squared_whole = diff_whole * diff_whole
-            diff_squared_np = cp.asnumpy(diff_squared_whole)
-        else:
-            diff_squared_np = diff_whole * diff_whole
-        diff_squared_cuda = CudaArray(diff_squared_np, device="cpu", block_size=None)
+        """Calculate RMS difference using ElementWiseVectorizer."""
+        # Square: diff^2
+        diff_squared_cuda = self.elem_vec.multiply(diff_cuda, diff_cuda)
+        # Calculate mean of squares
         mean_squared_result = self.reduction_vec.vectorize_reduction(
             diff_squared_cuda, "mean"
         )
@@ -186,7 +150,7 @@ class MapComparator:
         recon_mean = _to_float(recon_mean_result)
         obs_mean = _to_float(obs_mean_result)
 
-        # Center arrays
+        # Center arrays using ElementWiseVectorizer
         recon_mean_cuda = CudaArray(
             np.full(recon_cuda.shape, recon_mean, dtype=np.float64),
             device="cpu",
@@ -198,60 +162,24 @@ class MapComparator:
             block_size=None,
         )
 
-        recon_whole = recon_cuda.use_whole_array()
-        obs_whole = obs_cuda.use_whole_array()
-        recon_mean_whole = recon_mean_cuda.use_whole_array()
-        obs_mean_whole = obs_mean_cuda.use_whole_array()
-
-        if self.elem_vec.use_gpu and CUPY_AVAILABLE:
-            if not isinstance(recon_whole, cp.ndarray):
-                recon_whole = cp.asarray(recon_whole)
-            if not isinstance(obs_whole, cp.ndarray):
-                obs_whole = cp.asarray(obs_whole)
-            if not isinstance(recon_mean_whole, cp.ndarray):
-                recon_mean_whole = cp.asarray(recon_mean_whole)
-            if not isinstance(obs_mean_whole, cp.ndarray):
-                obs_mean_whole = cp.asarray(obs_mean_whole)
-            recon_centered_whole = recon_whole - recon_mean_whole
-            obs_centered_whole = obs_whole - obs_mean_whole
-            cov_product_whole = recon_centered_whole * obs_centered_whole
-            recon_centered_np = cp.asnumpy(recon_centered_whole)
-            obs_centered_np = cp.asnumpy(obs_centered_whole)
-            cov_product_np = cp.asnumpy(cov_product_whole)
-        else:
-            recon_centered_np = recon_whole - recon_mean_whole
-            obs_centered_np = obs_whole - obs_mean_whole
-            cov_product_np = recon_centered_np * obs_centered_np
-
-        recon_centered_cuda = CudaArray(
-            recon_centered_np, device="cpu", block_size=None
+        # Center: array - mean
+        recon_centered_cuda = self.elem_vec.subtract(recon_cuda, recon_mean_cuda)
+        obs_centered_cuda = self.elem_vec.subtract(obs_cuda, obs_mean_cuda)
+        # Covariance product: (recon - mean_recon) * (obs - mean_obs)
+        cov_product_cuda = self.elem_vec.multiply(
+            recon_centered_cuda, obs_centered_cuda
         )
-        obs_centered_cuda = CudaArray(obs_centered_np, device="cpu", block_size=None)
-        cov_product_cuda = CudaArray(cov_product_np, device="cpu", block_size=None)
 
         # Calculate covariance
         cov_result = self.reduction_vec.vectorize_reduction(cov_product_cuda, "mean")
         covariance = _to_float(cov_result)
 
-        # Calculate standard deviations
-        recon_centered_whole = recon_centered_cuda.use_whole_array()
-        obs_centered_whole = obs_centered_cuda.use_whole_array()
-
-        if self.elem_vec.use_gpu and CUPY_AVAILABLE:
-            if not isinstance(recon_centered_whole, cp.ndarray):
-                recon_centered_whole = cp.asarray(recon_centered_whole)
-            if not isinstance(obs_centered_whole, cp.ndarray):
-                obs_centered_whole = cp.asarray(obs_centered_whole)
-            recon_squared_whole = recon_centered_whole * recon_centered_whole
-            obs_squared_whole = obs_centered_whole * obs_centered_whole
-            recon_squared_np = cp.asnumpy(recon_squared_whole)
-            obs_squared_np = cp.asnumpy(obs_squared_whole)
-        else:
-            recon_squared_np = recon_centered_whole * recon_centered_whole
-            obs_squared_np = obs_centered_whole * obs_centered_whole
-
-        recon_squared_cuda = CudaArray(recon_squared_np, device="cpu", block_size=None)
-        obs_squared_cuda = CudaArray(obs_squared_np, device="cpu", block_size=None)
+        # Calculate standard deviations using ElementWiseVectorizer
+        # Square centered arrays: (recon - mean)^2, (obs - mean)^2
+        recon_squared_cuda = self.elem_vec.multiply(
+            recon_centered_cuda, recon_centered_cuda
+        )
+        obs_squared_cuda = self.elem_vec.multiply(obs_centered_cuda, obs_centered_cuda)
         recon_var_result = self.reduction_vec.vectorize_reduction(
             recon_squared_cuda, "mean"
         )

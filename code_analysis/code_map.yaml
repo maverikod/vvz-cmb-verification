@@ -94,6 +94,22 @@ classes:
     - create_node_mask
     - validate_node_map
     name: ThetaNodeMapGenerator
+  cmb/reconstruction/amplitude_validator.py:AmplitudeValidator:
+    bases: []
+    docstring: 'Amplitude validator for CMB maps.
+
+
+      Validates temperature fluctuation amplitude range.'
+    file: cmb/reconstruction/amplitude_validator.py
+    line: 24
+    methods:
+    - __init__
+    - validate
+    - _calculate_mean
+    - _calculate_std
+    - _calculate_in_range_fraction
+    - _cleanup_arrays
+    name: AmplitudeValidator
   cmb/reconstruction/cmb_map_reconstructor.py:CmbMapReconstructor:
     bases: []
     docstring: 'CMB map reconstructor from Θ-field data.
@@ -114,7 +130,7 @@ classes:
 
       - Spherical harmonic synthesis'
     file: cmb/reconstruction/cmb_map_reconstructor.py
-    line: 55
+    line: 64
     methods:
     - __init__
     - reconstruct_map
@@ -122,6 +138,73 @@ classes:
     - _project_nodes_to_sky
     - _integrate_frequency_spectrum
     name: CmbMapReconstructor
+  cmb/reconstruction/map_comparator.py:MapComparator:
+    bases: []
+    docstring: 'Map comparison calculator.
+
+
+      Compares two maps and calculates correlation, difference statistics.
+
+      Uses CUDA acceleration for all operations.'
+    file: cmb/reconstruction/map_comparator.py
+    line: 32
+    methods:
+    - __init__
+    - compare
+    - _calculate_difference
+    - _calculate_mean
+    - _calculate_std
+    - _calculate_rms
+    - _calculate_correlation
+    - _cleanup_arrays
+    name: MapComparator
+  cmb/reconstruction/map_loader.py:MapLoader:
+    bases: []
+    docstring: 'HEALPix map loader.
+
+
+      Loads and validates HEALPix maps, handling resolution differences.'
+    file: cmb/reconstruction/map_loader.py
+    line: 16
+    methods:
+    - __init__
+    - load_map
+    name: MapLoader
+  cmb/reconstruction/map_validator.py:MapValidator:
+    bases: []
+    docstring: 'CMB map validator (facade class).
+
+
+      Validates reconstructed maps against ACT DR6.02 observations.
+
+      Coordinates validation operations using helper classes.'
+    file: cmb/reconstruction/map_validator.py
+    line: 26
+    methods:
+    - __init__
+    - load_observed_map
+    - compare_maps
+    - validate_arcmin_structures
+    - validate_amplitude
+    - generate_validation_report
+    name: MapValidator
+  cmb/reconstruction/structure_validator.py:StructureValidator:
+    bases: []
+    docstring: 'Arcmin-scale structure validator.
+
+
+      Validates structures at specified angular scales using spherical harmonics.'
+    file: cmb/reconstruction/structure_validator.py
+    line: 26
+    methods:
+    - __init__
+    - validate
+    - _filter_by_scale
+    - _count_structures
+    - _create_threshold_mask
+    - _match_structures
+    - _cleanup_arrays
+    name: StructureValidator
   cmb/theta_data_loader.py:ThetaEvolution:
     bases: []
     docstring: "Θ-field temporal evolution data.\n\nAttributes:\n    times: Time array\
@@ -1270,6 +1353,27 @@ classes:
     - test_invalid_operation
     - test_1d_local_minima
     name: TestGridVectorizer
+  tests/unit/test_map_validator.py:TestMapValidator:
+    bases: []
+    docstring: Test MapValidator class.
+    file: tests/unit/test_map_validator.py
+    line: 52
+    methods:
+    - test_init
+    - test_load_observed_map
+    - test_load_observed_map_file_not_found
+    - test_compare_maps
+    - test_compare_maps_size_mismatch
+    - test_validate_arcmin_structures
+    - test_validate_arcmin_structures_invalid_scale
+    - test_validate_amplitude
+    - test_validate_amplitude_invalid_range
+    - test_generate_validation_report
+    - test_generate_validation_report_save_file
+    - test_cuda_operations_used
+    - test_identical_maps_high_correlation
+    - test_opposite_maps_negative_correlation
+    name: TestMapValidator
   tests/unit/test_memory_watchdog.py:TestMemoryWatchdog:
     bases: []
     docstring: Test MemoryWatchdog class.
@@ -2199,6 +2303,67 @@ functions:
     file: cmb/nodes/theta_node_map.py
     line: 334
     name: validate_node_map
+  cmb/reconstruction/amplitude_validator.py:__init__:
+    args:
+    - self
+    docstring: Initialize amplitude validator.
+    file: cmb/reconstruction/amplitude_validator.py
+    line: 31
+    name: __init__
+  cmb/reconstruction/amplitude_validator.py:_calculate_in_range_fraction:
+    args:
+    - self
+    - map_cuda
+    - min_microK
+    - max_microK
+    docstring: Calculate fraction of pixels in range using ElementWiseVectorizer.
+    file: cmb/reconstruction/amplitude_validator.py
+    line: 91
+    name: _calculate_in_range_fraction
+  cmb/reconstruction/amplitude_validator.py:_calculate_mean:
+    args:
+    - self
+    - map_cuda
+    docstring: Calculate mean amplitude.
+    file: cmb/reconstruction/amplitude_validator.py
+    line: 81
+    name: _calculate_mean
+  cmb/reconstruction/amplitude_validator.py:_calculate_std:
+    args:
+    - self
+    - map_cuda
+    docstring: Calculate standard deviation.
+    file: cmb/reconstruction/amplitude_validator.py
+    line: 86
+    name: _calculate_std
+  cmb/reconstruction/amplitude_validator.py:_cleanup_arrays:
+    args:
+    - self
+    - arrays
+    docstring: Cleanup GPU memory.
+    file: cmb/reconstruction/amplitude_validator.py
+    line: 141
+    name: _cleanup_arrays
+  cmb/reconstruction/amplitude_validator.py:_to_float:
+    args:
+    - value
+    docstring: Convert reduction result to float.
+    file: cmb/reconstruction/amplitude_validator.py
+    line: 15
+    name: _to_float
+  cmb/reconstruction/amplitude_validator.py:validate:
+    args:
+    - self
+    - map_data
+    - min_microK
+    - max_microK
+    docstring: "Validate temperature fluctuation amplitude.\n\nArgs:\n    map_data:\
+      \ CMB map array\n    min_microK: Minimum expected amplitude in μK\n    max_microK:\
+      \ Maximum expected amplitude in μK\n\nReturns:\n    Dictionary with amplitude\
+      \ validation results\n\nRaises:\n    ValueError: If range parameters are invalid"
+    file: cmb/reconstruction/amplitude_validator.py
+    line: 36
+    name: validate
   cmb/reconstruction/cmb_map_reconstructor.py:__init__:
     args:
     - self
@@ -2212,7 +2377,7 @@ functions:
       \ Θ-node structure data\n    nside: HEALPix NSIDE parameter\n    config: Configuration\
       \ instance (uses global if None)"
     file: cmb/reconstruction/cmb_map_reconstructor.py
-    line: 69
+    line: 78
     name: __init__
   cmb/reconstruction/cmb_map_reconstructor.py:_convert_nodes_to_temperature:
     args:
@@ -2226,7 +2391,7 @@ functions:
       \ fluctuations for each node in μK\n\nRaises:\n    ValueError: If conversion\
       \ fails"
     file: cmb/reconstruction/cmb_map_reconstructor.py
-    line: 270
+    line: 297
     name: _convert_nodes_to_temperature
   cmb/reconstruction/cmb_map_reconstructor.py:_integrate_frequency_spectrum:
     args:
@@ -2237,7 +2402,7 @@ functions:
       \ operations for all calculations.\n\nReturns:\n    Array of integrated spectrum\
       \ weights for each node\n\nRaises:\n    ValueError: If integration fails"
     file: cmb/reconstruction/cmb_map_reconstructor.py
-    line: 385
+    line: 412
     name: _integrate_frequency_spectrum
   cmb/reconstruction/cmb_map_reconstructor.py:_project_nodes_to_sky:
     args:
@@ -2250,7 +2415,7 @@ functions:
       \ (theta, phi) sky coordinates for each node in radians\n\nRaises:\n    ValueError:\
       \ If projection fails"
     file: cmb/reconstruction/cmb_map_reconstructor.py
-    line: 297
+    line: 324
     name: _project_nodes_to_sky
   cmb/reconstruction/cmb_map_reconstructor.py:_to_float:
     args:
@@ -2259,7 +2424,7 @@ functions:
       \ vectorize_reduction (Union[CudaArray, float, int])\n\nReturns:\n    Float\
       \ value"
     file: cmb/reconstruction/cmb_map_reconstructor.py
-    line: 38
+    line: 47
     name: _to_float
   cmb/reconstruction/cmb_map_reconstructor.py:reconstruct_map:
     args:
@@ -2272,8 +2437,255 @@ functions:
       \    HEALPix map of temperature fluctuations ΔT in μK\n\nRaises:\n    ValueError:\
       \ If reconstruction fails"
     file: cmb/reconstruction/cmb_map_reconstructor.py
-    line: 112
+    line: 121
     name: reconstruct_map
+  cmb/reconstruction/map_comparator.py:__init__:
+    args:
+    - self
+    docstring: Initialize comparator.
+    file: cmb/reconstruction/map_comparator.py
+    line: 40
+    name: __init__
+  cmb/reconstruction/map_comparator.py:_calculate_correlation:
+    args:
+    - self
+    - recon_cuda
+    - obs_cuda
+    docstring: Calculate Pearson correlation coefficient.
+    file: cmb/reconstruction/map_comparator.py
+    line: 143
+    name: _calculate_correlation
+  cmb/reconstruction/map_comparator.py:_calculate_difference:
+    args:
+    - self
+    - recon_cuda
+    - obs_cuda
+    docstring: Calculate difference map using ElementWiseVectorizer.
+    file: cmb/reconstruction/map_comparator.py
+    line: 100
+    name: _calculate_difference
+  cmb/reconstruction/map_comparator.py:_calculate_mean:
+    args:
+    - self
+    - diff_cuda
+    docstring: Calculate mean difference.
+    file: cmb/reconstruction/map_comparator.py
+    line: 107
+    name: _calculate_mean
+  cmb/reconstruction/map_comparator.py:_calculate_rms:
+    args:
+    - self
+    - diff_cuda
+    docstring: Calculate RMS difference using ElementWiseVectorizer.
+    file: cmb/reconstruction/map_comparator.py
+    line: 131
+    name: _calculate_rms
+  cmb/reconstruction/map_comparator.py:_calculate_std:
+    args:
+    - self
+    - diff_cuda
+    - mean_diff
+    docstring: Calculate standard deviation of difference using ElementWiseVectorizer.
+    file: cmb/reconstruction/map_comparator.py
+    line: 112
+    name: _calculate_std
+  cmb/reconstruction/map_comparator.py:_cleanup_arrays:
+    args:
+    - self
+    - arrays
+    docstring: Cleanup GPU memory for arrays.
+    file: cmb/reconstruction/map_comparator.py
+    line: 210
+    name: _cleanup_arrays
+  cmb/reconstruction/map_comparator.py:_to_float:
+    args:
+    - value
+    docstring: "Convert reduction result to float.\n\nArgs:\n    value: Result from\
+      \ vectorize_reduction (Union[CudaArray, float, int])\n\nReturns:\n    Float\
+      \ value"
+    file: cmb/reconstruction/map_comparator.py
+    line: 15
+    name: _to_float
+  cmb/reconstruction/map_comparator.py:compare:
+    args:
+    - self
+    - reconstructed_map
+    - observed_map
+    docstring: "Compare reconstructed and observed maps.\n\nUses CUDA-accelerated\
+      \ operations for all calculations.\n\nArgs:\n    reconstructed_map: Reconstructed\
+      \ CMB map\n    observed_map: Observed CMB map\n\nReturns:\n    Dictionary with\
+      \ comparison metrics:\n    - correlation: Correlation coefficient (Pearson)\n\
+      \    - mean_diff: Mean difference\n    - std_diff: Standard deviation of difference\n\
+      \    - rms_diff: RMS difference\n\nRaises:\n    ValueError: If maps have incompatible\
+      \ formats"
+    file: cmb/reconstruction/map_comparator.py
+    line: 46
+    name: compare
+  cmb/reconstruction/map_loader.py:__init__:
+    args:
+    - self
+    - nside
+    docstring: "Initialize map loader.\n\nArgs:\n    nside: Target HEALPix NSIDE parameter"
+    file: cmb/reconstruction/map_loader.py
+    line: 23
+    name: __init__
+  cmb/reconstruction/map_loader.py:load_map:
+    args:
+    - self
+    - map_path
+    docstring: "Load HEALPix map from FITS file.\n\nArgs:\n    map_path: Path to FITS\
+      \ file\n\nReturns:\n    HEALPix map array with target NSIDE\n\nRaises:\n   \
+      \ FileNotFoundError: If map file doesn't exist\n    ValueError: If map format\
+      \ is invalid"
+    file: cmb/reconstruction/map_loader.py
+    line: 32
+    name: load_map
+  cmb/reconstruction/map_validator.py:__init__:
+    args:
+    - self
+    - reconstructed_map
+    - observed_map_path
+    - nside
+    docstring: "Initialize validator.\n\nArgs:\n    reconstructed_map: Reconstructed\
+      \ CMB map\n    observed_map_path: Path to ACT DR6.02 map\n    nside: HEALPix\
+      \ NSIDE parameter"
+    file: cmb/reconstruction/map_validator.py
+    line: 34
+    name: __init__
+  cmb/reconstruction/map_validator.py:compare_maps:
+    args:
+    - self
+    docstring: "Compare reconstructed and observed maps.\n\nReturns:\n    Dictionary\
+      \ with comparison metrics:\n    - correlation: Correlation coefficient (Pearson)\n\
+      \    - mean_diff: Mean difference\n    - std_diff: Standard deviation of difference\n\
+      \    - rms_diff: RMS difference\n\nRaises:\n    ValueError: If maps have incompatible\
+      \ formats"
+    file: cmb/reconstruction/map_validator.py
+    line: 66
+    name: compare_maps
+  cmb/reconstruction/map_validator.py:generate_validation_report:
+    args:
+    - self
+    - output_path
+    docstring: "Generate comprehensive validation report.\n\nArgs:\n    output_path:\
+      \ Path to save report (optional)\n\nReturns:\n    Validation report as string"
+    file: cmb/reconstruction/map_validator.py
+    line: 138
+    name: generate_validation_report
+  cmb/reconstruction/map_validator.py:load_observed_map:
+    args:
+    - self
+    docstring: "Load observed ACT DR6.02 map.\n\nRaises:\n    FileNotFoundError: If\
+      \ map file doesn't exist\n    ValueError: If map format is invalid"
+    file: cmb/reconstruction/map_validator.py
+    line: 56
+    name: load_observed_map
+  cmb/reconstruction/map_validator.py:validate_amplitude:
+    args:
+    - self
+    - min_microK
+    - max_microK
+    docstring: "Validate temperature fluctuation amplitude (20-30 μK).\n\nArgs:\n\
+      \    min_microK: Minimum expected amplitude in μK\n    max_microK: Maximum expected\
+      \ amplitude in μK\n\nReturns:\n    Dictionary with amplitude validation results:\n\
+      \    - mean_amplitude: Mean amplitude\n    - std_amplitude: Standard deviation\n\
+      \    - in_range_fraction: Fraction of pixels in range\n    - validation_passed:\
+      \ Boolean validation result"
+    file: cmb/reconstruction/map_validator.py
+    line: 117
+    name: validate_amplitude
+  cmb/reconstruction/map_validator.py:validate_arcmin_structures:
+    args:
+    - self
+    - scale_min
+    - scale_max
+    docstring: "Validate arcmin-scale structures (2-5′).\n\nArgs:\n    scale_min:\
+      \ Minimum scale in arcmin\n    scale_max: Maximum scale in arcmin\n\nReturns:\n\
+      \    Dictionary with structure validation results:\n    - structure_count: Number\
+      \ of structures found\n    - position_matches: Number of matching positions\n\
+      \    - amplitude_matches: Number of matching amplitudes\n\nRaises:\n    ValueError:\
+      \ If scale parameters are invalid"
+    file: cmb/reconstruction/map_validator.py
+    line: 88
+    name: validate_arcmin_structures
+  cmb/reconstruction/structure_validator.py:__init__:
+    args:
+    - self
+    - nside
+    docstring: "Initialize structure validator.\n\nArgs:\n    nside: HEALPix NSIDE\
+      \ parameter"
+    file: cmb/reconstruction/structure_validator.py
+    line: 33
+    name: __init__
+  cmb/reconstruction/structure_validator.py:_cleanup_arrays:
+    args:
+    - self
+    - arrays
+    docstring: Cleanup GPU memory.
+    file: cmb/reconstruction/structure_validator.py
+    line: 312
+    name: _cleanup_arrays
+  cmb/reconstruction/structure_validator.py:_count_structures:
+    args:
+    - self
+    - recon_filtered
+    - obs_filtered
+    docstring: Count structures above threshold.
+    file: cmb/reconstruction/structure_validator.py
+    line: 132
+    name: _count_structures
+  cmb/reconstruction/structure_validator.py:_create_threshold_mask:
+    args:
+    - self
+    - map_cuda
+    - threshold
+    - shape
+    docstring: Create mask for values above threshold using ElementWiseVectorizer.
+    file: cmb/reconstruction/structure_validator.py
+    line: 170
+    name: _create_threshold_mask
+  cmb/reconstruction/structure_validator.py:_filter_by_scale:
+    args:
+    - self
+    - recon_map
+    - obs_map
+    - l_min
+    - l_max
+    docstring: Filter maps by multipole range.
+    file: cmb/reconstruction/structure_validator.py
+    line: 94
+    name: _filter_by_scale
+  cmb/reconstruction/structure_validator.py:_match_structures:
+    args:
+    - self
+    - recon_filtered
+    - obs_filtered
+    docstring: Match structures by position and amplitude using CUDA utilities.
+    file: cmb/reconstruction/structure_validator.py
+    line: 186
+    name: _match_structures
+  cmb/reconstruction/structure_validator.py:_to_float:
+    args:
+    - value
+    docstring: Convert reduction result to float.
+    file: cmb/reconstruction/structure_validator.py
+    line: 17
+    name: _to_float
+  cmb/reconstruction/structure_validator.py:validate:
+    args:
+    - self
+    - reconstructed_map
+    - observed_map
+    - scale_min
+    - scale_max
+    docstring: "Validate arcmin-scale structures.\n\nArgs:\n    reconstructed_map:\
+      \ Reconstructed CMB map\n    observed_map: Observed CMB map\n    scale_min:\
+      \ Minimum scale in arcmin\n    scale_max: Maximum scale in arcmin\n\nReturns:\n\
+      \    Dictionary with structure validation results\n\nRaises:\n    ValueError:\
+      \ If scale parameters are invalid"
+    file: cmb/reconstruction/structure_validator.py
+    line: 44
+    name: validate
   cmb/theta_data_loader.py:load_evolution_data:
     args:
     - data_path
@@ -5888,6 +6300,170 @@ functions:
     file: tests/unit/test_grid_vectorizer.py
     line: 23
     name: test_local_minima
+  tests/unit/test_map_validator.py:sample_nside:
+    args: []
+    docstring: Create sample NSIDE for tests.
+    file: tests/unit/test_map_validator.py
+    line: 19
+    name: sample_nside
+  tests/unit/test_map_validator.py:sample_observed_map:
+    args:
+    - sample_nside
+    docstring: Create sample observed map for tests.
+    file: tests/unit/test_map_validator.py
+    line: 35
+    name: sample_observed_map
+  tests/unit/test_map_validator.py:sample_observed_map_path:
+    args:
+    - sample_observed_map
+    - sample_nside
+    docstring: Create temporary FITS file with observed map.
+    file: tests/unit/test_map_validator.py
+    line: 44
+    name: sample_observed_map_path
+  tests/unit/test_map_validator.py:sample_reconstructed_map:
+    args:
+    - sample_nside
+    docstring: Create sample reconstructed map for tests.
+    file: tests/unit/test_map_validator.py
+    line: 25
+    name: sample_reconstructed_map
+  tests/unit/test_map_validator.py:test_compare_maps:
+    args:
+    - self
+    - sample_reconstructed_map
+    - sample_observed_map_path
+    - sample_nside
+    docstring: Test map comparison.
+    file: tests/unit/test_map_validator.py
+    line: 88
+    name: test_compare_maps
+  tests/unit/test_map_validator.py:test_compare_maps_size_mismatch:
+    args:
+    - self
+    - sample_reconstructed_map
+    - sample_nside
+    docstring: Test map comparison with size mismatch.
+    file: tests/unit/test_map_validator.py
+    line: 116
+    name: test_compare_maps_size_mismatch
+  tests/unit/test_map_validator.py:test_cuda_operations_used:
+    args:
+    - self
+    - sample_reconstructed_map
+    - sample_observed_map_path
+    - sample_nside
+    docstring: Test that CUDA operations are used in calculations.
+    file: tests/unit/test_map_validator.py
+    line: 250
+    name: test_cuda_operations_used
+  tests/unit/test_map_validator.py:test_generate_validation_report:
+    args:
+    - self
+    - sample_reconstructed_map
+    - sample_observed_map_path
+    - sample_nside
+    docstring: Test validation report generation.
+    file: tests/unit/test_map_validator.py
+    line: 210
+    name: test_generate_validation_report
+  tests/unit/test_map_validator.py:test_generate_validation_report_save_file:
+    args:
+    - self
+    - sample_reconstructed_map
+    - sample_observed_map_path
+    - sample_nside
+    docstring: Test validation report generation with file save.
+    file: tests/unit/test_map_validator.py
+    line: 230
+    name: test_generate_validation_report_save_file
+  tests/unit/test_map_validator.py:test_identical_maps_high_correlation:
+    args:
+    - self
+    - sample_reconstructed_map
+    - sample_nside
+    docstring: Test that identical maps have high correlation.
+    file: tests/unit/test_map_validator.py
+    line: 277
+    name: test_identical_maps_high_correlation
+  tests/unit/test_map_validator.py:test_init:
+    args:
+    - self
+    - sample_reconstructed_map
+    - sample_observed_map_path
+    - sample_nside
+    docstring: Test MapValidator initialization.
+    file: tests/unit/test_map_validator.py
+    line: 55
+    name: test_init
+  tests/unit/test_map_validator.py:test_load_observed_map:
+    args:
+    - self
+    - sample_reconstructed_map
+    - sample_observed_map_path
+    - sample_nside
+    docstring: Test loading observed map.
+    file: tests/unit/test_map_validator.py
+    line: 67
+    name: test_load_observed_map
+  tests/unit/test_map_validator.py:test_load_observed_map_file_not_found:
+    args:
+    - self
+    - sample_reconstructed_map
+    - sample_nside
+    docstring: Test loading non-existent map file.
+    file: tests/unit/test_map_validator.py
+    line: 78
+    name: test_load_observed_map_file_not_found
+  tests/unit/test_map_validator.py:test_opposite_maps_negative_correlation:
+    args:
+    - self
+    - sample_reconstructed_map
+    - sample_nside
+    docstring: Test that opposite maps have negative correlation.
+    file: tests/unit/test_map_validator.py
+    line: 294
+    name: test_opposite_maps_negative_correlation
+  tests/unit/test_map_validator.py:test_validate_amplitude:
+    args:
+    - self
+    - sample_reconstructed_map
+    - sample_observed_map_path
+    - sample_nside
+    docstring: Test amplitude validation.
+    file: tests/unit/test_map_validator.py
+    line: 171
+    name: test_validate_amplitude
+  tests/unit/test_map_validator.py:test_validate_amplitude_invalid_range:
+    args:
+    - self
+    - sample_reconstructed_map
+    - sample_observed_map_path
+    - sample_nside
+    docstring: Test amplitude validation with invalid range.
+    file: tests/unit/test_map_validator.py
+    line: 198
+    name: test_validate_amplitude_invalid_range
+  tests/unit/test_map_validator.py:test_validate_arcmin_structures:
+    args:
+    - self
+    - sample_reconstructed_map
+    - sample_observed_map_path
+    - sample_nside
+    docstring: Test arcmin-scale structure validation.
+    file: tests/unit/test_map_validator.py
+    line: 131
+    name: test_validate_arcmin_structures
+  tests/unit/test_map_validator.py:test_validate_arcmin_structures_invalid_scale:
+    args:
+    - self
+    - sample_reconstructed_map
+    - sample_observed_map_path
+    - sample_nside
+    docstring: Test arcmin-scale validation with invalid parameters.
+    file: tests/unit/test_map_validator.py
+    line: 155
+    name: test_validate_arcmin_structures_invalid_scale
   tests/unit/test_memory_watchdog.py:setup_method:
     args:
     - self
@@ -7185,7 +7761,7 @@ functions:
       \ Whole array data\n    *args: Additional arguments (not used)\n    **kwargs:\
       \ Additional keyword arguments (not used)\n\nReturns:\n    Processed array"
     file: utils/cuda/elementwise_vectorizer.py
-    line: 210
+    line: 223
     name: _process_whole_array
   utils/cuda/elementwise_vectorizer.py:abs:
     args:
@@ -7193,7 +7769,7 @@ functions:
     - array
     docstring: Apply absolute value.
     file: utils/cuda/elementwise_vectorizer.py
-    line: 287
+    line: 300
     name: abs
   utils/cuda/elementwise_vectorizer.py:add:
     args:
@@ -7202,7 +7778,7 @@ functions:
     - operand
     docstring: Add operand to array.
     file: utils/cuda/elementwise_vectorizer.py
-    line: 227
+    line: 240
     name: add
   utils/cuda/elementwise_vectorizer.py:batch:
     args:
@@ -7213,7 +7789,7 @@ functions:
       \    **kwargs: Operation-specific keyword arguments\n\nReturns:\n    List of\
       \ result CudaArrays"
     file: utils/cuda/elementwise_vectorizer.py
-    line: 366
+    line: 379
     name: batch
   utils/cuda/elementwise_vectorizer.py:cos:
     args:
@@ -7221,7 +7797,7 @@ functions:
     - array
     docstring: Apply cosine function.
     file: utils/cuda/elementwise_vectorizer.py
-    line: 271
+    line: 284
     name: cos
   utils/cuda/elementwise_vectorizer.py:divide:
     args:
@@ -7230,7 +7806,7 @@ functions:
     - operand
     docstring: Divide array by operand.
     file: utils/cuda/elementwise_vectorizer.py
-    line: 251
+    line: 264
     name: divide
   utils/cuda/elementwise_vectorizer.py:exp:
     args:
@@ -7238,7 +7814,7 @@ functions:
     - array
     docstring: Apply exponential function.
     file: utils/cuda/elementwise_vectorizer.py
-    line: 275
+    line: 288
     name: exp
   utils/cuda/elementwise_vectorizer.py:log:
     args:
@@ -7246,7 +7822,7 @@ functions:
     - array
     docstring: Apply natural logarithm.
     file: utils/cuda/elementwise_vectorizer.py
-    line: 279
+    line: 292
     name: log
   utils/cuda/elementwise_vectorizer.py:multiply:
     args:
@@ -7255,7 +7831,7 @@ functions:
     - operand
     docstring: Multiply array by operand.
     file: utils/cuda/elementwise_vectorizer.py
-    line: 243
+    line: 256
     name: multiply
   utils/cuda/elementwise_vectorizer.py:power:
     args:
@@ -7264,7 +7840,7 @@ functions:
     - exponent
     docstring: Raise array to power.
     file: utils/cuda/elementwise_vectorizer.py
-    line: 259
+    line: 272
     name: power
   utils/cuda/elementwise_vectorizer.py:scatter_add:
     args:
@@ -7280,7 +7856,7 @@ functions:
       \ For large arrays, uses GPU\n    acceleration if available. Falls back to np.bincount\
       \ on CPU."
     file: utils/cuda/elementwise_vectorizer.py
-    line: 291
+    line: 304
     name: scatter_add
   utils/cuda/elementwise_vectorizer.py:sin:
     args:
@@ -7288,7 +7864,7 @@ functions:
     - array
     docstring: Apply sine function.
     file: utils/cuda/elementwise_vectorizer.py
-    line: 267
+    line: 280
     name: sin
   utils/cuda/elementwise_vectorizer.py:sqrt:
     args:
@@ -7296,7 +7872,7 @@ functions:
     - array
     docstring: Apply square root.
     file: utils/cuda/elementwise_vectorizer.py
-    line: 283
+    line: 296
     name: sqrt
   utils/cuda/elementwise_vectorizer.py:subtract:
     args:
@@ -7305,7 +7881,7 @@ functions:
     - operand
     docstring: Subtract operand from array.
     file: utils/cuda/elementwise_vectorizer.py
-    line: 235
+    line: 248
     name: subtract
   utils/cuda/elementwise_vectorizer.py:vectorize_operation:
     args:
@@ -8532,6 +9108,41 @@ imports:
     module: cmb.reconstruction.cmb_map_reconstructor
     name: CmbMapReconstructor
     type: import_from
+  cmb/reconstruction/amplitude_validator.py:Any:
+    file: cmb/reconstruction/amplitude_validator.py
+    line: 10
+    module: typing
+    name: Any
+    type: import_from
+  cmb/reconstruction/amplitude_validator.py:CudaArray:
+    file: cmb/reconstruction/amplitude_validator.py
+    line: 12
+    module: utils.cuda
+    name: CudaArray
+    type: import_from
+  cmb/reconstruction/amplitude_validator.py:Dict:
+    file: cmb/reconstruction/amplitude_validator.py
+    line: 10
+    module: typing
+    name: Dict
+    type: import_from
+  cmb/reconstruction/amplitude_validator.py:ElementWiseVectorizer:
+    file: cmb/reconstruction/amplitude_validator.py
+    line: 12
+    module: utils.cuda
+    name: ElementWiseVectorizer
+    type: import_from
+  cmb/reconstruction/amplitude_validator.py:ReductionVectorizer:
+    file: cmb/reconstruction/amplitude_validator.py
+    line: 12
+    module: utils.cuda
+    name: ReductionVectorizer
+    type: import_from
+  cmb/reconstruction/amplitude_validator.py:numpy:
+    file: cmb/reconstruction/amplitude_validator.py
+    line: 11
+    name: numpy
+    type: import
   cmb/reconstruction/cmb_map_reconstructor.py:Config:
     file: cmb/reconstruction/cmb_map_reconstructor.py
     line: 29
@@ -8586,6 +9197,11 @@ imports:
     module: utils.cuda
     name: TransformVectorizer
     type: import_from
+  cmb/reconstruction/cmb_map_reconstructor.py:cupy:
+    file: cmb/reconstruction/cmb_map_reconstructor.py
+    line: 259
+    name: cupy
+    type: import
   cmb/reconstruction/cmb_map_reconstructor.py:get_config:
     file: cmb/reconstruction/cmb_map_reconstructor.py
     line: 29
@@ -8613,6 +9229,162 @@ imports:
     line: 28
     module: cmb.theta_evolution_processor
     name: process_evolution_data
+    type: import_from
+  cmb/reconstruction/map_comparator.py:CudaArray:
+    file: cmb/reconstruction/map_comparator.py
+    line: 12
+    module: utils.cuda
+    name: CudaArray
+    type: import_from
+  cmb/reconstruction/map_comparator.py:Dict:
+    file: cmb/reconstruction/map_comparator.py
+    line: 10
+    module: typing
+    name: Dict
+    type: import_from
+  cmb/reconstruction/map_comparator.py:ElementWiseVectorizer:
+    file: cmb/reconstruction/map_comparator.py
+    line: 12
+    module: utils.cuda
+    name: ElementWiseVectorizer
+    type: import_from
+  cmb/reconstruction/map_comparator.py:ReductionVectorizer:
+    file: cmb/reconstruction/map_comparator.py
+    line: 12
+    module: utils.cuda
+    name: ReductionVectorizer
+    type: import_from
+  cmb/reconstruction/map_comparator.py:numpy:
+    file: cmb/reconstruction/map_comparator.py
+    line: 11
+    name: numpy
+    type: import
+  cmb/reconstruction/map_loader.py:Path:
+    file: cmb/reconstruction/map_loader.py
+    line: 10
+    module: pathlib
+    name: Path
+    type: import_from
+  cmb/reconstruction/map_loader.py:healpy:
+    file: cmb/reconstruction/map_loader.py
+    line: 12
+    name: healpy
+    type: import
+  cmb/reconstruction/map_loader.py:load_healpix_map:
+    file: cmb/reconstruction/map_loader.py
+    line: 13
+    module: utils.io.data_loader
+    name: load_healpix_map
+    type: import_from
+  cmb/reconstruction/map_loader.py:numpy:
+    file: cmb/reconstruction/map_loader.py
+    line: 11
+    name: numpy
+    type: import
+  cmb/reconstruction/map_validator.py:AmplitudeValidator:
+    file: cmb/reconstruction/map_validator.py
+    line: 23
+    module: cmb.reconstruction.amplitude_validator
+    name: AmplitudeValidator
+    type: import_from
+  cmb/reconstruction/map_validator.py:Any:
+    file: cmb/reconstruction/map_validator.py
+    line: 18
+    module: typing
+    name: Any
+    type: import_from
+  cmb/reconstruction/map_validator.py:Dict:
+    file: cmb/reconstruction/map_validator.py
+    line: 18
+    module: typing
+    name: Dict
+    type: import_from
+  cmb/reconstruction/map_validator.py:MapComparator:
+    file: cmb/reconstruction/map_validator.py
+    line: 21
+    module: cmb.reconstruction.map_comparator
+    name: MapComparator
+    type: import_from
+  cmb/reconstruction/map_validator.py:MapLoader:
+    file: cmb/reconstruction/map_validator.py
+    line: 20
+    module: cmb.reconstruction.map_loader
+    name: MapLoader
+    type: import_from
+  cmb/reconstruction/map_validator.py:Optional:
+    file: cmb/reconstruction/map_validator.py
+    line: 18
+    module: typing
+    name: Optional
+    type: import_from
+  cmb/reconstruction/map_validator.py:Path:
+    file: cmb/reconstruction/map_validator.py
+    line: 17
+    module: pathlib
+    name: Path
+    type: import_from
+  cmb/reconstruction/map_validator.py:StructureValidator:
+    file: cmb/reconstruction/map_validator.py
+    line: 22
+    module: cmb.reconstruction.structure_validator
+    name: StructureValidator
+    type: import_from
+  cmb/reconstruction/map_validator.py:numpy:
+    file: cmb/reconstruction/map_validator.py
+    line: 19
+    name: numpy
+    type: import
+  cmb/reconstruction/structure_validator.py:Any:
+    file: cmb/reconstruction/structure_validator.py
+    line: 10
+    module: typing
+    name: Any
+    type: import_from
+  cmb/reconstruction/structure_validator.py:CudaArray:
+    file: cmb/reconstruction/structure_validator.py
+    line: 13
+    module: utils.cuda
+    name: CudaArray
+    type: import_from
+  cmb/reconstruction/structure_validator.py:Dict:
+    file: cmb/reconstruction/structure_validator.py
+    line: 10
+    module: typing
+    name: Dict
+    type: import_from
+  cmb/reconstruction/structure_validator.py:ElementWiseVectorizer:
+    file: cmb/reconstruction/structure_validator.py
+    line: 13
+    module: utils.cuda
+    name: ElementWiseVectorizer
+    type: import_from
+  cmb/reconstruction/structure_validator.py:ReductionVectorizer:
+    file: cmb/reconstruction/structure_validator.py
+    line: 13
+    module: utils.cuda
+    name: ReductionVectorizer
+    type: import_from
+  cmb/reconstruction/structure_validator.py:decompose_map:
+    file: cmb/reconstruction/structure_validator.py
+    line: 14
+    module: utils.math.spherical_harmonics
+    name: decompose_map
+    type: import_from
+  cmb/reconstruction/structure_validator.py:healpy:
+    file: cmb/reconstruction/structure_validator.py
+    line: 12
+    name: healpy
+    type: import
+  cmb/reconstruction/structure_validator.py:numpy:
+    file: cmb/reconstruction/structure_validator.py
+    line: 11
+    name: numpy
+    type: import
+  cmb/reconstruction/structure_validator.py:synthesize_map:
+    file: cmb/reconstruction/structure_validator.py
+    line: 14
+    module: utils.math.spherical_harmonics
+    name: synthesize_map
     type: import_from
   cmb/theta_data_loader.py:Config:
     file: cmb/theta_data_loader.py
@@ -11123,6 +11895,39 @@ imports:
     line: 8
     name: pytest
     type: import
+  tests/unit/test_map_validator.py:MapValidator:
+    file: tests/unit/test_map_validator.py
+    line: 15
+    module: cmb.reconstruction.map_validator
+    name: MapValidator
+    type: import_from
+  tests/unit/test_map_validator.py:Path:
+    file: tests/unit/test_map_validator.py
+    line: 13
+    module: pathlib
+    name: Path
+    type: import_from
+  tests/unit/test_map_validator.py:TemporaryDirectory:
+    file: tests/unit/test_map_validator.py
+    line: 14
+    module: tempfile
+    name: TemporaryDirectory
+    type: import_from
+  tests/unit/test_map_validator.py:healpy:
+    file: tests/unit/test_map_validator.py
+    line: 12
+    name: healpy
+    type: import
+  tests/unit/test_map_validator.py:numpy:
+    file: tests/unit/test_map_validator.py
+    line: 11
+    name: numpy
+    type: import
+  tests/unit/test_map_validator.py:pytest:
+    file: tests/unit/test_map_validator.py
+    line: 10
+    name: pytest
+    type: import
   tests/unit/test_memory_watchdog.py:CudaMemoryLimitExceededError:
     file: tests/unit/test_memory_watchdog.py
     line: 12
@@ -11748,7 +12553,7 @@ imports:
     type: import_from
   utils/cuda/elementwise_vectorizer.py:CudaArray:
     file: utils/cuda/elementwise_vectorizer.py
-    line: 176
+    line: 186
     module: utils.cuda.array_model
     name: CudaArray
     type: import_from

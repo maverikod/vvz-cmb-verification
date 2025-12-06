@@ -141,7 +141,8 @@ class CmbMapReconstructor:
             # Create HEALPix pixel indices for each node
             npix = hp.nside2npix(self.nside)
 
-            # Initialize map using CudaArray (create directly as CudaArray)
+            # Initialize map using CudaArray
+            # Create numpy array first (required for CudaArray constructor), then wrap
             zeros_np = np.zeros(npix, dtype=np.float64)
             cmb_map_cuda = CudaArray(zeros_np, device="cpu")
 
@@ -385,7 +386,7 @@ class CmbMapReconstructor:
         # Calculate spectrum weights for each node
         # For each node, integrate: ∫ ρ_Θ(ω,t) dω over [ω_min, ω_macro]
         # Using formula: ρ_Θ(ω,t) ∝ ω^alpha · (t/t_0)^beta
-        # Create CudaArray directly from numpy zeros
+        # Create CudaArray from numpy zeros (will be overwritten by integration result)
         weights_np = np.zeros(n_nodes, dtype=np.float64)
         weights_cuda = CudaArray(weights_np, device="cpu")
 
@@ -396,7 +397,7 @@ class CmbMapReconstructor:
 
         # Calculate node frequencies: ω_node = ω_min + depth * (ω_macro - ω_min)
         # depth = Δω/ω, so ω_node ≈ ω_min * (1 + depth) for small depths
-        # Create CudaArray directly from numpy full
+        # Create CudaArray from numpy full arrays
         omega_min_array_np = np.full(n_nodes, omega_min_ref, dtype=np.float64)
         omega_macro_array_np = np.full(n_nodes, omega_macro_ref, dtype=np.float64)
         omega_min_cuda = CudaArray(omega_min_array_np, device="cpu")

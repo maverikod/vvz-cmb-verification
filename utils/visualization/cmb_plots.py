@@ -12,6 +12,7 @@ from typing import Optional
 import numpy as np
 import matplotlib.pyplot as plt
 import healpy as hp
+from utils.cuda import CudaArray, ReductionVectorizer
 
 
 def plot_healpix_map(
@@ -84,7 +85,30 @@ def plot_temperature_fluctuations(
         raise ValueError("Map data must be a numpy array")
 
     # Remove monopole and dipole if needed
-    map_fluctuations = map_data - np.mean(map_data)
+    # Use CUDA-accelerated reduction for mean calculation
+    map_data_cuda = CudaArray(map_data, device="cpu")
+    reduction_vec = ReductionVectorizer(use_gpu=True)
+    mean_result = reduction_vec.vectorize_reduction(map_data_cuda, "mean")
+
+    # Convert to float
+    if isinstance(mean_result, CudaArray):
+        mean_value = float(mean_result.to_numpy().item())
+    else:
+        mean_value = float(mean_result)
+
+    # Calculate fluctuations using CUDA-accelerated subtraction
+    # Use scalar operand for subtraction (ElementWiseVectorizer supports scalars)
+    from utils.cuda import ElementWiseVectorizer
+
+    elem_vec = ElementWiseVectorizer(use_gpu=True)
+    map_fluctuations_cuda = elem_vec.subtract(map_data_cuda, mean_value)
+    map_fluctuations = map_fluctuations_cuda.to_numpy()
+
+    # Cleanup GPU memory
+    if map_data_cuda.device == "cuda":
+        map_data_cuda.swap_to_cpu()
+    if map_fluctuations_cuda.device == "cuda":
+        map_fluctuations_cuda.swap_to_cpu()
 
     try:
         # Create figure

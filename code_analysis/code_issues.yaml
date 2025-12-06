@@ -21,10 +21,10 @@ issues:
     file: cmb/theta_data_loader.py
     limit: 400
     lines: 871
-  - exceeds_limit: 54
+  - exceeds_limit: 102
     file: cmb/nodes/node_properties.py
     limit: 400
-    lines: 454
+    lines: 502
   - exceeds_limit: 93
     file: cmb/reconstruction/cmb_map_reconstructor.py
     limit: 400

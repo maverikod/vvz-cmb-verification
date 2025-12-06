@@ -52,7 +52,7 @@ classes:
 
       Uses CUDA-accelerated operations for efficient computation.'
     file: cmb/nodes/node_properties.py
-    line: 68
+    line: 116
     methods:
     - __init__
     - calculate_node_depth
@@ -2005,29 +2005,29 @@ functions:
       \    reduction_vec: Reduction vectorizer for reductions\n    grid_spacing: Grid\
       \ spacing for area conversion"
     file: cmb/nodes/node_properties.py
-    line: 75
+    line: 123
     name: __init__
   cmb/nodes/node_properties.py:_cuda_maximum:
     args:
     - a
     - b
-    docstring: "Compute maximum using numpy, wrapped in CudaArray for consistency.\n\
-      \nFor very small arrays (2-3 elements), numpy operations are efficient.\nWe\
-      \ wrap in CudaArray to maintain consistency with project standards.\n\nArgs:\n\
-      \    a: Input array\n    b: Scalar value\n\nReturns:\n    Maximum array"
+    docstring: "Compute maximum using CUDA-accelerated ElementWiseVectorizer.\n\n\
+      Uses ElementWiseVectorizer for vectorized maximum operation,\nensuring consistency\
+      \ with project CUDA standards.\n\nArgs:\n    a: Input array\n    b: Scalar value\n\
+      \nReturns:\n    Maximum array"
     file: cmb/nodes/node_properties.py
-    line: 20
+    line: 21
     name: _cuda_maximum
   cmb/nodes/node_properties.py:_cuda_minimum:
     args:
     - a
     - b
-    docstring: "Compute minimum using numpy, wrapped in CudaArray for consistency.\n\
-      \nFor very small arrays (2-3 elements), numpy operations are efficient.\nWe\
-      \ wrap in CudaArray to maintain consistency with project standards.\n\nArgs:\n\
-      \    a: Input array\n    b: Array or scalar value\n\nReturns:\n    Minimum array"
+    docstring: "Compute minimum using CUDA-accelerated ElementWiseVectorizer.\n\n\
+      Uses ElementWiseVectorizer for vectorized minimum operation,\nensuring consistency\
+      \ with project CUDA standards.\n\nArgs:\n    a: Input array\n    b: Array or\
+      \ scalar value\n\nReturns:\n    Minimum array"
     file: cmb/nodes/node_properties.py
-    line: 44
+    line: 67
     name: _cuda_minimum
   cmb/nodes/node_properties.py:calculate_local_curvature:
     args:
@@ -2037,7 +2037,7 @@ functions:
       \ Node position (grid indices)\n\nReturns:\n    Local curvature value\n\nRaises:\n\
       \    ValueError: If curvature calculation fails"
     file: cmb/nodes/node_properties.py
-    line: 240
+    line: 288
     name: calculate_local_curvature
   cmb/nodes/node_properties.py:calculate_node_area:
     args:
@@ -2047,7 +2047,7 @@ functions:
       \ Node position (grid indices)\n\nReturns:\n    Node area in grid units or physical\
       \ units\n\nRaises:\n    ValueError: If area calculation fails"
     file: cmb/nodes/node_properties.py
-    line: 165
+    line: 213
     name: calculate_node_area
   cmb/nodes/node_properties.py:calculate_node_depth:
     args:
@@ -2058,7 +2058,7 @@ functions:
       \ (grid indices)\n\nReturns:\n    Node depth (Δω/ω)\n\nRaises:\n    ValueError:\
       \ If depth calculation fails"
     file: cmb/nodes/node_properties.py
-    line: 96
+    line: 144
     name: calculate_node_depth
   cmb/nodes/node_properties.py:calculate_node_properties_batch:
     args:
@@ -2072,7 +2072,7 @@ functions:
       \nReturns:\n    Tuple of (depths, areas, curvatures) arrays, each of shape (N,)\n\
       \nRaises:\n    ValueError: If batch calculation fails"
     file: cmb/nodes/node_properties.py
-    line: 301
+    line: 349
     name: calculate_node_properties_batch
   cmb/nodes/theta_node_map.py:__init__:
     args:
@@ -7990,7 +7990,7 @@ functions:
       \ Map projection ('mollweide', 'orthographic', etc.)\n    unit: Temperature\
       \ unit for colorbar\n\nRaises:\n    ValueError: If map data is invalid"
     file: utils/visualization/cmb_plots.py
-    line: 17
+    line: 18
     name: plot_healpix_map
   utils/visualization/cmb_plots.py:plot_map_comparison:
     args:
@@ -8002,7 +8002,7 @@ functions:
       \ map\n    map2: Second HEALPix map\n    title: Plot title\n    output_path:\
       \ Path to save plot (optional)"
     file: utils/visualization/cmb_plots.py
-    line: 112
+    line: 136
     name: plot_map_comparison
   utils/visualization/cmb_plots.py:plot_node_overlay:
     args:
@@ -8016,7 +8016,7 @@ functions:
       \ in radians (0 to π)\n        phi: azimuth in radians (0 to 2π)\n    title:\
       \ Plot title\n    output_path: Path to save plot (optional)"
     file: utils/visualization/cmb_plots.py
-    line: 166
+    line: 190
     name: plot_node_overlay
   utils/visualization/cmb_plots.py:plot_temperature_fluctuations:
     args:
@@ -8027,7 +8027,7 @@ functions:
       \ temperature map\n    title: Plot title\n    output_path: Path to save plot\
       \ (optional)"
     file: utils/visualization/cmb_plots.py
-    line: 70
+    line: 71
     name: plot_temperature_fluctuations
   utils/visualization/spectrum_plots.py:plot_high_l_peak:
     args:
@@ -8206,6 +8206,12 @@ imports:
     line: 13
     module: utils.cuda
     name: CudaArray
+    type: import_from
+  cmb/nodes/node_properties.py:ElementWiseVectorizer:
+    file: cmb/nodes/node_properties.py
+    line: 13
+    module: utils.cuda
+    name: ElementWiseVectorizer
     type: import_from
   cmb/nodes/node_properties.py:GridVectorizer:
     file: cmb/nodes/node_properties.py
@@ -12262,6 +12268,18 @@ imports:
     module: utils.visualization.cmb_plots
     name: plot_temperature_fluctuations
     type: import_from
+  utils/visualization/cmb_plots.py:CudaArray:
+    file: utils/visualization/cmb_plots.py
+    line: 15
+    module: utils.cuda
+    name: CudaArray
+    type: import_from
+  utils/visualization/cmb_plots.py:ElementWiseVectorizer:
+    file: utils/visualization/cmb_plots.py
+    line: 101
+    module: utils.cuda
+    name: ElementWiseVectorizer
+    type: import_from
   utils/visualization/cmb_plots.py:Optional:
     file: utils/visualization/cmb_plots.py
     line: 11
@@ -12273,6 +12291,12 @@ imports:
     line: 10
     module: pathlib
     name: Path
+    type: import_from
+  utils/visualization/cmb_plots.py:ReductionVectorizer:
+    file: utils/visualization/cmb_plots.py
+    line: 15
+    module: utils.cuda
+    name: ReductionVectorizer
     type: import_from
   utils/visualization/cmb_plots.py:healpy:
     file: utils/visualization/cmb_plots.py

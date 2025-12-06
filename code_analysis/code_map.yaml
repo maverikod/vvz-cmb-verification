@@ -52,7 +52,7 @@ classes:
 
       Uses CUDA-accelerated operations for efficient computation.'
     file: cmb/nodes/node_properties.py
-    line: 69
+    line: 68
     methods:
     - __init__
     - calculate_node_depth
@@ -1977,7 +1977,7 @@ functions:
       \    reduction_vec: Reduction vectorizer for reductions\n    grid_spacing: Grid\
       \ spacing for area conversion"
     file: cmb/nodes/node_properties.py
-    line: 76
+    line: 75
     name: __init__
   cmb/nodes/node_properties.py:_cuda_maximum:
     args:
@@ -1988,7 +1988,7 @@ functions:
       \ wrap in CudaArray to maintain consistency with project standards.\n\nArgs:\n\
       \    a: Input array\n    b: Scalar value\n\nReturns:\n    Maximum array"
     file: cmb/nodes/node_properties.py
-    line: 21
+    line: 20
     name: _cuda_maximum
   cmb/nodes/node_properties.py:_cuda_minimum:
     args:
@@ -1999,7 +1999,7 @@ functions:
       \ wrap in CudaArray to maintain consistency with project standards.\n\nArgs:\n\
       \    a: Input array\n    b: Array or scalar value\n\nReturns:\n    Minimum array"
     file: cmb/nodes/node_properties.py
-    line: 45
+    line: 44
     name: _cuda_minimum
   cmb/nodes/node_properties.py:calculate_local_curvature:
     args:
@@ -2009,7 +2009,7 @@ functions:
       \ Node position (grid indices)\n\nReturns:\n    Local curvature value\n\nRaises:\n\
       \    ValueError: If curvature calculation fails"
     file: cmb/nodes/node_properties.py
-    line: 241
+    line: 240
     name: calculate_local_curvature
   cmb/nodes/node_properties.py:calculate_node_area:
     args:
@@ -2019,7 +2019,7 @@ functions:
       \ Node position (grid indices)\n\nReturns:\n    Node area in grid units or physical\
       \ units\n\nRaises:\n    ValueError: If area calculation fails"
     file: cmb/nodes/node_properties.py
-    line: 166
+    line: 165
     name: calculate_node_area
   cmb/nodes/node_properties.py:calculate_node_depth:
     args:
@@ -2030,7 +2030,7 @@ functions:
       \ (grid indices)\n\nReturns:\n    Node depth (Δω/ω)\n\nRaises:\n    ValueError:\
       \ If depth calculation fails"
     file: cmb/nodes/node_properties.py
-    line: 97
+    line: 96
     name: calculate_node_depth
   cmb/nodes/node_properties.py:calculate_node_properties_batch:
     args:
@@ -2044,7 +2044,7 @@ functions:
       \nReturns:\n    Tuple of (depths, areas, curvatures) arrays, each of shape (N,)\n\
       \nRaises:\n    ValueError: If batch calculation fails"
     file: cmb/nodes/node_properties.py
-    line: 302
+    line: 301
     name: calculate_node_properties_batch
   cmb/nodes/theta_node_map.py:__init__:
     args:
@@ -2489,15 +2489,20 @@ functions:
     - depths
     - config
     docstring: "Map node depth (Δω/ω) to temperature fluctuation (ΔT).\n\nFormula\
-      \ (from tech_spec-new.md 2.1): ΔT = (Δω/ω_CMB) T_0\nWhere:\n    T_0 = 2.725\
-      \ K (CMB temperature)\n    ω_CMB ~ 10^11 Hz\n    Δω = ω - ω_min (depth of node)\n\
-      Result: ΔT ≈ 20-30 μK\n\nThis is direct conversion from node depth, NOT linear\
-      \ approximation\nor classical thermodynamic formula.\n\nSee ALL.md JW-CMB.6\
-      \ and JW-CMB2.6 for derivation.\n\nUses CUDA acceleration with ElementWiseVectorizer\
-      \ for vectorized\nmultiplication operations.\n\nArgs:\n    depths: Node depths\
-      \ (Δω/ω) - dimensionless relative depth\n    config: Configuration instance\
-      \ (uses global if None)\n\nReturns:\n    Array of temperature fluctuations in\
-      \ μK\n\nRaises:\n    ValueError: If depths are invalid"
+      \ from theory (tech_spec-new.md 2.1, ALL.md JW-CMB.6, JW-CMB2.6):\n    ΔT =\
+      \ (Δω/ω_CMB) T_0\n\nWhere:\n    T_0 = 2.725 K (CMB temperature)\n    ω_CMB ~\
+      \ 10^11 Hz\n    Δω = ω - ω_min (depth of node)\n    depths = Δω/ω (relative\
+      \ depth from load_node_depths)\n\nFor CMB nodes (where ω ≈ ω_CMB):\n    Δω/ω\
+      \ ≈ Δω/ω_CMB\n    Therefore: ΔT ≈ (Δω/ω) T_0 = depths * T_0\n\nThis is an approximation\
+      \ valid for CMB nodes in the frequency range ~10^11 Hz.\nFor non-CMB nodes,\
+      \ the full formula would require: ΔT = depths * (ω/ω_CMB) * T_0.\n\nResult:\
+      \ ΔT ≈ 20-30 μK (as observed in ACT/SPT data)\n\nThis is direct conversion from\
+      \ node depth, NOT linear approximation\nor classical thermodynamic formula.\n\
+      \nSee ALL.md JW-CMB.6 and JW-CMB2.6 for derivation.\n\nUses CUDA acceleration\
+      \ with ElementWiseVectorizer for vectorized\nmultiplication operations.\n\n\
+      Args:\n    depths: Node depths (Δω/ω) - dimensionless relative depth\n    config:\
+      \ Configuration instance (uses global if None)\n\nReturns:\n    Array of temperature\
+      \ fluctuations in μK\n\nRaises:\n    ValueError: If depths are invalid"
     file: cmb/theta_node_processor.py
     line: 62
     name: map_depth_to_temperature
@@ -2511,7 +2516,7 @@ functions:
       \    ThetaNodeData instance with all processed data\n\nRaises:\n    FileNotFoundError:\
       \ If data files don't exist\n    ValueError: If data processing fails"
     file: cmb/theta_node_processor.py
-    line: 136
+    line: 158
     name: process_node_data
   cmb/theta_node_processor.py:validate_node_data:
     args:
@@ -2519,7 +2524,7 @@ functions:
     docstring: "Validate Θ-node data.\n\nArgs:\n    node_data: ThetaNodeData to validate\n\
       \nReturns:\n    True if valid\n\nRaises:\n    ValueError: If data is invalid"
     file: cmb/theta_node_processor.py
-    line: 230
+    line: 252
     name: validate_node_data
   config/settings.py:__init__:
     args:
@@ -8098,12 +8103,6 @@ imports:
     line: 13
     module: utils.cuda
     name: CudaArray
-    type: import_from
-  cmb/nodes/node_properties.py:ElementWiseVectorizer:
-    file: cmb/nodes/node_properties.py
-    line: 13
-    module: utils.cuda
-    name: ElementWiseVectorizer
     type: import_from
   cmb/nodes/node_properties.py:GridVectorizer:
     file: cmb/nodes/node_properties.py

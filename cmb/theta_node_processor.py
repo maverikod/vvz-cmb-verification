@@ -65,12 +65,23 @@ def map_depth_to_temperature(
     """
     Map node depth (Δω/ω) to temperature fluctuation (ΔT).
 
-    Formula (from tech_spec-new.md 2.1): ΔT = (Δω/ω_CMB) T_0
+    Formula from theory (tech_spec-new.md 2.1, ALL.md JW-CMB.6, JW-CMB2.6):
+        ΔT = (Δω/ω_CMB) T_0
+
     Where:
         T_0 = 2.725 K (CMB temperature)
         ω_CMB ~ 10^11 Hz
         Δω = ω - ω_min (depth of node)
-    Result: ΔT ≈ 20-30 μK
+        depths = Δω/ω (relative depth from load_node_depths)
+
+    For CMB nodes (where ω ≈ ω_CMB):
+        Δω/ω ≈ Δω/ω_CMB
+        Therefore: ΔT ≈ (Δω/ω) T_0 = depths * T_0
+
+    This is an approximation valid for CMB nodes in the frequency range ~10^11 Hz.
+    For non-CMB nodes, the full formula would require: ΔT = depths * (ω/ω_CMB) * T_0.
+
+    Result: ΔT ≈ 20-30 μK (as observed in ACT/SPT data)
 
     This is direct conversion from node depth, NOT linear approximation
     or classical thermodynamic formula.
@@ -108,14 +119,25 @@ def map_depth_to_temperature(
     if has_negative:
         raise ValueError("All depths must be non-negative")
 
-    # Formula: ΔT = (Δω/ω_CMB) T_0
-    # depths is already Δω/ω, so we need to convert to ΔT
-    # ΔT = depths * T_0 (in Kelvin)
-    # Then convert to microKelvin
+    # Formula from theory (tech_spec-new.md 2.1, ALL.md JW-CMB.6, JW-CMB2.6):
+    # ΔT = (Δω/ω_CMB) T_0
+    #
+    # Where:
+    #   - depths = Δω/ω (relative depth from load_node_depths)
+    #   - For CMB nodes: ω ≈ ω_CMB (nodes are in CMB frequency range ~10^11 Hz)
+    #   - Therefore: Δω/ω ≈ Δω/ω_CMB for CMB nodes
+    #
+    # Strict formula: ΔT = (Δω/ω_CMB) T_0 = (Δω/ω) * (ω/ω_CMB) T_0
+    # For CMB nodes (ω ≈ ω_CMB): ΔT ≈ (Δω/ω) T_0 = depths * T_0
+    #
+    # This is an approximation valid for CMB nodes where ω ≈ ω_CMB.
+    # For non-CMB nodes, would need to multiply by (ω/ω_CMB) factor.
+    #
     # Use ElementWiseVectorizer for CUDA-accelerated multiplication
     elem_vec = ElementWiseVectorizer(use_gpu=True)
 
-    # First multiply by T_0
+    # Apply formula: ΔT ≈ depths * T_0 (valid for CMB nodes where ω ≈ ω_CMB)
+    # This gives temperature in Kelvin
     temperatures_K_cuda = elem_vec.multiply(depths_cuda, config.constants.T_0)
 
     # Then multiply by 1e6 to convert to microKelvin

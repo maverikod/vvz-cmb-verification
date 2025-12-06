@@ -356,9 +356,7 @@ class NodePropertiesCalculator:
                     # Get slice bounds using CUDA-accelerated operations
                     pos_array = np.asarray(pos_tuple, dtype=int)
                     shape_array = np.array(omega_np.shape, dtype=int)
-                    starts = _cuda_maximum(
-                        pos_array - half_size, 0.0
-                    ).astype(int)
+                    starts = _cuda_maximum(pos_array - half_size, 0.0).astype(int)
                     ends = _cuda_minimum(shape_array, pos_array + half_size + 1).astype(
                         int
                     )

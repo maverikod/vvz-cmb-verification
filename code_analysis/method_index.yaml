@@ -132,6 +132,7 @@ ElementWiseVectorizer:
 - log
 - sqrt
 - abs
+- scatter_add
 - batch
 FrequencyInvarianceTester:
 - __init__
@@ -296,6 +297,20 @@ TestCalculatePowerSpectrumFromAlm:
 - test_calculate_power_spectrum
 - test_calculate_with_l_max
 - test_calculate_empty_alm
+TestCmbMapReconstructor:
+- test_init
+- test_init_default_config
+- test_convert_nodes_to_temperature
+- test_project_nodes_to_sky
+- test_project_nodes_to_sky_invalid_theta
+- test_project_nodes_to_sky_invalid_phi
+- test_integrate_frequency_spectrum
+- test_reconstruct_map
+- test_reconstruct_map_cuda_usage
+- test_reconstruct_map_scatter_add_usage
+- test_reconstruct_map_large_nside
+- test_reconstruct_map_empty_nodes
+- test_reconstruct_map_formula_cmb21
 TestConfigurationAccess:
 - test_get_config_before_initialization
 - test_initialize_config

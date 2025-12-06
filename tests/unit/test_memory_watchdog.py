@@ -46,9 +46,7 @@ class TestMemoryWatchdog:
         """Test process registration with custom ID."""
         watchdog = MemoryWatchdog.get_instance()
         custom_id = "test-process-123"
-        process_id = watchdog.register_process(
-            process_id=custom_id, memory_bytes=1000
-        )
+        process_id = watchdog.register_process(process_id=custom_id, memory_bytes=1000)
         assert process_id == custom_id
 
     def test_unregister_process(self):
@@ -66,6 +64,7 @@ class TestMemoryWatchdog:
         try:
             watchdog.update_process_memory(process_id, 2000)
             import time
+
             time.sleep(0.1)
             processes = watchdog.get_registered_processes()
             process = next(
@@ -96,6 +95,7 @@ class TestMemoryWatchdog:
         )
         # Give watchdog time to process
         import time
+
         time.sleep(0.1)
         processes = watchdog.get_registered_processes()
         # Process should be registered (unless killed by watchdog)
@@ -121,6 +121,7 @@ class TestMemoryWatchdog:
                 pass
 
         import time
+
         time.sleep(0.1)
         processes = watchdog.get_registered_processes()
         # Some processes might be killed by watchdog - that's valid
@@ -137,11 +138,10 @@ class TestMemoryWatchdog:
             memory_bytes=1000, priority=1, description="High priority"
         )
         import time
+
         time.sleep(0.1)
         processes = watchdog.get_registered_processes()
-        process = next(
-            (p for p in processes if p["process_id"] == process_id), None
-        )
+        process = next((p for p in processes if p["process_id"] == process_id), None)
         if process is not None:
             assert process["priority"] == 1
         # If process was killed, that's also valid behavior

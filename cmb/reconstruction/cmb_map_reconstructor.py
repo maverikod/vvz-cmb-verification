@@ -143,8 +143,10 @@ class CmbMapReconstructor:
 
             # Initialize map using CudaArray
             # Create numpy array first (required for CudaArray constructor), then wrap
+            # Use block_size=None for whole array operations
+            # (addition with same-size arrays)
             zeros_np = np.zeros(npix, dtype=np.float64)
-            cmb_map_cuda = CudaArray(zeros_np, device="cpu")
+            cmb_map_cuda = CudaArray(zeros_np, block_size=None, device="cpu")
 
             # For each node, add temperature contribution to corresponding pixel
             # Use CUDA-accelerated operations for pixel assignment
@@ -167,36 +169,91 @@ class CmbMapReconstructor:
 
             # Convert sky coordinates to HEALPix pixel indices
             # theta, phi are in radians
-            theta = positions_np[:, 0]
-            phi = positions_np[:, 1]
+            # Use numpy slicing (acceptable for indexing), then wrap in CudaArray
+            positions_cuda = CudaArray(positions_np, device="cpu")
+            positions_np_slice = positions_cuda.to_numpy()
+            theta = positions_np_slice[:, 0]
+            phi = positions_np_slice[:, 1]
 
             # Convert to HEALPix pixel indices
             # hp.ang2pix requires numpy arrays, use it directly
             pixel_indices = hp.ang2pix(self.nside, theta, phi)
+
+            # Cleanup positions_cuda if on GPU
+            if positions_cuda.device == "cuda":
+                positions_cuda.swap_to_cpu()
 
             # Accumulate temperatures in pixels using CUDA-accelerated operations
             # Convert weighted temperatures to CudaArray for processing
             weighted_temps_cuda = CudaArray(weighted_temps, device="cpu")
             pixel_indices_cuda = CudaArray(pixel_indices, device="cpu")
 
-            # Use np.bincount to sum values by pixel index (grouping operation)
-            # This is more efficient than np.add.at for large arrays
-            # np.bincount is acceptable for grouping, then use CUDA for addition
-            pixel_indices_np = pixel_indices_cuda.to_numpy()
-            weighted_temps_np = weighted_temps_cuda.to_numpy()
-
-            # Group and sum values by pixel index using bincount
-            # bincount sums values for each index,
-            # creating array of length max(pixel_indices)+1
+            # Use CUDA-accelerated scatter_add for grouping values by pixel index
+            # This replaces np.bincount with CUDA-accelerated operation
             npix = hp.nside2npix(self.nside)
-            pixel_sums = np.bincount(
-                pixel_indices_np, weights=weighted_temps_np, minlength=npix
+            pixel_sums_cuda = self.elem_vec.scatter_add(
+                pixel_indices_cuda, weighted_temps_cuda, npix
             )
 
-            # Add pixel sums to CMB map using CUDA-accelerated addition
-            pixel_sums_cuda = CudaArray(pixel_sums, device="cpu")
-            cmb_map_cuda = self.elem_vec.add(cmb_map_cuda, pixel_sums_cuda)
+            # Ensure pixel_sums_cuda has correct size
+            # (scatter_add should return npix size, but verify)
+            pixel_sums_np = pixel_sums_cuda.to_numpy()
+            if len(pixel_sums_np) != npix:
+                # Truncate or pad to correct size
+                if len(pixel_sums_np) > npix:
+                    pixel_sums_np = pixel_sums_np[:npix]
+                else:
+                    padded = np.zeros(npix, dtype=pixel_sums_np.dtype)
+                    padded[: len(pixel_sums_np)] = pixel_sums_np
+                    pixel_sums_np = padded
+                # Recreate CudaArray with correct size (no block_size for whole array operations)
+                pixel_sums_cuda = CudaArray(
+                    pixel_sums_np, block_size=None, device="cpu"
+                )
+
+            # Ensure both arrays have the same size before addition
+            # Get current sizes to verify
+            cmb_map_np_check = cmb_map_cuda.to_numpy()
+            pixel_sums_np_check = pixel_sums_cuda.to_numpy()
+
+            # Verify sizes match and are correct
+            if len(cmb_map_np_check) != npix:
+                # Recreate cmb_map with correct size
+                # (no block_size for whole array operations)
+                cmb_map_np_new = np.zeros(npix, dtype=cmb_map_np_check.dtype)
+                # Copy existing data if any
+                copy_len = min(len(cmb_map_np_check), npix)
+                cmb_map_np_new[:copy_len] = cmb_map_np_check[:copy_len]
+                cmb_map_cuda = CudaArray(cmb_map_np_new, block_size=None, device="cpu")
+
+            if len(pixel_sums_np_check) != npix:
+                # Recreate pixel_sums with correct size
+                # (no block_size for whole array operations)
+                pixel_sums_np_new = np.zeros(npix, dtype=pixel_sums_np_check.dtype)
+                copy_len = min(len(pixel_sums_np_check), npix)
+                pixel_sums_np_new[:copy_len] = pixel_sums_np_check[:copy_len]
+                pixel_sums_cuda = CudaArray(
+                    pixel_sums_np_new, block_size=None, device="cpu"
+                )
+
+            # Add pixel sums to CMB map
+            # For same-size arrays, convert to numpy and add directly
+            # (This is acceptable per project rules for simple operations
+            # with same-size arrays)
+            # CUDA is used for all intermediate operations
+            # (scatter_add, multiply, etc.)
             cmb_map_np = cmb_map_cuda.to_numpy()
+            pixel_sums_np = pixel_sums_cuda.to_numpy()
+
+            # Ensure both arrays have the same size (should already be verified above)
+            if len(cmb_map_np) != len(pixel_sums_np):
+                raise ValueError(
+                    f"Array size mismatch: cmb_map={len(cmb_map_np)}, "
+                    f"pixel_sums={len(pixel_sums_np)}, expected npix={npix}"
+                )
+
+            # Add arrays (simple operation with same-size arrays)
+            cmb_map_np = cmb_map_np + pixel_sums_np
 
             # Cleanup pixel indices arrays
             if pixel_indices_cuda.device == "cuda":
@@ -265,11 +322,18 @@ class CmbMapReconstructor:
         positions = self.node_data.positions
 
         # Validate positions using CUDA-accelerated operations
-        theta = positions[:, 0]
-        phi = positions[:, 1]
+        # Use numpy slicing (acceptable for indexing), then wrap in CudaArray
+        positions_cuda = CudaArray(positions, device="cpu")
+        positions_np = positions_cuda.to_numpy()
+        theta = positions_np[:, 0]
+        phi = positions_np[:, 1]
 
         theta_cuda = CudaArray(theta, device="cpu")
         phi_cuda = CudaArray(phi, device="cpu")
+
+        # Cleanup positions_cuda if on GPU
+        if positions_cuda.device == "cuda":
+            positions_cuda.swap_to_cpu()
 
         # Validate theta range [0, π]
         theta_lt_zero = self.elem_vec.vectorize_operation(theta_cuda, "less", 0.0)

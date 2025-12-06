@@ -30,12 +30,8 @@ class TestThetaEvolutionIntegration:
         """
         # Create test evolution data
         times = np.array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0])
-        omega_min = np.array(
-            [1.0e10, 1.1e10, 1.2e10, 1.3e10, 1.4e10, 1.5e10]
-        )
-        omega_macro = np.array(
-            [10.0e10, 10.1e10, 10.2e10, 10.3e10, 10.4e10, 10.5e10]
-        )
+        omega_min = np.array([1.0e10, 1.1e10, 1.2e10, 1.3e10, 1.4e10, 1.5e10])
+        omega_macro = np.array([10.0e10, 10.1e10, 10.2e10, 10.3e10, 10.4e10, 10.5e10])
         metadata = {"test": "integration", "source": "test_data"}
 
         evolution = ThetaEvolution(
@@ -90,9 +86,7 @@ class TestThetaEvolutionIntegration:
         """
         times = np.array([0.0, 1.0, 2.0, 3.0, 4.0])
         omega_min = np.array([1.0e10, 1.1e10, 1.2e10, 1.3e10, 1.4e10])
-        omega_macro = np.array(
-            [10.0e10, 10.1e10, 10.2e10, 10.3e10, 10.4e10]
-        )
+        omega_macro = np.array([10.0e10, 10.1e10, 10.2e10, 10.3e10, 10.4e10])
         metadata = {}
 
         evolution = ThetaEvolution(
@@ -134,14 +128,10 @@ class TestThetaEvolutionIntegration:
         # Create test data
         times = np.array([0.0, 1.0, 2.0, 3.0, 4.0])
         omega_min = np.array([1.0e10, 1.1e10, 1.2e10, 1.3e10, 1.4e10])
-        omega_macro = np.array(
-            [10.0e10, 10.1e10, 10.2e10, 10.3e10, 10.4e10]
-        )
+        omega_macro = np.array([10.0e10, 10.1e10, 10.2e10, 10.3e10, 10.4e10])
 
         # Create temporary JSON file
-        with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".json", delete=False
-        ) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
             json_data = {
                 "times": times.tolist(),
                 "omega_min": omega_min.tolist(),
@@ -189,9 +179,7 @@ class TestThetaEvolutionIntegration:
         # Create test data
         times = np.array([0.0, 1.0, 2.0, 3.0, 4.0])
         omega_min = np.array([1.0e10, 1.1e10, 1.2e10, 1.3e10, 1.4e10])
-        omega_macro = np.array(
-            [10.0e10, 10.1e10, 10.2e10, 10.3e10, 10.4e10]
-        )
+        omega_macro = np.array([10.0e10, 10.1e10, 10.2e10, 10.3e10, 10.4e10])
 
         # Create temporary CSV file
         with tempfile.NamedTemporaryFile(
@@ -239,9 +227,7 @@ class TestThetaEvolutionIntegration:
         # Create realistic time range (e.g., redshift 0 to 1100)
         # Time in some cosmological units
         times = np.array([0.0, 100.0, 200.0, 300.0, 400.0, 500.0])
-        omega_min = np.array(
-            [1.0e10, 1.05e10, 1.1e10, 1.15e10, 1.2e10, 1.25e10]
-        )
+        omega_min = np.array([1.0e10, 1.05e10, 1.1e10, 1.15e10, 1.2e10, 1.25e10])
         omega_macro = np.array(
             [10.0e10, 10.05e10, 10.1e10, 10.15e10, 10.2e10, 10.25e10]
         )

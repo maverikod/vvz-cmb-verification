@@ -841,7 +841,7 @@ classes:
     bases: []
     docstring: null
     file: docs/search_theory_index.py
-    line: 155
+    line: 157
     methods:
     - total_segments
     - line_span
@@ -879,6 +879,26 @@ classes:
     - test_evolution_processing_with_csv_file
     - test_evolution_processing_realistic_time_range
     name: TestThetaEvolutionIntegration
+  tests/unit/test_cmb_map_reconstructor.py:TestCmbMapReconstructor:
+    bases: []
+    docstring: Test CmbMapReconstructor class.
+    file: tests/unit/test_cmb_map_reconstructor.py
+    line: 92
+    methods:
+    - test_init
+    - test_init_default_config
+    - test_convert_nodes_to_temperature
+    - test_project_nodes_to_sky
+    - test_project_nodes_to_sky_invalid_theta
+    - test_project_nodes_to_sky_invalid_phi
+    - test_integrate_frequency_spectrum
+    - test_reconstruct_map
+    - test_reconstruct_map_cuda_usage
+    - test_reconstruct_map_scatter_add_usage
+    - test_reconstruct_map_large_nside
+    - test_reconstruct_map_empty_nodes
+    - test_reconstruct_map_formula_cmb21
+    name: TestCmbMapReconstructor
   tests/unit/test_cmb_plots.py:TestPlotHealpixMap:
     bases: []
     docstring: Tests for plot_healpix_map function.
@@ -1363,7 +1383,7 @@ classes:
     bases: []
     docstring: Tests for load_evolution_data function.
     file: tests/unit/test_theta_data_loader.py
-    line: 175
+    line: 169
     methods:
     - test_load_csv_evolution_data
     - test_load_json_evolution_data
@@ -1402,7 +1422,7 @@ classes:
     bases: []
     docstring: Tests for validate_evolution_data function.
     file: tests/unit/test_theta_data_loader.py
-    line: 367
+    line: 357
     methods:
     - test_validate_valid_evolution
     - test_validate_empty_times
@@ -1415,7 +1435,7 @@ classes:
     bases: []
     docstring: Tests for validate_frequency_spectrum function.
     file: tests/unit/test_theta_data_loader.py
-    line: 256
+    line: 250
     methods:
     - test_validate_valid_spectrum
     - test_validate_empty_frequencies
@@ -1683,6 +1703,7 @@ classes:
     - log
     - sqrt
     - abs
+    - scatter_add
     - batch
     name: ElementWiseVectorizer
   utils/cuda/exceptions.py:CudaBlockProcessingError:
@@ -2205,7 +2226,7 @@ functions:
       \ fluctuations for each node in μK\n\nRaises:\n    ValueError: If conversion\
       \ fails"
     file: cmb/reconstruction/cmb_map_reconstructor.py
-    line: 218
+    line: 266
     name: _convert_nodes_to_temperature
   cmb/reconstruction/cmb_map_reconstructor.py:_integrate_frequency_spectrum:
     args:
@@ -2216,7 +2237,7 @@ functions:
       \ operations for all calculations.\n\nReturns:\n    Array of integrated spectrum\
       \ weights for each node\n\nRaises:\n    ValueError: If integration fails"
     file: cmb/reconstruction/cmb_map_reconstructor.py
-    line: 326
+    line: 381
     name: _integrate_frequency_spectrum
   cmb/reconstruction/cmb_map_reconstructor.py:_project_nodes_to_sky:
     args:
@@ -2229,7 +2250,7 @@ functions:
       \ (theta, phi) sky coordinates for each node in radians\n\nRaises:\n    ValueError:\
       \ If projection fails"
     file: cmb/reconstruction/cmb_map_reconstructor.py
-    line: 245
+    line: 293
     name: _project_nodes_to_sky
   cmb/reconstruction/cmb_map_reconstructor.py:_to_float:
     args:
@@ -4311,7 +4332,7 @@ functions:
     - raw
     docstring: null
     file: docs/search_theory_index.py
-    line: 245
+    line: 250
     name: _build_index
   docs/search_theory_index.py:_build_segment_text:
     args:
@@ -4320,21 +4341,21 @@ functions:
     docstring: 'Aggregate text for phrase search: keywords, summary and (optionally)
       raw text.'
     file: docs/search_theory_index.py
-    line: 284
+    line: 290
     name: _build_segment_text
   docs/search_theory_index.py:_get_cache_path:
     args:
     - index_path
     docstring: null
     file: docs/search_theory_index.py
-    line: 176
+    line: 179
     name: _get_cache_path
   docs/search_theory_index.py:_load_index_yaml:
     args:
     - path
     docstring: Load the YAML index file without any caching.
     file: docs/search_theory_index.py
-    line: 181
+    line: 184
     name: _load_index_yaml
   docs/search_theory_index.py:_segments_overlapping_line:
     args:
@@ -4342,7 +4363,7 @@ functions:
     - line
     docstring: null
     file: docs/search_theory_index.py
-    line: 434
+    line: 442
     name: _segments_overlapping_line
   docs/search_theory_index.py:_segments_overlapping_range:
     args:
@@ -4351,13 +4372,13 @@ functions:
     - hi
     docstring: null
     file: docs/search_theory_index.py
-    line: 438
+    line: 446
     name: _segments_overlapping_range
   docs/search_theory_index.py:build_arg_parser:
     args: []
     docstring: null
     file: docs/search_theory_index.py
-    line: 611
+    line: 627
     name: build_arg_parser
   docs/search_theory_index.py:from_dict:
     args:
@@ -4379,7 +4400,7 @@ functions:
     - self
     docstring: null
     file: docs/search_theory_index.py
-    line: 164
+    line: 166
     name: line_span
   docs/search_theory_index.py:load_index:
     args:
@@ -4390,21 +4411,21 @@ functions:
       \ \"mtime\": <float>,\n        \"size\": <int>,\n        \"data\": <raw_yaml_dict>\n\
       \    }"
     file: docs/search_theory_index.py
-    line: 192
+    line: 195
     name: load_index
   docs/search_theory_index.py:load_theory_lines:
     args:
     - path
     docstring: Load theory markdown file as a list of lines (1-based mapping).
     file: docs/search_theory_index.py
-    line: 262
+    line: 267
     name: load_theory_lines
   docs/search_theory_index.py:main:
     args:
     - argv
     docstring: null
     file: docs/search_theory_index.py
-    line: 706
+    line: 722
     name: main
   docs/search_theory_index.py:matches_category:
     args:
@@ -4412,7 +4433,7 @@ functions:
     - cat_substr
     docstring: null
     file: docs/search_theory_index.py
-    line: 278
+    line: 284
     name: matches_category
   docs/search_theory_index.py:matches_phrase:
     args:
@@ -4422,7 +4443,7 @@ functions:
     - _cache
     docstring: null
     file: docs/search_theory_index.py
-    line: 306
+    line: 312
     name: matches_phrase
   docs/search_theory_index.py:matches_tag:
     args:
@@ -4430,7 +4451,7 @@ functions:
     - tag_substr
     docstring: null
     file: docs/search_theory_index.py
-    line: 272
+    line: 278
     name: matches_tag
   docs/search_theory_index.py:mode_assemble:
     args:
@@ -4440,7 +4461,7 @@ functions:
     - add_headers
     docstring: Assemble continuous text from theory file based on selected segments.
     file: docs/search_theory_index.py
-    line: 510
+    line: 522
     name: mode_assemble
   docs/search_theory_index.py:mode_export:
     args:
@@ -4448,7 +4469,7 @@ functions:
     - export_path
     docstring: null
     file: docs/search_theory_index.py
-    line: 478
+    line: 487
     name: mode_export
   docs/search_theory_index.py:mode_line:
     args:
@@ -4456,7 +4477,7 @@ functions:
     - line_no
     docstring: null
     file: docs/search_theory_index.py
-    line: 446
+    line: 452
     name: mode_line
   docs/search_theory_index.py:mode_range:
     args:
@@ -4464,7 +4485,7 @@ functions:
     - line_range
     docstring: null
     file: docs/search_theory_index.py
-    line: 457
+    line: 463
     name: mode_range
   docs/search_theory_index.py:mode_search:
     args:
@@ -4479,35 +4500,35 @@ functions:
     - json_output
     docstring: null
     file: docs/search_theory_index.py
-    line: 556
+    line: 571
     name: mode_search
   docs/search_theory_index.py:mode_stats:
     args:
     - index
     docstring: null
     file: docs/search_theory_index.py
-    line: 356
+    line: 364
     name: mode_stats
   docs/search_theory_index.py:mode_stats_extended:
     args:
     - index
     docstring: null
     file: docs/search_theory_index.py
-    line: 369
+    line: 377
     name: mode_stats_extended
   docs/search_theory_index.py:mode_tree:
     args:
     - index
     docstring: Print simple category tree (flat, grouped by category).
     file: docs/search_theory_index.py
-    line: 420
+    line: 428
     name: mode_tree
   docs/search_theory_index.py:mode_validate:
     args:
     - index
     docstring: null
     file: docs/search_theory_index.py
-    line: 393
+    line: 401
     name: mode_validate
   docs/search_theory_index.py:print_result_text:
     args:
@@ -4517,14 +4538,14 @@ functions:
     - snippet_lines
     docstring: Pretty-print a single segment.
     file: docs/search_theory_index.py
-    line: 326
+    line: 333
     name: print_result_text
   docs/search_theory_index.py:total_segments:
     args:
     - self
     docstring: null
     file: docs/search_theory_index.py
-    line: 160
+    line: 162
     name: total_segments
   tests/integration/test_config_integration.py:test_cmb_config_available:
     args:
@@ -4579,7 +4600,7 @@ functions:
 
       Uses time values typical for cosmological evolution.'
     file: tests/integration/test_theta_evolution_integration.py
-    line: 233
+    line: 221
     name: test_evolution_processing_realistic_time_range
   tests/integration/test_theta_evolution_integration.py:test_evolution_processing_with_csv_file:
     args:
@@ -4589,7 +4610,7 @@ functions:
 
       Creates temporary CSV file and tests loading and processing.'
     file: tests/integration/test_theta_evolution_integration.py
-    line: 181
+    line: 171
     name: test_evolution_processing_with_csv_file
   tests/integration/test_theta_evolution_integration.py:test_evolution_processing_with_json_file:
     args:
@@ -4599,7 +4620,7 @@ functions:
 
       Creates temporary JSON file and tests loading and processing.'
     file: tests/integration/test_theta_evolution_integration.py
-    line: 128
+    line: 122
     name: test_evolution_processing_with_json_file
   tests/integration/test_theta_evolution_integration.py:test_process_evolution_data_function:
     args:
@@ -4609,8 +4630,172 @@ functions:
 
       Verify it creates and processes processor correctly.'
     file: tests/integration/test_theta_evolution_integration.py
-    line: 85
+    line: 81
     name: test_process_evolution_data_function
+  tests/unit/test_cmb_map_reconstructor.py:sample_config:
+    args: []
+    docstring: Create sample configuration for tests.
+    file: tests/unit/test_cmb_map_reconstructor.py
+    line: 20
+    name: sample_config
+  tests/unit/test_cmb_map_reconstructor.py:sample_evolution:
+    args: []
+    docstring: Create sample evolution data for tests.
+    file: tests/unit/test_cmb_map_reconstructor.py
+    line: 53
+    name: sample_evolution
+  tests/unit/test_cmb_map_reconstructor.py:sample_frequency_spectrum:
+    args: []
+    docstring: Create sample frequency spectrum for tests.
+    file: tests/unit/test_cmb_map_reconstructor.py
+    line: 34
+    name: sample_frequency_spectrum
+  tests/unit/test_cmb_map_reconstructor.py:sample_node_data:
+    args:
+    - sample_config
+    docstring: Create sample node data for tests.
+    file: tests/unit/test_cmb_map_reconstructor.py
+    line: 69
+    name: sample_node_data
+  tests/unit/test_cmb_map_reconstructor.py:test_convert_nodes_to_temperature:
+    args:
+    - self
+    - sample_frequency_spectrum
+    - sample_evolution
+    - sample_node_data
+    - sample_config
+    docstring: Test node depth to temperature conversion.
+    file: tests/unit/test_cmb_map_reconstructor.py
+    line: 136
+    name: test_convert_nodes_to_temperature
+  tests/unit/test_cmb_map_reconstructor.py:test_init:
+    args:
+    - self
+    - sample_frequency_spectrum
+    - sample_evolution
+    - sample_node_data
+    - sample_config
+    docstring: Test initialization.
+    file: tests/unit/test_cmb_map_reconstructor.py
+    line: 95
+    name: test_init
+  tests/unit/test_cmb_map_reconstructor.py:test_init_default_config:
+    args:
+    - self
+    - sample_frequency_spectrum
+    - sample_evolution
+    - sample_node_data
+    docstring: Test initialization with default config.
+    file: tests/unit/test_cmb_map_reconstructor.py
+    line: 120
+    name: test_init_default_config
+  tests/unit/test_cmb_map_reconstructor.py:test_integrate_frequency_spectrum:
+    args:
+    - self
+    - sample_frequency_spectrum
+    - sample_evolution
+    - sample_node_data
+    - sample_config
+    docstring: Test frequency spectrum integration.
+    file: tests/unit/test_cmb_map_reconstructor.py
+    line: 262
+    name: test_integrate_frequency_spectrum
+  tests/unit/test_cmb_map_reconstructor.py:test_project_nodes_to_sky:
+    args:
+    - self
+    - sample_frequency_spectrum
+    - sample_evolution
+    - sample_node_data
+    - sample_config
+    docstring: Test node projection to sky coordinates.
+    file: tests/unit/test_cmb_map_reconstructor.py
+    line: 169
+    name: test_project_nodes_to_sky
+  tests/unit/test_cmb_map_reconstructor.py:test_project_nodes_to_sky_invalid_phi:
+    args:
+    - self
+    - sample_frequency_spectrum
+    - sample_evolution
+    - sample_config
+    docstring: Test projection with invalid phi values.
+    file: tests/unit/test_cmb_map_reconstructor.py
+    line: 229
+    name: test_project_nodes_to_sky_invalid_phi
+  tests/unit/test_cmb_map_reconstructor.py:test_project_nodes_to_sky_invalid_theta:
+    args:
+    - self
+    - sample_frequency_spectrum
+    - sample_evolution
+    - sample_config
+    docstring: Test projection with invalid theta values.
+    file: tests/unit/test_cmb_map_reconstructor.py
+    line: 196
+    name: test_project_nodes_to_sky_invalid_theta
+  tests/unit/test_cmb_map_reconstructor.py:test_reconstruct_map:
+    args:
+    - self
+    - sample_frequency_spectrum
+    - sample_evolution
+    - sample_node_data
+    - sample_config
+    docstring: Test full map reconstruction.
+    file: tests/unit/test_cmb_map_reconstructor.py
+    line: 290
+    name: test_reconstruct_map
+  tests/unit/test_cmb_map_reconstructor.py:test_reconstruct_map_cuda_usage:
+    args:
+    - self
+    - sample_frequency_spectrum
+    - sample_evolution
+    - sample_node_data
+    - sample_config
+    docstring: Test that reconstruction uses CUDA utilities.
+    file: tests/unit/test_cmb_map_reconstructor.py
+    line: 320
+    name: test_reconstruct_map_cuda_usage
+  tests/unit/test_cmb_map_reconstructor.py:test_reconstruct_map_empty_nodes:
+    args:
+    - self
+    - sample_frequency_spectrum
+    - sample_evolution
+    - sample_config
+    docstring: Test reconstruction with empty node data.
+    file: tests/unit/test_cmb_map_reconstructor.py
+    line: 404
+    name: test_reconstruct_map_empty_nodes
+  tests/unit/test_cmb_map_reconstructor.py:test_reconstruct_map_formula_cmb21:
+    args:
+    - self
+    - sample_frequency_spectrum
+    - sample_evolution
+    - sample_node_data
+    - sample_config
+    docstring: Test that reconstruction uses formula CMB2.1 correctly.
+    file: tests/unit/test_cmb_map_reconstructor.py
+    line: 436
+    name: test_reconstruct_map_formula_cmb21
+  tests/unit/test_cmb_map_reconstructor.py:test_reconstruct_map_large_nside:
+    args:
+    - self
+    - sample_frequency_spectrum
+    - sample_evolution
+    - sample_node_data
+    - sample_config
+    docstring: Test reconstruction with larger NSIDE (more realistic).
+    file: tests/unit/test_cmb_map_reconstructor.py
+    line: 379
+    name: test_reconstruct_map_large_nside
+  tests/unit/test_cmb_map_reconstructor.py:test_reconstruct_map_scatter_add_usage:
+    args:
+    - self
+    - sample_frequency_spectrum
+    - sample_evolution
+    - sample_node_data
+    - sample_config
+    docstring: Test that reconstruction uses scatter_add for pixel accumulation.
+    file: tests/unit/test_cmb_map_reconstructor.py
+    line: 353
+    name: test_reconstruct_map_scatter_add_usage
   tests/unit/test_cmb_plots.py:test_plot_comparison:
     args:
     - self
@@ -5715,14 +5900,14 @@ functions:
     - self
     docstring: Test getting memory usage statistics.
     file: tests/unit/test_memory_watchdog.py
-    line: 80
+    line: 79
     name: test_get_memory_usage
   tests/unit/test_memory_watchdog.py:test_get_registered_processes:
     args:
     - self
     docstring: Test getting registered processes.
     file: tests/unit/test_memory_watchdog.py
-    line: 91
+    line: 90
     name: test_get_registered_processes
   tests/unit/test_memory_watchdog.py:test_memory_process_dataclass:
     args:
@@ -5743,7 +5928,7 @@ functions:
     - self
     docstring: Test process priority handling.
     file: tests/unit/test_memory_watchdog.py
-    line: 133
+    line: 134
     name: test_process_priority
   tests/unit/test_memory_watchdog.py:test_register_process:
     args:
@@ -5778,7 +5963,7 @@ functions:
     - self
     docstring: Test process unregistration.
     file: tests/unit/test_memory_watchdog.py
-    line: 54
+    line: 52
     name: test_unregister_process
   tests/unit/test_memory_watchdog.py:test_update_nonexistent_process:
     args:
@@ -5792,7 +5977,7 @@ functions:
     - self
     docstring: Test updating process memory.
     file: tests/unit/test_memory_watchdog.py
-    line: 62
+    line: 60
     name: test_update_process_memory
   tests/unit/test_reduction_vectorizer.py:test_max:
     args:
@@ -5995,7 +6180,7 @@ functions:
     - self
     docstring: Test loading evolution data from CSV file.
     file: tests/unit/test_theta_data_loader.py
-    line: 178
+    line: 172
     name: test_load_csv_evolution_data
   tests/unit/test_theta_data_loader.py:test_load_csv_frequency_spectrum:
     args:
@@ -6009,119 +6194,119 @@ functions:
     - self
     docstring: Test loading CSV with missing column raises ValueError.
     file: tests/unit/test_theta_data_loader.py
-    line: 241
+    line: 235
     name: test_load_csv_missing_column
   tests/unit/test_theta_data_loader.py:test_load_json_evolution_data:
     args:
     - self
     docstring: Test loading evolution data from JSON file.
     file: tests/unit/test_theta_data_loader.py
-    line: 204
+    line: 198
     name: test_load_json_evolution_data
   tests/unit/test_theta_data_loader.py:test_load_json_frequency_spectrum:
     args:
     - self
     docstring: Test loading frequency spectrum from JSON file.
     file: tests/unit/test_theta_data_loader.py
-    line: 105
+    line: 103
     name: test_load_json_frequency_spectrum
   tests/unit/test_theta_data_loader.py:test_load_json_missing_key:
     args:
     - self
     docstring: Test loading JSON with missing key raises ValueError.
     file: tests/unit/test_theta_data_loader.py
-    line: 158
+    line: 154
     name: test_load_json_missing_key
   tests/unit/test_theta_data_loader.py:test_load_nonexistent_file:
     args:
     - self
     docstring: Test loading non-existent file raises FileNotFoundError.
     file: tests/unit/test_theta_data_loader.py
-    line: 234
+    line: 228
     name: test_load_nonexistent_file
   tests/unit/test_theta_data_loader.py:test_validate_empty_frequencies:
     args:
     - self
     docstring: Test validating spectrum with empty frequencies.
     file: tests/unit/test_theta_data_loader.py
-    line: 275
+    line: 269
     name: test_validate_empty_frequencies
   tests/unit/test_theta_data_loader.py:test_validate_empty_times:
     args:
     - self
     docstring: Test validating evolution with empty times raises ValueError.
     file: tests/unit/test_theta_data_loader.py
-    line: 386
+    line: 376
     name: test_validate_empty_times
   tests/unit/test_theta_data_loader.py:test_validate_length_mismatch:
     args:
     - self
     docstring: Test validating evolution with length mismatch raises ValueError.
     file: tests/unit/test_theta_data_loader.py
-    line: 403
+    line: 393
     name: test_validate_length_mismatch
   tests/unit/test_theta_data_loader.py:test_validate_nan_frequencies:
     args:
     - self
     docstring: Test validating spectrum with NaN frequencies raises ValueError.
     file: tests/unit/test_theta_data_loader.py
-    line: 347
+    line: 339
     name: test_validate_nan_frequencies
   tests/unit/test_theta_data_loader.py:test_validate_nan_times:
     args:
     - self
     docstring: Test validating evolution with NaN times raises ValueError.
     file: tests/unit/test_theta_data_loader.py
-    line: 439
+    line: 427
     name: test_validate_nan_times
   tests/unit/test_theta_data_loader.py:test_validate_negative_frequencies:
     args:
     - self
     docstring: Test validating spectrum with negative frequencies.
     file: tests/unit/test_theta_data_loader.py
-    line: 292
+    line: 286
     name: test_validate_negative_frequencies
   tests/unit/test_theta_data_loader.py:test_validate_negative_omega_min:
     args:
     - self
     docstring: Test validating evolution with negative omega_min.
     file: tests/unit/test_theta_data_loader.py
-    line: 420
+    line: 410
     name: test_validate_negative_omega_min
   tests/unit/test_theta_data_loader.py:test_validate_negative_spectrum:
     args:
     - self
     docstring: Test validating spectrum with negative values raises ValueError.
     file: tests/unit/test_theta_data_loader.py
-    line: 311
+    line: 303
     name: test_validate_negative_spectrum
   tests/unit/test_theta_data_loader.py:test_validate_omega_min_greater_than_macro:
     args:
     - self
     docstring: Test validating evolution where omega_min >= omega_macro.
     file: tests/unit/test_theta_data_loader.py
-    line: 456
+    line: 444
     name: test_validate_omega_min_greater_than_macro
   tests/unit/test_theta_data_loader.py:test_validate_shape_mismatch:
     args:
     - self
     docstring: Test validating spectrum with shape mismatch raises ValueError.
     file: tests/unit/test_theta_data_loader.py
-    line: 330
+    line: 322
     name: test_validate_shape_mismatch
   tests/unit/test_theta_data_loader.py:test_validate_valid_evolution:
     args:
     - self
     docstring: Test validating valid evolution data.
     file: tests/unit/test_theta_data_loader.py
-    line: 370
+    line: 360
     name: test_validate_valid_evolution
   tests/unit/test_theta_data_loader.py:test_validate_valid_spectrum:
     args:
     - self
     docstring: Test validating valid frequency spectrum.
     file: tests/unit/test_theta_data_loader.py
-    line: 259
+    line: 253
     name: test_validate_valid_spectrum
   tests/unit/test_theta_evolution_processor.py:test_check_time_coverage_gaps_no_gaps:
     args:
@@ -6618,7 +6803,7 @@ functions:
     - self
     docstring: Test FFT on 2D array.
     file: tests/unit/test_transform_vectorizer.py
-    line: 75
+    line: 73
     name: test_2d_fft
   tests/unit/test_transform_vectorizer.py:test_fft:
     args:
@@ -6646,7 +6831,7 @@ functions:
     - self
     docstring: Test invalid transform.
     file: tests/unit/test_transform_vectorizer.py
-    line: 67
+    line: 65
     name: test_invalid_transform
   tests/unit/test_transform_vectorizer.py:test_irfft:
     args:
@@ -7028,7 +7213,7 @@ functions:
       \    **kwargs: Operation-specific keyword arguments\n\nReturns:\n    List of\
       \ result CudaArrays"
     file: utils/cuda/elementwise_vectorizer.py
-    line: 291
+    line: 366
     name: batch
   utils/cuda/elementwise_vectorizer.py:cos:
     args:
@@ -7081,6 +7266,22 @@ functions:
     file: utils/cuda/elementwise_vectorizer.py
     line: 259
     name: power
+  utils/cuda/elementwise_vectorizer.py:scatter_add:
+    args:
+    - self
+    - indices
+    - values
+    - output_size
+    docstring: "Scatter-add operation: accumulate values at indices.\n\nEquivalent\
+      \ to np.bincount(indices, weights=values, minlength=output_size).\n\nArgs:\n\
+      \    indices: Array of indices (must be integer type)\n    values: Array of\
+      \ values to accumulate\n    output_size: Size of output array\n\nReturns:\n\
+      \    CudaArray with accumulated values\n\nNote:\n    This is a grouping operation.\
+      \ For large arrays, uses GPU\n    acceleration if available. Falls back to np.bincount\
+      \ on CPU."
+    file: utils/cuda/elementwise_vectorizer.py
+    line: 291
+    name: scatter_add
   utils/cuda/elementwise_vectorizer.py:sin:
     args:
     - self
@@ -7799,7 +8000,7 @@ functions:
       Returns:\n    Dictionary with JSON data\n\nRaises:\n    FileNotFoundError: If\
       \ file doesn't exist\n    json.JSONDecodeError: If JSON is invalid"
     file: utils/io/data_loader.py
-    line: 331
+    line: 329
     name: load_json_data
   utils/io/data_loader.py:load_power_spectrum_from_tar:
     args:
@@ -7821,7 +8022,7 @@ functions:
       \    nside: Expected NSIDE value (optional)\n\nReturns:\n    True if map is\
       \ valid\n\nRaises:\n    ValueError: If map is invalid"
     file: utils/io/data_loader.py
-    line: 360
+    line: 358
     name: validate_healpix_map
   utils/io/data_saver.py:convert_to_serializable:
     args:
@@ -7830,7 +8031,7 @@ functions:
       \ to convert (can be numpy array, dict, list, etc.)\n\nReturns:\n    JSON-serializable\
       \ representation of the object"
     file: utils/io/data_saver.py
-    line: 239
+    line: 235
     name: convert_to_serializable
   utils/io/data_saver.py:convert_to_yaml_serializable:
     args:
@@ -7839,7 +8040,7 @@ functions:
       \ to convert (can be numpy array, dict, list, etc.)\n\nReturns:\n    YAML-serializable\
       \ representation of the object"
     file: utils/io/data_saver.py
-    line: 276
+    line: 272
     name: convert_to_yaml_serializable
   utils/io/data_saver.py:ensure_output_directory:
     args:
@@ -7848,7 +8049,7 @@ functions:
       \ Path to output file or directory\n\nRaises:\n    PermissionError: If directory\
       \ cannot be created"
     file: utils/io/data_saver.py
-    line: 318
+    line: 309
     name: ensure_output_directory
   utils/io/data_saver.py:save_analysis_results:
     args:
@@ -7859,7 +8060,7 @@ functions:
       \ analysis results\n    file_path: Path to output file\n    format: Output format\
       \ ('json', 'yaml')\n\nRaises:\n    ValueError: If format is invalid"
     file: utils/io/data_saver.py
-    line: 219
+    line: 215
     name: save_analysis_results
   utils/io/data_saver.py:save_healpix_map:
     args:
@@ -7888,7 +8089,7 @@ functions:
       \ writes entire file at once.\n\nRaises:\n    ValueError: If format is invalid\
       \ or data is missing"
     file: utils/io/data_saver.py
-    line: 79
+    line: 77
     name: save_power_spectrum
   utils/math/frequency_conversion.py:frequency_to_multipole:
     args:
@@ -7936,7 +8137,7 @@ functions:
       \ uses data limit)\n\nReturns:\n    Tuple of (multipoles, C_l values)\n\nRaises:\n\
       \    ValueError: If coefficients are invalid"
     file: utils/math/spherical_harmonics.py
-    line: 206
+    line: 204
     name: calculate_power_spectrum_from_alm
   utils/math/spherical_harmonics.py:convert_healpix_to_alm:
     args:
@@ -7947,7 +8148,7 @@ functions:
       \    map_data: HEALPix map array\n    nside: HEALPix NSIDE parameter\n    l_max:\
       \ Maximum multipole\n\nReturns:\n    Array of harmonic coefficients a_lm"
     file: utils/math/spherical_harmonics.py
-    line: 247
+    line: 245
     name: convert_healpix_to_alm
   utils/math/spherical_harmonics.py:decompose_map:
     args:
@@ -10274,95 +10475,95 @@ imports:
     type: import_from
   docs/search_theory_index.py:Any:
     file: docs/search_theory_index.py
-    line: 78
+    line: 77
     module: typing
     name: Any
     type: import_from
   docs/search_theory_index.py:Dict:
     file: docs/search_theory_index.py
-    line: 78
+    line: 77
     module: typing
     name: Dict
     type: import_from
   docs/search_theory_index.py:List:
     file: docs/search_theory_index.py
-    line: 78
+    line: 77
     module: typing
     name: List
     type: import_from
   docs/search_theory_index.py:Optional:
     file: docs/search_theory_index.py
-    line: 78
+    line: 77
     module: typing
     name: Optional
     type: import_from
   docs/search_theory_index.py:Path:
     file: docs/search_theory_index.py
-    line: 77
+    line: 76
     module: pathlib
     name: Path
     type: import_from
   docs/search_theory_index.py:Sequence:
     file: docs/search_theory_index.py
-    line: 78
+    line: 77
     module: typing
     name: Sequence
     type: import_from
   docs/search_theory_index.py:Tuple:
     file: docs/search_theory_index.py
-    line: 78
+    line: 77
     module: typing
     name: Tuple
     type: import_from
   docs/search_theory_index.py:annotations:
     file: docs/search_theory_index.py
-    line: 67
+    line: 66
     module: __future__
     name: annotations
     type: import_from
   docs/search_theory_index.py:argparse:
     file: docs/search_theory_index.py
-    line: 69
+    line: 68
     name: argparse
     type: import
   docs/search_theory_index.py:collections:
     file: docs/search_theory_index.py
-    line: 70
+    line: 69
     name: collections
     type: import
   docs/search_theory_index.py:dataclasses:
     file: docs/search_theory_index.py
-    line: 71
+    line: 70
     name: dataclasses
     type: import
   docs/search_theory_index.py:json:
     file: docs/search_theory_index.py
-    line: 72
+    line: 71
     name: json
     type: import
   docs/search_theory_index.py:os:
     file: docs/search_theory_index.py
-    line: 73
+    line: 72
     name: os
     type: import
   docs/search_theory_index.py:pickle:
     file: docs/search_theory_index.py
-    line: 74
+    line: 73
     name: pickle
     type: import
   docs/search_theory_index.py:statistics:
     file: docs/search_theory_index.py
-    line: 75
+    line: 74
     name: statistics
     type: import
   docs/search_theory_index.py:sys:
     file: docs/search_theory_index.py
-    line: 76
+    line: 75
     name: sys
     type: import
   docs/search_theory_index.py:yaml:
     file: docs/search_theory_index.py
-    line: 81
+    line: 80
     name: yaml
     type: import
   tests/integration/test_config_integration.py:Config:
@@ -10415,7 +10616,7 @@ imports:
     type: import_from
   tests/integration/test_theta_evolution_integration.py:csv:
     file: tests/integration/test_theta_evolution_integration.py
-    line: 187
+    line: 177
     name: csv
     type: import
   tests/integration/test_theta_evolution_integration.py:json:
@@ -10444,6 +10645,63 @@ imports:
     file: tests/integration/test_theta_evolution_integration.py
     line: 13
     name: tempfile
+    type: import
+  tests/unit/test_cmb_map_reconstructor.py:CmbMapReconstructor:
+    file: tests/unit/test_cmb_map_reconstructor.py
+    line: 13
+    module: cmb.reconstruction.cmb_map_reconstructor
+    name: CmbMapReconstructor
+    type: import_from
+  tests/unit/test_cmb_map_reconstructor.py:Config:
+    file: tests/unit/test_cmb_map_reconstructor.py
+    line: 16
+    module: config.settings
+    name: Config
+    type: import_from
+  tests/unit/test_cmb_map_reconstructor.py:ThetaEvolution:
+    file: tests/unit/test_cmb_map_reconstructor.py
+    line: 14
+    module: cmb.theta_data_loader
+    name: ThetaEvolution
+    type: import_from
+  tests/unit/test_cmb_map_reconstructor.py:ThetaFrequencySpectrum:
+    file: tests/unit/test_cmb_map_reconstructor.py
+    line: 14
+    module: cmb.theta_data_loader
+    name: ThetaFrequencySpectrum
+    type: import_from
+  tests/unit/test_cmb_map_reconstructor.py:ThetaNodeData:
+    file: tests/unit/test_cmb_map_reconstructor.py
+    line: 15
+    module: cmb.theta_node_processor
+    name: ThetaNodeData
+    type: import_from
+  tests/unit/test_cmb_map_reconstructor.py:healpy:
+    file: tests/unit/test_cmb_map_reconstructor.py
+    line: 12
+    name: healpy
+    type: import
+  tests/unit/test_cmb_map_reconstructor.py:initialize_config:
+    file: tests/unit/test_cmb_map_reconstructor.py
+    line: 16
+    module: config.settings
+    name: initialize_config
+    type: import_from
+  tests/unit/test_cmb_map_reconstructor.py:map_depth_to_temperature:
+    file: tests/unit/test_cmb_map_reconstructor.py
+    line: 240
+    module: cmb.theta_node_processor
+    name: map_depth_to_temperature
+    type: import_from
+  tests/unit/test_cmb_map_reconstructor.py:numpy:
+    file: tests/unit/test_cmb_map_reconstructor.py
+    line: 11
+    name: numpy
+    type: import
+  tests/unit/test_cmb_map_reconstructor.py:pytest:
+    file: tests/unit/test_cmb_map_reconstructor.py
+    line: 10
+    name: pytest
     type: import
   tests/unit/test_cmb_plots.py:Path:
     file: tests/unit/test_cmb_plots.py
@@ -10908,7 +11166,7 @@ imports:
     type: import
   tests/unit/test_memory_watchdog.py:time:
     file: tests/unit/test_memory_watchdog.py
-    line: 68
+    line: 66
     name: time
     type: import
   tests/unit/test_reduction_vectorizer.py:CudaArray:
@@ -12094,7 +12352,7 @@ imports:
     type: import
   utils/io/data_saver.py:yaml:
     file: utils/io/data_saver.py
-    line: 269
+    line: 265
     name: yaml
     type: import
   utils/math/__init__.py:calculate_power_spectrum_from_alm:

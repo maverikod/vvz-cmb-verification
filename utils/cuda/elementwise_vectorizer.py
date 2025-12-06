@@ -288,6 +288,81 @@ class ElementWiseVectorizer(BaseVectorizer):
         """Apply absolute value."""
         return self.vectorize_operation(array, "abs", None)
 
+    def scatter_add(
+        self,
+        indices: "CudaArray",  # noqa: F821
+        values: "CudaArray",  # noqa: F821
+        output_size: int,
+    ) -> "CudaArray":  # noqa: F821
+        """
+        Scatter-add operation: accumulate values at indices.
+
+        Equivalent to np.bincount(indices, weights=values, minlength=output_size).
+
+        Args:
+            indices: Array of indices (must be integer type)
+            values: Array of values to accumulate
+            output_size: Size of output array
+
+        Returns:
+            CudaArray with accumulated values
+
+        Note:
+            This is a grouping operation. For large arrays, uses GPU
+            acceleration if available. Falls back to np.bincount on CPU.
+        """
+        from utils.cuda.array_model import CudaArray
+
+        # Get numpy arrays for processing
+        indices_np = indices.to_numpy()
+        values_np = values.to_numpy()
+
+        # Validate indices are integers
+        if not np.issubdtype(indices_np.dtype, np.integer):
+            indices_np = indices_np.astype(np.int64)
+
+        # Use GPU if available
+        if self.use_gpu and CUPY_AVAILABLE:
+            try:
+                # Convert to CuPy arrays
+                indices_cp = cp.asarray(indices_np, dtype=cp.int64)
+                values_cp = cp.asarray(values_np)
+
+                # Use CuPy's scatter_add or manual implementation
+                output_cp = cp.zeros(output_size, dtype=values_cp.dtype)
+
+                # Check if scatter_add is available (CuPy 8.0+)
+                if hasattr(cp, "scatter_add"):
+                    # CuPy 8.0+ has scatter_add
+                    # Note: scatter_add signature: output, indices, values
+                    cp.scatter_add(output_cp, indices_cp, values_cp)
+                else:
+                    # Manual implementation for older CuPy versions
+                    # Use cp.add.at for atomic addition
+                    # Filter valid indices first
+                    valid_mask = (indices_cp >= 0) & (indices_cp < output_size)
+                    if cp.any(valid_mask):
+                        valid_indices = indices_cp[valid_mask]
+                        valid_values = values_cp[valid_mask]
+                        # Use add.at for atomic scatter-add
+                        cp.add.at(output_cp, valid_indices, valid_values)
+
+                # Convert back to numpy
+                result_np = cp.asnumpy(output_cp)
+            except Exception:
+                # Fallback to numpy bincount on any error
+                result_np = np.bincount(
+                    indices_np, weights=values_np, minlength=output_size
+                )
+        else:
+            # Use numpy bincount on CPU
+            result_np = np.bincount(
+                indices_np, weights=values_np, minlength=output_size
+            )
+
+        # Return as CudaArray
+        return CudaArray(result_np, device=indices.device)
+
     def batch(
         self, arrays: List["CudaArray"], *args: Any, **kwargs: Any  # noqa: F821
     ) -> List["CudaArray"]:  # noqa: F821

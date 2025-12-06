@@ -313,9 +313,7 @@ def load_csv_data(
             for field in fieldnames:
                 if field:
                     try:
-                        fallback_data_dict[field] = np.array(
-                            fallback_data_dict[field]
-                        )
+                        fallback_data_dict[field] = np.array(fallback_data_dict[field])
                     except Exception:
                         # Keep as list if conversion fails
                         pass

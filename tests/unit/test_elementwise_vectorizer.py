@@ -81,7 +81,7 @@ class TestElementWiseVectorizer:
         array = CudaArray(data, device="cpu")
         vectorizer = ElementWiseVectorizer(use_gpu=False)
         result = vectorizer.power(array, 2)
-        expected = data ** 2
+        expected = data**2
         assert np.allclose(result.to_numpy(), expected)
 
     def test_sqrt(self):
@@ -131,7 +131,7 @@ class TestElementWiseVectorizer:
 
     def test_log(self):
         """Test natural logarithm operation."""
-        data = np.array([1, np.e, np.e ** 2])
+        data = np.array([1, np.e, np.e**2])
         array = CudaArray(data, device="cpu")
         vectorizer = ElementWiseVectorizer(use_gpu=False)
         result = vectorizer.log(array)

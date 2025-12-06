@@ -58,9 +58,7 @@ class TestTransformVectorizer:
         # First do RFFT
         rfft_result = vectorizer.vectorize_transform(array, "rfft")
         # Then do IRFFT
-        result = vectorizer.vectorize_transform(
-            rfft_result, "irfft", n=len(data)
-        )
+        result = vectorizer.vectorize_transform(rfft_result, "irfft", n=len(data))
         # Should get back original (within numerical precision)
         assert np.allclose(result.to_numpy(), data, rtol=1e-10)
 

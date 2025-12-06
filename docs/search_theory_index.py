@@ -1,6 +1,5 @@
-
 #!/usr/bin/env python3
-'''search_theory_index.py
+"""search_theory_index.py
 
 Index manager and CLI helper to work with the theory index (ALL_index.yaml).
 
@@ -62,7 +61,7 @@ Assemble continuous markdown text from All.md based on selected segments:
 
 This script intentionally avoids any heavy dependencies or non-portable tricks,
 so it should work both in local environments and in constrained tools.
-'''
+"""
 
 from __future__ import annotations
 
@@ -89,9 +88,10 @@ except ImportError as exc:
 # Data structures
 # ---------------------------------------------------------------------------
 
+
 @dataclasses.dataclass
 class Segment:
-    '''Lightweight wrapper around a segment entry from the YAML index.'''
+    """Lightweight wrapper around a segment entry from the YAML index."""
 
     id: str
     category: str
@@ -133,7 +133,9 @@ class Segment:
 
         if not ranges_list:
             # Fallback: zero-length dummy
-            ranges_list = [(int(d.get("start_line", 0) or 0), int(d.get("end_line", 0) or 0))]
+            ranges_list = [
+                (int(d.get("start_line", 0) or 0), int(d.get("end_line", 0) or 0))
+            ]
 
         # Canonical aggregate start/end
         start_line = min(s for s, _ in ranges_list)
@@ -173,13 +175,14 @@ class IndexData:
 # Low-level index loading with pickle cache
 # ---------------------------------------------------------------------------
 
+
 def _get_cache_path(index_path: str) -> str:
     p = Path(index_path)
     return str(p.with_suffix(p.suffix + ".pkl"))
 
 
 def _load_index_yaml(path: str) -> Dict[str, Any]:
-    '''Load the YAML index file without any caching.'''
+    """Load the YAML index file without any caching."""
     if not os.path.exists(path):
         raise FileNotFoundError(f"Index file not found: {path}")
     with open(path, "r", encoding="utf-8") as f:
@@ -190,7 +193,7 @@ def _load_index_yaml(path: str) -> Dict[str, Any]:
 
 
 def load_index(path: str, use_cache: bool = True) -> IndexData:
-    '''Load index with optional pickle-based caching.
+    """Load index with optional pickle-based caching.
 
     Cache layout::
 
@@ -200,7 +203,7 @@ def load_index(path: str, use_cache: bool = True) -> IndexData:
             "size": <int>,
             "data": <raw_yaml_dict>
         }
-    '''
+    """
     path = str(Path(path).resolve())
     yaml_mtime = os.path.getmtime(path)
     yaml_size = os.path.getsize(path)
@@ -237,7 +240,9 @@ def load_index(path: str, use_cache: bool = True) -> IndexData:
             with open(cache_path, "wb") as f:
                 pickle.dump(payload, f, protocol=pickle.HIGHEST_PROTOCOL)
         except Exception as exc:  # pragma: no cover - best-effort cache
-            print(f"WARNING: failed to write cache {cache_path}: {exc}", file=sys.stderr)
+            print(
+                f"WARNING: failed to write cache {cache_path}: {exc}", file=sys.stderr
+            )
 
     return _build_index(raw)
 
@@ -260,7 +265,7 @@ def _build_index(raw: Dict[str, Any]) -> IndexData:
 
 
 def load_theory_lines(path: str) -> List[str]:
-    '''Load theory markdown file as a list of lines (1-based mapping).'''
+    """Load theory markdown file as a list of lines (1-based mapping)."""
     with open(path, "r", encoding="utf-8") as f:
         return f.readlines()
 
@@ -268,6 +273,7 @@ def load_theory_lines(path: str) -> List[str]:
 # ---------------------------------------------------------------------------
 # Matching / search helpers
 # ---------------------------------------------------------------------------
+
 
 def matches_tag(seg: Segment, tag_substr: Optional[str]) -> bool:
     if not tag_substr:
@@ -282,7 +288,7 @@ def matches_category(seg: Segment, cat_substr: Optional[str]) -> bool:
 
 
 def _build_segment_text(seg: Segment, theory_lines: Optional[List[str]]) -> str:
-    '''Aggregate text for phrase search: keywords, summary and (optionally) raw text.'''
+    """Aggregate text for phrase search: keywords, summary and (optionally) raw text."""
     parts: List[str] = []
     if seg.keywords:
         parts.append(" ".join(seg.keywords))
@@ -323,13 +329,14 @@ def matches_phrase(
 # Printing helpers
 # ---------------------------------------------------------------------------
 
+
 def print_result_text(
     seg: Segment,
     theory_lines: Optional[List[str]] = None,
     show_text: bool = False,
     snippet_lines: int = 10,
 ) -> None:
-    '''Pretty-print a single segment.'''
+    """Pretty-print a single segment."""
     print("=" * 80)
     print(f"id       : {seg.id}")
     print(f"category : {seg.category}")
@@ -352,6 +359,7 @@ def print_result_text(
 # ---------------------------------------------------------------------------
 # Modes: stats, stats-extended, validate, tree, line/range, export, assemble, search
 # ---------------------------------------------------------------------------
+
 
 def mode_stats(index: IndexData) -> int:
     min_line, max_line = index.line_span
@@ -418,7 +426,7 @@ def mode_validate(index: IndexData) -> int:
 
 
 def mode_tree(index: IndexData) -> int:
-    '''Print simple category tree (flat, grouped by category).'''
+    """Print simple category tree (flat, grouped by category)."""
     cat_to_ids: Dict[str, List[str]] = collections.defaultdict(list)
     for seg in index.segments:
         cat_to_ids[seg.category].append(seg.id)
@@ -437,9 +445,7 @@ def _segments_overlapping_line(index: IndexData, line: int) -> List[Segment]:
 
 def _segments_overlapping_range(index: IndexData, lo: int, hi: int) -> List[Segment]:
     return [
-        seg
-        for seg in index.segments
-        if not (seg.end_line < lo or seg.start_line > hi)
+        seg for seg in index.segments if not (seg.end_line < lo or seg.start_line > hi)
     ]
 
 
@@ -460,7 +466,10 @@ def mode_range(index: IndexData, line_range: str) -> int:
         lo = int(lo_str.strip())
         hi = int(hi_str.strip())
     except Exception:
-        print(f"ERROR: invalid --range value: {line_range!r}, expected 'lo-hi'.", file=sys.stderr)
+        print(
+            f"ERROR: invalid --range value: {line_range!r}, expected 'lo-hi'.",
+            file=sys.stderr,
+        )
         return 2
     if lo > hi:
         lo, hi = hi, lo
@@ -500,7 +509,10 @@ def mode_export(filtered: List[Segment], export_path: str) -> int:
             )
             return 2
     except Exception as exc:
-        print(f"ERROR: failed to write export file {export_path!r}: {exc}", file=sys.stderr)
+        print(
+            f"ERROR: failed to write export file {export_path!r}: {exc}",
+            file=sys.stderr,
+        )
         return 1
 
     print(f"Exported {len(filtered)} segments to {export_path}")
@@ -513,7 +525,7 @@ def mode_assemble(
     output_path: str,
     add_headers: bool = True,
 ) -> int:
-    '''Assemble continuous text from theory file based on selected segments.'''
+    """Assemble continuous text from theory file based on selected segments."""
     if not output_path:
         print("ERROR: --output-path is required for mode=assemble.", file=sys.stderr)
         return 2
@@ -546,7 +558,10 @@ def mode_assemble(
         with open(output_path, "w", encoding="utf-8") as f:
             f.write("".join(assembled_parts))
     except Exception as exc:
-        print(f"ERROR: failed to write assembled file {output_path!r}: {exc}", file=sys.stderr)
+        print(
+            f"ERROR: failed to write assembled file {output_path!r}: {exc}",
+            file=sys.stderr,
+        )
         return 1
 
     print(f"Assembled {len(segments_sorted)} segments into {output_path}")
@@ -607,6 +622,7 @@ def mode_search(
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
+
 
 def build_arg_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
@@ -718,7 +734,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         except FileNotFoundError as exc:
             print(f"WARNING: {exc}", file=sys.stderr)
             if args.mode == "search":
-                print("Phrase matching will ignore raw text; --show-text will do nothing.", file=sys.stderr)
+                print(
+                    "Phrase matching will ignore raw text; --show-text will do nothing.",
+                    file=sys.stderr,
+                )
     elif args.theory and args.mode in ("line", "range"):
         try:
             theory_lines = load_theory_lines(args.theory)
@@ -755,7 +774,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                 continue
             if not matches_category(seg, args.category):
                 continue
-            if not matches_phrase(seg, args.phrase, theory_lines_for_export, cache_text):
+            if not matches_phrase(
+                seg, args.phrase, theory_lines_for_export, cache_text
+            ):
                 continue
             subset.append(seg)
         return mode_export(subset, args.export_path or "")

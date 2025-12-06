@@ -71,9 +71,7 @@ def save_healpix_map(
             dtype=None,  # Preserve input dtype
         )
     except Exception as e:
-        raise ValueError(
-            f"Failed to save HEALPix map to {file_path}: {e}"
-        ) from e
+        raise ValueError(f"Failed to save HEALPix map to {file_path}: {e}") from e
 
 
 def save_power_spectrum(
@@ -211,9 +209,7 @@ def save_power_spectrum(
         np.savez(str(file_path), **spectrum_data)  # type: ignore[arg-type]
 
     else:
-        raise ValueError(
-            f"Unsupported format: {format}. Use 'json', 'csv', or 'npy'."
-        )
+        raise ValueError(f"Unsupported format: {format}. Use 'json', 'csv', or 'npy'.")
 
 
 def save_analysis_results(
@@ -288,10 +284,7 @@ def save_analysis_results(
             elif isinstance(obj, (np.integer, np.floating)):
                 return float(obj)
             elif isinstance(obj, dict):
-                return {
-                    k: convert_to_yaml_serializable(v)
-                    for k, v in obj.items()
-                }
+                return {k: convert_to_yaml_serializable(v) for k, v in obj.items()}
             elif isinstance(obj, (list, tuple)):
                 return [convert_to_yaml_serializable(item) for item in obj]
             elif isinstance(obj, Path):
@@ -310,9 +303,7 @@ def save_analysis_results(
             )
 
     else:
-        raise ValueError(
-            f"Unsupported format: {format}. Use 'json' or 'yaml'."
-        )
+        raise ValueError(f"Unsupported format: {format}. Use 'json' or 'yaml'.")
 
 
 def ensure_output_directory(output_path: Path) -> None:

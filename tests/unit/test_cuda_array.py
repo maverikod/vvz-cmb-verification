@@ -205,10 +205,10 @@ class TestCudaArray:
         array = CudaArray(data, device="cpu")
 
         def square(x):
-            return x ** 2
+            return x**2
 
         result = array.process_blocks(square, use_gpu=False)
-        expected = data ** 2
+        expected = data**2
         assert np.array_equal(result.to_numpy(), expected)
 
     def test_calculate_block_shape_1d(self):

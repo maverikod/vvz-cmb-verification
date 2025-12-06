@@ -185,9 +185,7 @@ def synthesize_map(
             cuda_alm: CudaArray = alm  # type: ignore
             alm = cuda_alm.to_numpy()
         else:
-            raise ValueError(
-                "Harmonic coefficients must be a numpy array or CudaArray"
-            )
+            raise ValueError("Harmonic coefficients must be a numpy array or CudaArray")
 
     if alm.size == 0:
         raise ValueError("Harmonic coefficients array is empty")

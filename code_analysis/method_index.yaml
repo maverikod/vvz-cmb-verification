@@ -37,6 +37,11 @@ CmbMapReconstructor:
 - _convert_nodes_to_temperature
 - _project_nodes_to_sky
 - _integrate_frequency_spectrum
+- __init__
+- reconstruct_map
+- _convert_nodes_to_temperature
+- _project_nodes_to_sky
+- _integrate_frequency_spectrum
 Config:
 - __init__
 - load

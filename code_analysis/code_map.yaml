@@ -94,6 +94,34 @@ classes:
     - create_node_mask
     - validate_node_map
     name: ThetaNodeMapGenerator
+  cmb/reconstruction/cmb_map_reconstructor.py:CmbMapReconstructor:
+    bases: []
+    docstring: 'CMB map reconstructor from Θ-field data.
+
+
+      Reconstructs full-sky CMB temperature map from Θ-field
+
+      frequency spectrum and node structure.
+
+
+      Uses CUDA acceleration for all array operations:
+
+      - Frequency spectrum integration
+
+      - Node depth to temperature conversion
+
+      - Sky coordinate projection
+
+      - Spherical harmonic synthesis'
+    file: cmb/reconstruction/cmb_map_reconstructor.py
+    line: 55
+    methods:
+    - __init__
+    - reconstruct_map
+    - _convert_nodes_to_temperature
+    - _project_nodes_to_sky
+    - _integrate_frequency_spectrum
+    name: CmbMapReconstructor
   cmb/theta_data_loader.py:ThetaEvolution:
     bases: []
     docstring: "Θ-field temporal evolution data.\n\nAttributes:\n    times: Time array\
@@ -2150,6 +2178,81 @@ functions:
     file: cmb/nodes/theta_node_map.py
     line: 334
     name: validate_node_map
+  cmb/reconstruction/cmb_map_reconstructor.py:__init__:
+    args:
+    - self
+    - frequency_spectrum
+    - evolution
+    - node_data
+    - nside
+    - config
+    docstring: "Initialize reconstructor.\n\nArgs:\n    frequency_spectrum: Θ-field\
+      \ frequency spectrum\n    evolution: Temporal evolution data\n    node_data:\
+      \ Θ-node structure data\n    nside: HEALPix NSIDE parameter\n    config: Configuration\
+      \ instance (uses global if None)"
+    file: cmb/reconstruction/cmb_map_reconstructor.py
+    line: 69
+    name: __init__
+  cmb/reconstruction/cmb_map_reconstructor.py:_convert_nodes_to_temperature:
+    args:
+    - self
+    docstring: "Convert Θ-node depths to temperature fluctuations.\n\nFormula (from\
+      \ tech_spec-new.md 2.1): ΔT = (Δω/ω_CMB) T_0\nWhere:\n    T_0 = 2.725 K (CMB\
+      \ temperature)\n    ω_CMB ~ 10^11 Hz\n    Δω = ω - ω_min (depth of node)\nResult:\
+      \ ΔT ≈ 20-30 μK\n\nThis is NOT a linear approximation, but direct conversion\n\
+      from node depth (Δω/ω) to temperature fluctuation.\n\nUses CUDA-accelerated\
+      \ operations via map_depth_to_temperature.\n\nReturns:\n    Array of temperature\
+      \ fluctuations for each node in μK\n\nRaises:\n    ValueError: If conversion\
+      \ fails"
+    file: cmb/reconstruction/cmb_map_reconstructor.py
+    line: 230
+    name: _convert_nodes_to_temperature
+  cmb/reconstruction/cmb_map_reconstructor.py:_integrate_frequency_spectrum:
+    args:
+    - self
+    docstring: "Integrate frequency spectrum ρ_Θ(ω,t) for each node.\n\nUses formula\
+      \ CMB2.1: ρ_Θ(ω,t) ∝ ω^(-2±0.5) · (t/t_0)^(-3±1)\n\nIntegrates over:\n- Frequency\
+      \ range for each node\n- Temporal evolution ω_min(t), ω_macro(t)\n\nUses CUDA-accelerated\
+      \ operations for all calculations.\n\nReturns:\n    Array of integrated spectrum\
+      \ weights for each node\n\nRaises:\n    ValueError: If integration fails"
+    file: cmb/reconstruction/cmb_map_reconstructor.py
+    line: 338
+    name: _integrate_frequency_spectrum
+  cmb/reconstruction/cmb_map_reconstructor.py:_project_nodes_to_sky:
+    args:
+    - self
+    docstring: "Project Θ-nodes to sky coordinates.\n\nMaps nodes from early universe\
+      \ (z≈1100) to current sky.\n\nUses ONLY phase parameters (ω_min(t), ω_macro(t))\
+      \ for evolution.\nDoes NOT use classical cosmological formulas (FRW, ΛCDM).\n\
+      \nFor now, uses node positions directly (they are already in sky coordinates).\n\
+      In future, could apply evolution-based projection.\n\nReturns:\n    Array of\
+      \ (theta, phi) sky coordinates for each node in radians\n\nRaises:\n    ValueError:\
+      \ If projection fails"
+    file: cmb/reconstruction/cmb_map_reconstructor.py
+    line: 257
+    name: _project_nodes_to_sky
+  cmb/reconstruction/cmb_map_reconstructor.py:_to_float:
+    args:
+    - value
+    docstring: "Convert reduction result to float.\n\nArgs:\n    value: Result from\
+      \ vectorize_reduction (Union[CudaArray, float, int])\n\nReturns:\n    Float\
+      \ value"
+    file: cmb/reconstruction/cmb_map_reconstructor.py
+    line: 38
+    name: _to_float
+  cmb/reconstruction/cmb_map_reconstructor.py:reconstruct_map:
+    args:
+    - self
+    docstring: "Reconstruct CMB temperature map from Θ-field.\n\nUses formula CMB2.1:\
+      \ ρ_Θ(ω,t) ∝ ω^(-2±0.5) · (t/t_0)^(-3±1)\n\nAlgorithm:\n1. Integrate frequency\
+      \ spectrum ρ_Θ(ω,t) over frequencies\n2. Convert node depths to temperatures:\
+      \ ΔT ~ T_0 · (Δω/ω_CMB)\n3. Project nodes to sky coordinates using phase parameters\
+      \ only\n4. Generate spherical harmonic map with integrated spectrum\n\nReturns:\n\
+      \    HEALPix map of temperature fluctuations ΔT in μK\n\nRaises:\n    ValueError:\
+      \ If reconstruction fails"
+    file: cmb/reconstruction/cmb_map_reconstructor.py
+    line: 112
+    name: reconstruct_map
   cmb/theta_data_loader.py:load_evolution_data:
     args:
     - data_path
@@ -8216,6 +8319,94 @@ imports:
     line: 15
     name: numpy
     type: import
+  cmb/reconstruction/__init__.py:CmbMapReconstructor:
+    file: cmb/reconstruction/__init__.py
+    line: 10
+    module: cmb.reconstruction.cmb_map_reconstructor
+    name: CmbMapReconstructor
+    type: import_from
+  cmb/reconstruction/cmb_map_reconstructor.py:Config:
+    file: cmb/reconstruction/cmb_map_reconstructor.py
+    line: 29
+    module: config.settings
+    name: Config
+    type: import_from
+  cmb/reconstruction/cmb_map_reconstructor.py:CudaArray:
+    file: cmb/reconstruction/cmb_map_reconstructor.py
+    line: 30
+    module: utils.cuda
+    name: CudaArray
+    type: import_from
+  cmb/reconstruction/cmb_map_reconstructor.py:ElementWiseVectorizer:
+    file: cmb/reconstruction/cmb_map_reconstructor.py
+    line: 30
+    module: utils.cuda
+    name: ElementWiseVectorizer
+    type: import_from
+  cmb/reconstruction/cmb_map_reconstructor.py:Optional:
+    file: cmb/reconstruction/cmb_map_reconstructor.py
+    line: 23
+    module: typing
+    name: Optional
+    type: import_from
+  cmb/reconstruction/cmb_map_reconstructor.py:ReductionVectorizer:
+    file: cmb/reconstruction/cmb_map_reconstructor.py
+    line: 30
+    module: utils.cuda
+    name: ReductionVectorizer
+    type: import_from
+  cmb/reconstruction/cmb_map_reconstructor.py:ThetaEvolution:
+    file: cmb/reconstruction/cmb_map_reconstructor.py
+    line: 26
+    module: cmb.theta_data_loader
+    name: ThetaEvolution
+    type: import_from
+  cmb/reconstruction/cmb_map_reconstructor.py:ThetaFrequencySpectrum:
+    file: cmb/reconstruction/cmb_map_reconstructor.py
+    line: 26
+    module: cmb.theta_data_loader
+    name: ThetaFrequencySpectrum
+    type: import_from
+  cmb/reconstruction/cmb_map_reconstructor.py:ThetaNodeData:
+    file: cmb/reconstruction/cmb_map_reconstructor.py
+    line: 27
+    module: cmb.theta_node_processor
+    name: ThetaNodeData
+    type: import_from
+  cmb/reconstruction/cmb_map_reconstructor.py:TransformVectorizer:
+    file: cmb/reconstruction/cmb_map_reconstructor.py
+    line: 30
+    module: utils.cuda
+    name: TransformVectorizer
+    type: import_from
+  cmb/reconstruction/cmb_map_reconstructor.py:get_config:
+    file: cmb/reconstruction/cmb_map_reconstructor.py
+    line: 29
+    module: config.settings
+    name: get_config
+    type: import_from
+  cmb/reconstruction/cmb_map_reconstructor.py:healpy:
+    file: cmb/reconstruction/cmb_map_reconstructor.py
+    line: 25
+    name: healpy
+    type: import
+  cmb/reconstruction/cmb_map_reconstructor.py:map_depth_to_temperature:
+    file: cmb/reconstruction/cmb_map_reconstructor.py
+    line: 27
+    module: cmb.theta_node_processor
+    name: map_depth_to_temperature
+    type: import_from
+  cmb/reconstruction/cmb_map_reconstructor.py:numpy:
+    file: cmb/reconstruction/cmb_map_reconstructor.py
+    line: 24
+    name: numpy
+    type: import
+  cmb/reconstruction/cmb_map_reconstructor.py:process_evolution_data:
+    file: cmb/reconstruction/cmb_map_reconstructor.py
+    line: 28
+    module: cmb.theta_evolution_processor
+    name: process_evolution_data
+    type: import_from
   cmb/theta_data_loader.py:Config:
     file: cmb/theta_data_loader.py
     line: 16

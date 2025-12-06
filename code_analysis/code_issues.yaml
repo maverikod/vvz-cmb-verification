@@ -25,6 +25,10 @@ issues:
     file: cmb/nodes/node_properties.py
     limit: 400
     lines: 454
+  - exceeds_limit: 92
+    file: cmb/reconstruction/cmb_map_reconstructor.py
+    limit: 400
+    lines: 492
   - exceeds_limit: 95
     file: utils/cuda/memory_watchdog.py
     limit: 400
@@ -79,12 +83,6 @@ issues:
     line: 16
     module: cmb.spectrum.subpeaks_analyzer
     type: import_from
-  - description: Module 'cmb.reconstruction.cmb_map_reconstructor' cannot be imported
-    file: docs/implementation_plan/phase_5_act_spt_predictions/step_5.2_frequency_invariance/frequency_invariance.py
-    imported: CmbMapReconstructor
-    line: 15
-    module: cmb.reconstruction.cmb_map_reconstructor
-    type: import_from
   - description: Module 'cmb.predictions.highl_peak_predictor' cannot be imported
     file: docs/implementation_plan/phase_5_act_spt_predictions/step_5.3_predictions_report/predictions_report.py
     imported: PeakValidation
@@ -109,18 +107,6 @@ issues:
     line: 17
     module: cmb.correlation.phi_split_analyzer
     type: import_from
-  - description: Module 'cmb.reconstruction.cmb_map_reconstructor' cannot be imported
-    file: docs/implementation_plan/phase_2_cmb_reconstruction/step_2.3_node_mapping/node_to_cmb_mapper.py
-    imported: CmbMapReconstructor
-    line: 16
-    module: cmb.reconstruction.cmb_map_reconstructor
-    type: import_from
-  - description: Module 'cmb.reconstruction.cmb_map_reconstructor' cannot be imported
-    file: docs/implementation_plan/phase_2_cmb_reconstruction/step_2.2_map_validation/map_validator.py
-    imported: CmbMapReconstructor
-    line: 15
-    module: cmb.reconstruction.cmb_map_reconstructor
-    type: import_from
   - description: Module 'cmb.correlation.cmb_lss_correlator' cannot be imported
     file: docs/implementation_plan/phase_4_cmb_lss_correlation/step_4.2_phi_split/phi_split_analyzer.py
     imported: CmbLssCorrelator
@@ -132,12 +118,6 @@ issues:
     imported: CorrelationFunction
     line: 15
     module: cmb.correlation.cmb_lss_correlator
-    type: import_from
-  - description: Module 'cmb.reconstruction.cmb_map_reconstructor' cannot be imported
-    file: docs/implementation_plan/phase_4_cmb_lss_correlation/step_4.1_correlation_core/cmb_lss_correlator.py
-    imported: CmbMapReconstructor
-    line: 16
-    module: cmb.reconstruction.cmb_map_reconstructor
     type: import_from
   - description: Module 'cmb.nodes.node_to_cmb_mapper' cannot be imported
     file: docs/implementation_plan/phase_4_cmb_lss_correlation/step_4.3_node_lss_mapping/node_lss_mapper.py
@@ -347,13 +327,13 @@ issues:
 summary:
   any_type_usage: 0
   classes_without_docstrings: 1
-  files_too_large: 12
+  files_too_large: 13
   files_without_docstrings: 0
   generic_exception_usage: 0
   imports_in_middle: 0
-  invalid_imports: 25
+  invalid_imports: 21
   max_lines_limit: 400
   methods_with_pass: 0
   methods_without_docstrings: 33
   not_implemented_in_non_abstract: 1
-  total_issues: 72
+  total_issues: 69

@@ -141,8 +141,9 @@ class CmbMapReconstructor:
             # Create HEALPix pixel indices for each node
             npix = hp.nside2npix(self.nside)
 
-            # Initialize map using CudaArray
-            cmb_map_cuda = CudaArray(np.zeros(npix, dtype=np.float64), device="cpu")
+            # Initialize map using CudaArray (create directly as CudaArray)
+            zeros_np = np.zeros(npix, dtype=np.float64)
+            cmb_map_cuda = CudaArray(zeros_np, device="cpu")
 
             # For each node, add temperature contribution to corresponding pixel
             # Use CUDA-accelerated operations for pixel assignment
@@ -170,18 +171,32 @@ class CmbMapReconstructor:
             # Use numpy for unique pixel finding (requires sorting)
             unique_pixels, pixel_counts = np.unique(pixel_indices, return_counts=True)
 
+            # Convert pixel_indices to CudaArray for CUDA-accelerated comparisons
+            pixel_indices_cuda = CudaArray(pixel_indices, device="cpu")
+            weighted_temps_cuda_for_accum = CudaArray(weighted_temps, device="cpu")
+
             # Accumulate contributions using CUDA
             cmb_map_np = cmb_map_cuda.to_numpy()
             for pixel_idx, count in zip(unique_pixels, pixel_counts):
-                # Find all nodes contributing to this pixel
-                node_mask = pixel_indices == pixel_idx
+                # Find all nodes contributing to this pixel using CUDA comparison
+                # Use scalar pixel_idx directly (vectorize_operation supports scalars)
+                node_mask_cuda = self.elem_vec.vectorize_operation(
+                    pixel_indices_cuda, "equal", float(pixel_idx)
+                )
+                node_mask = node_mask_cuda.to_numpy()
+
+                # Cleanup mask
+                if node_mask_cuda.device == "cuda":
+                    node_mask_cuda.swap_to_cpu()
+
+                # Get node indices (np.where is acceptable for indexing)
                 node_indices = np.where(node_mask)[0]
 
                 # Sum contributions using CUDA
                 if len(node_indices) > 0:
-                    contributions_cuda = CudaArray(
-                        weighted_temps[node_indices], device="cpu"
-                    )
+                    # Extract contributions using numpy indexing, then wrap in CudaArray
+                    contributions_np = weighted_temps[node_indices]
+                    contributions_cuda = CudaArray(contributions_np, device="cpu")
                     pixel_sum = self.reduction_vec.vectorize_reduction(
                         contributions_cuda, "sum"
                     )
@@ -190,6 +205,12 @@ class CmbMapReconstructor:
                     # Cleanup
                     if contributions_cuda.device == "cuda":
                         contributions_cuda.swap_to_cpu()
+
+            # Cleanup pixel indices arrays
+            if pixel_indices_cuda.device == "cuda":
+                pixel_indices_cuda.swap_to_cpu()
+            if weighted_temps_cuda_for_accum.device == "cuda":
+                weighted_temps_cuda_for_accum.swap_to_cpu()
 
             # Cleanup GPU memory
             if temperatures_cuda.device == "cuda":
@@ -364,8 +385,9 @@ class CmbMapReconstructor:
         # Calculate spectrum weights for each node
         # For each node, integrate: ∫ ρ_Θ(ω,t) dω over [ω_min, ω_macro]
         # Using formula: ρ_Θ(ω,t) ∝ ω^alpha · (t/t_0)^beta
-        weights = np.zeros(n_nodes, dtype=np.float64)
-        weights_cuda = CudaArray(weights, device="cpu")
+        # Create CudaArray directly from numpy zeros
+        weights_np = np.zeros(n_nodes, dtype=np.float64)
+        weights_cuda = CudaArray(weights_np, device="cpu")
 
         # For each node, find frequency range and integrate
         # Use node depths to determine frequency range
@@ -374,10 +396,11 @@ class CmbMapReconstructor:
 
         # Calculate node frequencies: ω_node = ω_min + depth * (ω_macro - ω_min)
         # depth = Δω/ω, so ω_node ≈ ω_min * (1 + depth) for small depths
-        omega_min_array = np.full(n_nodes, omega_min_ref, dtype=np.float64)
-        omega_macro_array = np.full(n_nodes, omega_macro_ref, dtype=np.float64)
-        omega_min_cuda = CudaArray(omega_min_array, device="cpu")
-        omega_macro_cuda = CudaArray(omega_macro_array, device="cpu")
+        # Create CudaArray directly from numpy full
+        omega_min_array_np = np.full(n_nodes, omega_min_ref, dtype=np.float64)
+        omega_macro_array_np = np.full(n_nodes, omega_macro_ref, dtype=np.float64)
+        omega_min_cuda = CudaArray(omega_min_array_np, device="cpu")
+        omega_macro_cuda = CudaArray(omega_macro_array_np, device="cpu")
 
         # Calculate node frequencies using CUDA
         # ω_node ≈ ω_min + depth * (ω_macro - ω_min)

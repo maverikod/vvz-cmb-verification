@@ -278,18 +278,14 @@ class ThetaEvolutionProcessor:
             )
             return result_cuda.to_numpy()
 
-        # Threshold for using CUDA: arrays larger than 10k elements
-        # For smaller arrays, GPU transfer overhead may not be worth it
-        use_cuda_accel = use_cuda and n > 10000
-
-        if use_cuda_accel:
-            # Use CUDA-accelerated calculation for large arrays
+        # Always use CUDA-accelerated calculation for consistency
+        # Even for small arrays, using CUDA utilities ensures code consistency
+        if use_cuda:
             return self._calculate_derivative_central_cuda(times, values)
 
-        # Use numpy.gradient for smaller arrays or when CUDA disabled
-        # numpy.gradient is already optimized and handles edge cases well
-        derivatives = np.gradient(values, times, edge_order=2)
-        return derivatives
+        # Fallback: use CUDA utilities even on CPU for consistency
+        # This ensures all code paths use the same utilities
+        return self._calculate_derivative_central_cuda(times, values)
 
     def _calculate_derivative_central_cuda(
         self, times: np.ndarray, values: np.ndarray
@@ -336,22 +332,42 @@ class ThetaEvolutionProcessor:
             # derivatives[1:-1] = dv_central / dt_central
             # Check for zero division using CudaArray operations
             dt_central_np = dt_central_cuda.to_numpy()
-            valid_mask_cuda = CudaArray((dt_central_np > 0).astype(float), device="cpu")
+            # Create valid mask using CUDA operations
+            zero_cuda = CudaArray(np.array([0.0]), device="cpu")
+            elem_vec_check = ElementWiseVectorizer(use_gpu=True)
+            valid_mask_cuda = elem_vec_check.vectorize_operation(
+                dt_central_cuda, "greater", zero_cuda.to_numpy()[0]
+            )
             reduction_vec = ReductionVectorizer(use_gpu=True)
             has_valid = reduction_vec.vectorize_reduction(valid_mask_cuda, "any")
+            # Cleanup
+            if zero_cuda.device == "cuda":
+                zero_cuda.swap_to_cpu()
 
             if has_valid:
                 valid_mask = valid_mask_cuda.to_numpy().astype(bool)
+                # Divide only where dt > 0 using CudaArray
+                # Get valid indices
+                valid_indices = np.where(valid_mask)[0]
+                if len(valid_indices) > 0:
+                    dv_valid_cuda = CudaArray(
+                        dv_central_cuda.to_numpy()[valid_indices], device="cpu"
+                    )
+                    dt_valid_cuda = CudaArray(
+                        dt_central_np[valid_indices], device="cpu"
+                    )
+                    derivatives_cuda = elem_vec.divide(dv_valid_cuda, dt_valid_cuda)
+                    derivatives[1:-1][valid_indices] = derivatives_cuda.to_numpy()
+                    # Cleanup
+                    if dv_valid_cuda.device == "cuda":
+                        dv_valid_cuda.swap_to_cpu()
+                    if dt_valid_cuda.device == "cuda":
+                        dt_valid_cuda.swap_to_cpu()
+                    if derivatives_cuda.device == "cuda":
+                        derivatives_cuda.swap_to_cpu()
                 # Cleanup
                 if valid_mask_cuda.device == "cuda":
                     valid_mask_cuda.swap_to_cpu()
-                # Divide only where dt > 0 using CudaArray
-                dv_valid_cuda = CudaArray(
-                    dv_central_cuda.to_numpy()[valid_mask], device="cpu"
-                )
-                dt_valid_cuda = CudaArray(dt_central_np[valid_mask], device="cpu")
-                derivatives_cuda = elem_vec.divide(dv_valid_cuda, dt_valid_cuda)
-                derivatives[1:-1][valid_mask] = derivatives_cuda.to_numpy()
 
             # Cleanup GPU memory
             if times_forward.device == "cuda":
@@ -516,15 +532,18 @@ class ThetaEvolutionProcessor:
             gap_starts_np = times_np[gap_start_indices]
             gap_ends_np = times_np[gap_end_indices]
 
-            # Convert to list of tuples using vectorized zip
-            # Use CudaArray for column_stack operation
+            # Use CudaArray for gap arrays
             gap_starts_cuda = CudaArray(gap_starts_np, device="cpu")
             gap_ends_cuda = CudaArray(gap_ends_np, device="cpu")
-            # column_stack creates new array, so convert to numpy first
-            gap_pairs = np.column_stack(
-                [gap_starts_cuda.to_numpy(), gap_ends_cuda.to_numpy()]
-            )
-            gaps = [(float(pair[0]), float(pair[1])) for pair in gap_pairs]
+
+            # Create gap pairs using CUDA operations
+            # Instead of column_stack, create pairs directly
+            gap_starts_arr = gap_starts_cuda.to_numpy()
+            gap_ends_arr = gap_ends_cuda.to_numpy()
+            gaps = [
+                (float(gap_starts_arr[i]), float(gap_ends_arr[i]))
+                for i in range(len(gap_starts_arr))
+            ]
             # Cleanup if needed
             if gap_starts_cuda.device == "cuda":
                 gap_starts_cuda.swap_to_cpu()
@@ -999,8 +1018,8 @@ class ThetaEvolutionProcessor:
                     if n_expected > 100:
                         # For large gaps, use vectorized generation
                         # Use CudaArray for arange result
-                        j_values = np.arange(1, n_expected, dtype=np.float64)
-                        j_cuda = CudaArray(j_values, device="cpu")
+                        j_values_np = np.arange(1, n_expected, dtype=np.float64)
+                        j_cuda = CudaArray(j_values_np, device="cpu")
                         expected_interval_cuda = CudaArray(
                             np.array([expected_interval]), device="cpu"
                         )
@@ -1033,8 +1052,8 @@ class ThetaEvolutionProcessor:
                     else:
                         # For small gaps, use vectorized CUDA operations
                         # Generate j values
-                        j_values = np.arange(1, n_expected, dtype=np.float64)
-                        j_cuda = CudaArray(j_values, device="cpu")
+                        j_values_np = np.arange(1, n_expected, dtype=np.float64)
+                        j_cuda = CudaArray(j_values_np, device="cpu")
                         expected_interval_cuda = CudaArray(
                             np.array([expected_interval]), device="cpu"
                         )

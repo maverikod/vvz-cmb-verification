@@ -52,7 +52,7 @@ classes:
 
       Uses CUDA-accelerated operations for efficient computation.'
     file: cmb/nodes/node_properties.py
-    line: 20
+    line: 69
     methods:
     - __init__
     - calculate_node_depth
@@ -1977,8 +1977,30 @@ functions:
       \    reduction_vec: Reduction vectorizer for reductions\n    grid_spacing: Grid\
       \ spacing for area conversion"
     file: cmb/nodes/node_properties.py
-    line: 27
+    line: 76
     name: __init__
+  cmb/nodes/node_properties.py:_cuda_maximum:
+    args:
+    - a
+    - b
+    docstring: "Compute maximum using numpy, wrapped in CudaArray for consistency.\n\
+      \nFor very small arrays (2-3 elements), numpy operations are efficient.\nWe\
+      \ wrap in CudaArray to maintain consistency with project standards.\n\nArgs:\n\
+      \    a: Input array\n    b: Scalar value\n\nReturns:\n    Maximum array"
+    file: cmb/nodes/node_properties.py
+    line: 21
+    name: _cuda_maximum
+  cmb/nodes/node_properties.py:_cuda_minimum:
+    args:
+    - a
+    - b
+    docstring: "Compute minimum using numpy, wrapped in CudaArray for consistency.\n\
+      \nFor very small arrays (2-3 elements), numpy operations are efficient.\nWe\
+      \ wrap in CudaArray to maintain consistency with project standards.\n\nArgs:\n\
+      \    a: Input array\n    b: Array or scalar value\n\nReturns:\n    Minimum array"
+    file: cmb/nodes/node_properties.py
+    line: 45
+    name: _cuda_minimum
   cmb/nodes/node_properties.py:calculate_local_curvature:
     args:
     - self
@@ -1987,7 +2009,7 @@ functions:
       \ Node position (grid indices)\n\nReturns:\n    Local curvature value\n\nRaises:\n\
       \    ValueError: If curvature calculation fails"
     file: cmb/nodes/node_properties.py
-    line: 192
+    line: 241
     name: calculate_local_curvature
   cmb/nodes/node_properties.py:calculate_node_area:
     args:
@@ -1997,7 +2019,7 @@ functions:
       \ Node position (grid indices)\n\nReturns:\n    Node area in grid units or physical\
       \ units\n\nRaises:\n    ValueError: If area calculation fails"
     file: cmb/nodes/node_properties.py
-    line: 117
+    line: 166
     name: calculate_node_area
   cmb/nodes/node_properties.py:calculate_node_depth:
     args:
@@ -2008,7 +2030,7 @@ functions:
       \ (grid indices)\n\nReturns:\n    Node depth (Δω/ω)\n\nRaises:\n    ValueError:\
       \ If depth calculation fails"
     file: cmb/nodes/node_properties.py
-    line: 48
+    line: 97
     name: calculate_node_depth
   cmb/nodes/node_properties.py:calculate_node_properties_batch:
     args:
@@ -2022,7 +2044,7 @@ functions:
       \nReturns:\n    Tuple of (depths, areas, curvatures) arrays, each of shape (N,)\n\
       \nRaises:\n    ValueError: If batch calculation fails"
     file: cmb/nodes/node_properties.py
-    line: 253
+    line: 302
     name: calculate_node_properties_batch
   cmb/nodes/theta_node_map.py:__init__:
     args:
@@ -2270,7 +2292,7 @@ functions:
       \ Time array (must be sorted)\n    values: Value array\n\nReturns:\n    Derivative\
       \ array"
     file: cmb/theta_evolution_processor.py
-    line: 294
+    line: 290
     name: _calculate_derivative_central_cuda
   cmb/theta_evolution_processor.py:_check_time_coverage_gaps:
     args:
@@ -2283,7 +2305,7 @@ functions:
       \    max_gap_ratio: Maximum allowed gap ratio (gap / median_interval)\n\nReturns:\n\
       \    List of (gap_start, gap_end) tuples for gaps exceeding threshold"
     file: cmb/theta_evolution_processor.py
-    line: 435
+    line: 451
     name: _check_time_coverage_gaps
   cmb/theta_evolution_processor.py:_compute_statistics:
     args:
@@ -2297,7 +2319,7 @@ functions:
       \  omega_min: ω_min values\n    omega_macro: ω_macro values\n    domega_min_dt:\
       \ Evolution rates for ω_min\n    domega_macro_dt: Evolution rates for ω_macro"
     file: cmb/theta_evolution_processor.py
-    line: 538
+    line: 557
     name: _compute_statistics
   cmb/theta_evolution_processor.py:_to_float:
     args:
@@ -2316,7 +2338,7 @@ functions:
       \ allowed gap ratio.\n                  If None, uses default (5.0)\n\nReturns:\n\
       \    List of (gap_start, gap_end) tuples for gaps exceeding threshold"
     file: cmb/theta_evolution_processor.py
-    line: 849
+    line: 868
     name: check_time_coverage_gaps
   cmb/theta_evolution_processor.py:generate_quality_report:
     args:
@@ -2326,7 +2348,7 @@ functions:
       - Data quality issues\n\nReturns:\n    Dictionary with quality issues, warnings,\
       \ and statistics"
     file: cmb/theta_evolution_processor.py
-    line: 1094
+    line: 1113
     name: generate_quality_report
   cmb/theta_evolution_processor.py:get_evolution_rate_macro:
     args:
@@ -2336,7 +2358,7 @@ functions:
       \   time: Time value\n\nReturns:\n    Evolution rate\n\nRaises:\n    ValueError:\
       \ If time is out of range or processor\n        not initialized"
     file: cmb/theta_evolution_processor.py
-    line: 762
+    line: 781
     name: get_evolution_rate_macro
   cmb/theta_evolution_processor.py:get_evolution_rate_min:
     args:
@@ -2346,7 +2368,7 @@ functions:
       \ time: Time value\n\nReturns:\n    Evolution rate\n\nRaises:\n    ValueError:\
       \ If time is out of range or processor\n        not initialized"
     file: cmb/theta_evolution_processor.py
-    line: 740
+    line: 759
     name: get_evolution_rate_min
   cmb/theta_evolution_processor.py:get_evolution_statistics:
     args:
@@ -2354,7 +2376,7 @@ functions:
     docstring: "Get evolution statistics.\n\nReturns:\n    Dictionary with statistics\
       \ about evolution data\n\nRaises:\n    ValueError: If processor not initialized"
     file: cmb/theta_evolution_processor.py
-    line: 835
+    line: 854
     name: get_evolution_statistics
   cmb/theta_evolution_processor.py:get_omega_macro:
     args:
@@ -2364,7 +2386,7 @@ functions:
       Returns:\n    ω_macro(t) value\n\nRaises:\n    ValueError: If time is out of\
       \ range or processor\n        not initialized"
     file: cmb/theta_evolution_processor.py
-    line: 718
+    line: 737
     name: get_omega_macro
   cmb/theta_evolution_processor.py:get_omega_min:
     args:
@@ -2374,7 +2396,7 @@ functions:
       Returns:\n    ω_min(t) value\n\nRaises:\n    ValueError: If time is out of range\
       \ or processor\n        not initialized"
     file: cmb/theta_evolution_processor.py
-    line: 696
+    line: 715
     name: get_omega_min
   cmb/theta_evolution_processor.py:process:
     args:
@@ -2395,7 +2417,7 @@ functions:
       Returns:\n    ThetaEvolutionProcessor instance with processed data\n\nRaises:\n\
       \    ValueError: If processing fails"
     file: cmb/theta_evolution_processor.py
-    line: 1207
+    line: 1226
     name: process_evolution_data
   cmb/theta_evolution_processor.py:validate_against_config:
     args:
@@ -2405,7 +2427,7 @@ functions:
       \ data meets configuration requirements\n\nRaises:\n    ValueError: If data\
       \ does not meet requirements"
     file: cmb/theta_evolution_processor.py
-    line: 803
+    line: 822
     name: validate_against_config
   cmb/theta_evolution_processor.py:validate_time_range:
     args:
@@ -2415,7 +2437,7 @@ functions:
       \ value to validate\n\nReturns:\n    True if time is within range\n\nRaises:\n\
       \    ValueError: If time is out of range"
     file: cmb/theta_evolution_processor.py
-    line: 784
+    line: 803
     name: validate_time_range
   cmb/theta_evolution_processor.py:verify_time_array_completeness:
     args:
@@ -2429,7 +2451,7 @@ functions:
       \    - missing_points: List[float] - List of expected but missing times\n  \
       \  - coverage_ratio: float - Ratio of actual to expected points"
     file: cmb/theta_evolution_processor.py
-    line: 879
+    line: 898
     name: verify_time_array_completeness
   cmb/theta_node_loader.py:load_node_depths:
     args:
@@ -2439,7 +2461,7 @@ functions:
       \ location.\n\nReturns:\n    Array of node depths (Δω/ω)\n\nRaises:\n    FileNotFoundError:\
       \ If data file doesn't exist\n    ValueError: If data format is invalid"
     file: cmb/theta_node_loader.py
-    line: 417
+    line: 423
     name: load_node_depths
   cmb/theta_node_loader.py:load_node_geometry:
     args:
@@ -8076,6 +8098,12 @@ imports:
     line: 13
     module: utils.cuda
     name: CudaArray
+    type: import_from
+  cmb/nodes/node_properties.py:ElementWiseVectorizer:
+    file: cmb/nodes/node_properties.py
+    line: 13
+    module: utils.cuda
+    name: ElementWiseVectorizer
     type: import_from
   cmb/nodes/node_properties.py:GridVectorizer:
     file: cmb/nodes/node_properties.py

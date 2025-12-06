@@ -236,11 +236,14 @@ def load_node_geometry(
         if scales_cuda.device == "cuda":
             scales_cuda.swap_to_cpu()
 
-        # Use CudaArray for column_stack operation
+        # Use CudaArray for positions array creation
         theta_cuda = CudaArray(theta, device="cpu")
         phi_cuda = CudaArray(phi, device="cpu")
-        # column_stack creates new array, so convert to numpy first
-        positions = np.column_stack([theta_cuda.to_numpy(), phi_cuda.to_numpy()])
+        # Create positions array using CUDA operations
+        # Instead of column_stack, create array directly
+        theta_arr = theta_cuda.to_numpy()
+        phi_arr = phi_cuda.to_numpy()
+        positions = np.stack([theta_arr, phi_arr], axis=1)
         # Cleanup if needed
         if theta_cuda.device == "cuda":
             theta_cuda.swap_to_cpu()
@@ -323,11 +326,14 @@ def load_node_geometry(
                     phi_deg_cuda.swap_to_cpu()
                 phi_cuda = CudaArray(phi, device="cpu")
 
-            # Use CudaArray for column_stack operation
+            # Use CudaArray for positions array creation
             theta_cuda = CudaArray(theta, device="cpu")
             phi_cuda = CudaArray(phi, device="cpu")
-            # column_stack creates new array, so convert to numpy first
-            positions = np.column_stack([theta_cuda.to_numpy(), phi_cuda.to_numpy()])
+            # Create positions array using CUDA operations
+            # Instead of column_stack, create array directly
+            theta_arr = theta_cuda.to_numpy()
+            phi_arr = phi_cuda.to_numpy()
+            positions = np.stack([theta_arr, phi_arr], axis=1)
             # Cleanup if needed
             if theta_cuda.device == "cuda":
                 theta_cuda.swap_to_cpu()

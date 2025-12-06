@@ -206,7 +206,8 @@ class CmbMapReconstructor:
                     padded = np.zeros(npix, dtype=pixel_sums_np.dtype)
                     padded[: len(pixel_sums_np)] = pixel_sums_np
                     pixel_sums_np = padded
-                # Recreate CudaArray with correct size (no block_size for whole array operations)
+                # Recreate CudaArray with correct size
+                # (no block_size for whole array operations)
                 pixel_sums_cuda = CudaArray(
                     pixel_sums_np, block_size=None, device="cpu"
                 )

@@ -2,22 +2,22 @@ issues:
   any_type_usage: []
   classes_without_docstrings: []
   files_too_large:
-  - exceeds_limit: 66
+  - exceeds_limit: 138
     file: cmb/theta_node_loader.py
     limit: 400
-    lines: 466
+    lines: 538
   - exceeds_limit: 74
     file: cmb/theta_data_parser.py
     limit: 400
     lines: 474
-  - exceeds_limit: 776
+  - exceeds_limit: 783
     file: cmb/theta_evolution_processor.py
     limit: 400
-    lines: 1176
-  - exceeds_limit: 300
+    lines: 1183
+  - exceeds_limit: 471
     file: cmb/theta_data_loader.py
     limit: 400
-    lines: 700
+    lines: 871
   - exceeds_limit: 4
     file: cmb/nodes/node_properties.py
     limit: 400

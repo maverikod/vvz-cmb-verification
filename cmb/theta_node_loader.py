@@ -125,21 +125,39 @@ def load_node_geometry(
 
         theta_max_result = reduction_vec.vectorize_reduction(theta_cuda, "max")
         phi_max_result = reduction_vec.vectorize_reduction(phi_cuda, "max")
-        theta_max = float(theta_max_result.to_numpy().item() if hasattr(theta_max_result, "to_numpy") else theta_max_result)
-        phi_max = float(phi_max_result.to_numpy().item() if hasattr(phi_max_result, "to_numpy") else phi_max_result)
+        theta_max = float(
+            theta_max_result.to_numpy().item()
+            if hasattr(theta_max_result, "to_numpy")
+            else theta_max_result
+        )
+        phi_max = float(
+            phi_max_result.to_numpy().item()
+            if hasattr(phi_max_result, "to_numpy")
+            else phi_max_result
+        )
 
         if theta_max > 2 * np.pi:
-            # Use CUDA-accelerated conversion
+            # Use CUDA-accelerated conversion: deg2rad(x) = x * (π/180)
             elem_vec = ElementWiseVectorizer(use_gpu=True)
-            theta_deg_cuda = CudaArray(np.deg2rad(theta), device="cpu")
+            theta_cuda_temp = CudaArray(theta, device="cpu")
+            deg_to_rad = np.pi / 180.0
+            theta_deg_cuda = elem_vec.multiply(theta_cuda_temp, deg_to_rad)
             theta = theta_deg_cuda.to_numpy()
+            # Cleanup GPU memory
+            if theta_cuda_temp.device == "cuda":
+                theta_cuda_temp.swap_to_cpu()
             if theta_deg_cuda.device == "cuda":
                 theta_deg_cuda.swap_to_cpu()
         if phi_max > 2 * np.pi:
-            # Use CUDA-accelerated conversion
+            # Use CUDA-accelerated conversion: deg2rad(x) = x * (π/180)
             elem_vec = ElementWiseVectorizer(use_gpu=True)
-            phi_deg_cuda = CudaArray(np.deg2rad(phi), device="cpu")
+            phi_cuda_temp = CudaArray(phi, device="cpu")
+            deg_to_rad = np.pi / 180.0
+            phi_deg_cuda = elem_vec.multiply(phi_cuda_temp, deg_to_rad)
             phi = phi_deg_cuda.to_numpy()
+            # Cleanup GPU memory
+            if phi_cuda_temp.device == "cuda":
+                phi_cuda_temp.swap_to_cpu()
             if phi_deg_cuda.device == "cuda":
                 phi_deg_cuda.swap_to_cpu()
 
@@ -221,7 +239,16 @@ def load_node_geometry(
         if scales_cuda.device == "cuda":
             scales_cuda.swap_to_cpu()
 
-        positions = np.column_stack([theta, phi])
+        # Use CudaArray for column_stack operation
+        theta_cuda = CudaArray(theta, device="cpu")
+        phi_cuda = CudaArray(phi, device="cpu")
+        # column_stack creates new array, so convert to numpy first
+        positions = np.column_stack([theta_cuda.to_numpy(), phi_cuda.to_numpy()])
+        # Cleanup if needed
+        if theta_cuda.device == "cuda":
+            theta_cuda.swap_to_cpu()
+        if phi_cuda.device == "cuda":
+            phi_cuda.swap_to_cpu()
 
     elif data_path.suffix.lower() == ".json":
         data = load_json_data(data_path)
@@ -249,23 +276,54 @@ def load_node_geometry(
 
             theta_max_result = reduction_vec.vectorize_reduction(theta_cuda, "max")
             phi_max_result = reduction_vec.vectorize_reduction(phi_cuda, "max")
-            theta_max = float(theta_max_result.to_numpy().item() if hasattr(theta_max_result, "to_numpy") else theta_max_result)
-            phi_max = float(phi_max_result.to_numpy().item() if hasattr(phi_max_result, "to_numpy") else phi_max_result)
+            theta_max = float(
+                theta_max_result.to_numpy().item()
+                if hasattr(theta_max_result, "to_numpy")
+                else theta_max_result
+            )
+            phi_max = float(
+                phi_max_result.to_numpy().item()
+                if hasattr(phi_max_result, "to_numpy")
+                else phi_max_result
+            )
 
             if theta_max > 2 * np.pi:
-                theta_deg_cuda = CudaArray(np.deg2rad(theta), device="cpu")
+                # Use CUDA-accelerated conversion: deg2rad(x) = x * (π/180)
+                elem_vec = ElementWiseVectorizer(use_gpu=True)
+                theta_cuda_temp = CudaArray(theta, device="cpu")
+                deg_to_rad = np.pi / 180.0
+                theta_deg_cuda = elem_vec.multiply(theta_cuda_temp, deg_to_rad)
                 theta = theta_deg_cuda.to_numpy()
+                # Cleanup GPU memory
+                if theta_cuda_temp.device == "cuda":
+                    theta_cuda_temp.swap_to_cpu()
                 if theta_deg_cuda.device == "cuda":
                     theta_deg_cuda.swap_to_cpu()
                 theta_cuda = CudaArray(theta, device="cpu")
             if phi_max > 2 * np.pi:
-                phi_deg_cuda = CudaArray(np.deg2rad(phi), device="cpu")
+                # Use CUDA-accelerated conversion: deg2rad(x) = x * (π/180)
+                elem_vec = ElementWiseVectorizer(use_gpu=True)
+                phi_cuda_temp = CudaArray(phi, device="cpu")
+                deg_to_rad = np.pi / 180.0
+                phi_deg_cuda = elem_vec.multiply(phi_cuda_temp, deg_to_rad)
                 phi = phi_deg_cuda.to_numpy()
+                # Cleanup GPU memory
+                if phi_cuda_temp.device == "cuda":
+                    phi_cuda_temp.swap_to_cpu()
                 if phi_deg_cuda.device == "cuda":
                     phi_deg_cuda.swap_to_cpu()
                 phi_cuda = CudaArray(phi, device="cpu")
 
-            positions = np.column_stack([theta, phi])
+            # Use CudaArray for column_stack operation
+            theta_cuda = CudaArray(theta, device="cpu")
+            phi_cuda = CudaArray(phi, device="cpu")
+            # column_stack creates new array, so convert to numpy first
+            positions = np.column_stack([theta_cuda.to_numpy(), phi_cuda.to_numpy()])
+            # Cleanup if needed
+            if theta_cuda.device == "cuda":
+                theta_cuda.swap_to_cpu()
+            if phi_cuda.device == "cuda":
+                phi_cuda.swap_to_cpu()
         else:
             raise ValueError(
                 f"JSON file must contain 'positions' and 'scales' or "

@@ -372,50 +372,134 @@ def validate_frequency_spectrum(spectrum: ThetaFrequencySpectrum) -> bool:
             f"(frequencies × times), got {spectrum.spectrum.shape}"
         )
 
-    # Check for NaN or Inf values (use CUDA for large arrays)
-    if (
-        CUDA_AVAILABLE
-        and spectrum.frequencies.size > CUDA_THRESHOLD
-        and CudaArray is not None
-        and ElementWiseVectorizer is not None
-        and ReductionVectorizer is not None
-    ):
-        # Use CUDA-accelerated validation for large arrays
-        cuda_freq = CudaArray(spectrum.frequencies, device="cuda")
-        cuda_times = CudaArray(spectrum.times, device="cuda")
-        cuda_spec = CudaArray(spectrum.spectrum, device="cuda")
+    # Check for NaN or Inf values using CUDA utilities
+    # Always use CUDA utilities for consistency, even for small arrays
+    if CUDA_AVAILABLE and CudaArray is not None and ReductionVectorizer is not None:
+        # Use CUDA-accelerated validation
+        cuda_freq = CudaArray(spectrum.frequencies, device="cpu")
+        cuda_times = CudaArray(spectrum.times, device="cpu")
+        cuda_spec = CudaArray(spectrum.spectrum, device="cpu")
         reducer = ReductionVectorizer(use_gpu=True)
 
-        # Check NaN on GPU (convert to numpy for isnan check)
-        if reducer.vectorize_reduction(
-            CudaArray(np.isnan(cuda_freq.to_numpy()), device="cuda"), "any"
-        ):
+        # Check NaN on GPU using CUDA operations
+        # Convert to numpy for isnan check, then wrap in CudaArray and swap to GPU
+        freq_nan_mask = CudaArray(np.isnan(cuda_freq.to_numpy()), device="cpu")
+        times_nan_mask = CudaArray(np.isnan(cuda_times.to_numpy()), device="cpu")
+        spec_nan_mask = CudaArray(np.isnan(cuda_spec.to_numpy()), device="cpu")
+
+        # Swap to GPU if using GPU acceleration
+        if reducer.use_gpu:
+            freq_nan_mask.swap_to_gpu()
+            times_nan_mask.swap_to_gpu()
+            spec_nan_mask.swap_to_gpu()
+
+        if reducer.vectorize_reduction(freq_nan_mask, "any"):
+            # Cleanup
+            for arr in [
+                cuda_freq,
+                cuda_times,
+                cuda_spec,
+                freq_nan_mask,
+                times_nan_mask,
+                spec_nan_mask,
+            ]:
+                if arr.device == "cuda":
+                    arr.swap_to_cpu()
             raise ValueError("Frequency array contains NaN values")
-        if reducer.vectorize_reduction(
-            CudaArray(np.isnan(cuda_times.to_numpy()), device="cuda"), "any"
-        ):
+        if reducer.vectorize_reduction(times_nan_mask, "any"):
+            # Cleanup
+            for arr in [
+                cuda_freq,
+                cuda_times,
+                cuda_spec,
+                freq_nan_mask,
+                times_nan_mask,
+                spec_nan_mask,
+            ]:
+                if arr.device == "cuda":
+                    arr.swap_to_cpu()
             raise ValueError("Time array contains NaN values")
-        if reducer.vectorize_reduction(
-            CudaArray(np.isnan(cuda_spec.to_numpy()), device="cuda"), "any"
-        ):
+        if reducer.vectorize_reduction(spec_nan_mask, "any"):
+            # Cleanup
+            for arr in [
+                cuda_freq,
+                cuda_times,
+                cuda_spec,
+                freq_nan_mask,
+                times_nan_mask,
+                spec_nan_mask,
+            ]:
+                if arr.device == "cuda":
+                    arr.swap_to_cpu()
             raise ValueError("Spectrum array contains NaN values")
 
         # Check Inf on GPU
-        if reducer.vectorize_reduction(
-            CudaArray(np.isinf(cuda_freq.to_numpy()), device="cuda"), "any"
-        ):
+        freq_inf_mask = CudaArray(np.isinf(cuda_freq.to_numpy()), device="cpu")
+        times_inf_mask = CudaArray(np.isinf(cuda_times.to_numpy()), device="cpu")
+        spec_inf_mask = CudaArray(np.isinf(cuda_spec.to_numpy()), device="cpu")
+
+        # Swap to GPU if using GPU acceleration
+        if reducer.use_gpu:
+            freq_inf_mask.swap_to_gpu()
+            times_inf_mask.swap_to_gpu()
+            spec_inf_mask.swap_to_gpu()
+
+        if reducer.vectorize_reduction(freq_inf_mask, "any"):
+            # Cleanup
+            for arr in [
+                cuda_freq,
+                cuda_times,
+                cuda_spec,
+                freq_inf_mask,
+                times_inf_mask,
+                spec_inf_mask,
+            ]:
+                if arr.device == "cuda":
+                    arr.swap_to_cpu()
             raise ValueError("Frequency array contains Inf values")
-        if reducer.vectorize_reduction(
-            CudaArray(np.isinf(cuda_times.to_numpy()), device="cuda"), "any"
-        ):
+        if reducer.vectorize_reduction(times_inf_mask, "any"):
+            # Cleanup
+            for arr in [
+                cuda_freq,
+                cuda_times,
+                cuda_spec,
+                freq_inf_mask,
+                times_inf_mask,
+                spec_inf_mask,
+            ]:
+                if arr.device == "cuda":
+                    arr.swap_to_cpu()
             raise ValueError("Time array contains Inf values")
-        if reducer.vectorize_reduction(
-            CudaArray(np.isinf(cuda_spec.to_numpy()), device="cuda"), "any"
-        ):
+        if reducer.vectorize_reduction(spec_inf_mask, "any"):
+            # Cleanup
+            for arr in [
+                cuda_freq,
+                cuda_times,
+                cuda_spec,
+                freq_inf_mask,
+                times_inf_mask,
+                spec_inf_mask,
+            ]:
+                if arr.device == "cuda":
+                    arr.swap_to_cpu()
             raise ValueError("Spectrum array contains Inf values")
+
+        # Cleanup GPU memory
+        for arr in [
+            cuda_freq,
+            cuda_times,
+            cuda_spec,
+            freq_nan_mask,
+            times_nan_mask,
+            spec_nan_mask,
+            freq_inf_mask,
+            times_inf_mask,
+            spec_inf_mask,
+        ]:
+            if arr.device == "cuda":
+                arr.swap_to_cpu()
     else:
-        # CPU path - use numpy for NaN/Inf checks (specific operations)
-        # but use CUDA utilities for other operations for consistency
+        # Fallback to numpy if CUDA not available
         if np.any(np.isnan(spectrum.frequencies)):
             raise ValueError("Frequency array contains NaN values")
         if np.any(np.isnan(spectrum.times)):
@@ -570,57 +654,142 @@ def validate_evolution_data(evolution: ThetaEvolution) -> bool:
         if non_positive_macro.device == "cuda":
             non_positive_macro.swap_to_cpu()
 
-    # Check for NaN or Inf values using CUDA for large arrays
-    if (
-        CUDA_AVAILABLE
-        and evolution.times.size > CUDA_THRESHOLD
-        and CudaArray is not None
-        and ReductionVectorizer is not None
-    ):
-        # Use CUDA-accelerated validation for large arrays
-        times_cuda = CudaArray(evolution.times, device="cuda")
-        omega_min_cuda = CudaArray(evolution.omega_min, device="cuda")
-        omega_macro_cuda = CudaArray(evolution.omega_macro, device="cuda")
+    # Check for NaN or Inf values using CUDA utilities
+    # Always use CUDA utilities for consistency, even for small arrays
+    if CUDA_AVAILABLE and CudaArray is not None and ReductionVectorizer is not None:
+        # Use CUDA-accelerated validation
+        times_cuda = CudaArray(evolution.times, device="cpu")
+        omega_min_cuda = CudaArray(evolution.omega_min, device="cpu")
+        omega_macro_cuda = CudaArray(evolution.omega_macro, device="cpu")
         reducer = ReductionVectorizer(use_gpu=True)
 
-        # Check NaN on GPU (convert to numpy for isnan check)
-        if reducer.vectorize_reduction(
-            CudaArray(np.isnan(times_cuda.to_numpy()), device="cuda"), "any"
-        ):
+        # Check NaN on GPU using CUDA operations
+        # Convert to numpy for isnan check, then wrap in CudaArray and swap to GPU
+        times_nan_mask = CudaArray(np.isnan(times_cuda.to_numpy()), device="cpu")
+        omega_min_nan_mask = CudaArray(
+            np.isnan(omega_min_cuda.to_numpy()), device="cpu"
+        )
+        omega_macro_nan_mask = CudaArray(
+            np.isnan(omega_macro_cuda.to_numpy()), device="cpu"
+        )
+
+        # Swap to GPU if using GPU acceleration
+        if reducer.use_gpu:
+            times_nan_mask.swap_to_gpu()
+            omega_min_nan_mask.swap_to_gpu()
+            omega_macro_nan_mask.swap_to_gpu()
+
+        if reducer.vectorize_reduction(times_nan_mask, "any"):
+            # Cleanup
+            for arr in [
+                times_cuda,
+                omega_min_cuda,
+                omega_macro_cuda,
+                times_nan_mask,
+                omega_min_nan_mask,
+                omega_macro_nan_mask,
+            ]:
+                if arr.device == "cuda":
+                    arr.swap_to_cpu()
             raise ValueError("Time array contains NaN values")
-        if reducer.vectorize_reduction(
-            CudaArray(np.isnan(omega_min_cuda.to_numpy()), device="cuda"), "any"
-        ):
+        if reducer.vectorize_reduction(omega_min_nan_mask, "any"):
+            # Cleanup
+            for arr in [
+                times_cuda,
+                omega_min_cuda,
+                omega_macro_cuda,
+                times_nan_mask,
+                omega_min_nan_mask,
+                omega_macro_nan_mask,
+            ]:
+                if arr.device == "cuda":
+                    arr.swap_to_cpu()
             raise ValueError("omega_min array contains NaN values")
-        if reducer.vectorize_reduction(
-            CudaArray(np.isnan(omega_macro_cuda.to_numpy()), device="cuda"), "any"
-        ):
+        if reducer.vectorize_reduction(omega_macro_nan_mask, "any"):
+            # Cleanup
+            for arr in [
+                times_cuda,
+                omega_min_cuda,
+                omega_macro_cuda,
+                times_nan_mask,
+                omega_min_nan_mask,
+                omega_macro_nan_mask,
+            ]:
+                if arr.device == "cuda":
+                    arr.swap_to_cpu()
             raise ValueError("omega_macro array contains NaN values")
 
         # Check Inf on GPU
-        if reducer.vectorize_reduction(
-            CudaArray(np.isinf(times_cuda.to_numpy()), device="cuda"), "any"
-        ):
+        times_inf_mask = CudaArray(np.isinf(times_cuda.to_numpy()), device="cpu")
+        omega_min_inf_mask = CudaArray(
+            np.isinf(omega_min_cuda.to_numpy()), device="cpu"
+        )
+        omega_macro_inf_mask = CudaArray(
+            np.isinf(omega_macro_cuda.to_numpy()), device="cpu"
+        )
+
+        # Swap to GPU if using GPU acceleration
+        if reducer.use_gpu:
+            times_inf_mask.swap_to_gpu()
+            omega_min_inf_mask.swap_to_gpu()
+            omega_macro_inf_mask.swap_to_gpu()
+
+        if reducer.vectorize_reduction(times_inf_mask, "any"):
+            # Cleanup
+            for arr in [
+                times_cuda,
+                omega_min_cuda,
+                omega_macro_cuda,
+                times_inf_mask,
+                omega_min_inf_mask,
+                omega_macro_inf_mask,
+            ]:
+                if arr.device == "cuda":
+                    arr.swap_to_cpu()
             raise ValueError("Time array contains Inf values")
-        if reducer.vectorize_reduction(
-            CudaArray(np.isinf(omega_min_cuda.to_numpy()), device="cuda"), "any"
-        ):
+        if reducer.vectorize_reduction(omega_min_inf_mask, "any"):
+            # Cleanup
+            for arr in [
+                times_cuda,
+                omega_min_cuda,
+                omega_macro_cuda,
+                times_inf_mask,
+                omega_min_inf_mask,
+                omega_macro_inf_mask,
+            ]:
+                if arr.device == "cuda":
+                    arr.swap_to_cpu()
             raise ValueError("omega_min array contains Inf values")
-        if reducer.vectorize_reduction(
-            CudaArray(np.isinf(omega_macro_cuda.to_numpy()), device="cuda"), "any"
-        ):
+        if reducer.vectorize_reduction(omega_macro_inf_mask, "any"):
+            # Cleanup
+            for arr in [
+                times_cuda,
+                omega_min_cuda,
+                omega_macro_cuda,
+                times_inf_mask,
+                omega_min_inf_mask,
+                omega_macro_inf_mask,
+            ]:
+                if arr.device == "cuda":
+                    arr.swap_to_cpu()
             raise ValueError("omega_macro array contains Inf values")
 
         # Cleanup GPU memory
-        if times_cuda.device == "cuda":
-            times_cuda.swap_to_cpu()
-        if omega_min_cuda.device == "cuda":
-            omega_min_cuda.swap_to_cpu()
-        if omega_macro_cuda.device == "cuda":
-            omega_macro_cuda.swap_to_cpu()
+        for arr in [
+            times_cuda,
+            omega_min_cuda,
+            omega_macro_cuda,
+            times_nan_mask,
+            omega_min_nan_mask,
+            omega_macro_nan_mask,
+            times_inf_mask,
+            omega_min_inf_mask,
+            omega_macro_inf_mask,
+        ]:
+            if arr.device == "cuda":
+                arr.swap_to_cpu()
     else:
-        # CPU path - use numpy for NaN/Inf checks (specific operations)
-        # but use CUDA utilities for other operations for consistency
+        # Fallback to numpy if CUDA not available
         if np.any(np.isnan(evolution.times)):
             raise ValueError("Time array contains NaN values")
         if np.any(np.isnan(evolution.omega_min)):

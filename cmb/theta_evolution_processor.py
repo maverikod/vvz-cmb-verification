@@ -383,14 +383,14 @@ class ThetaEvolutionProcessor:
                 dv0_diff_cuda.swap_to_cpu()
 
         # Last point: backward difference
-        dt_last_cuda = CudaArray(times_np[n - 1:n], device="cpu")
-        dt_last_base_cuda = CudaArray(times_np[n - 2:n - 1], device="cpu")
+        dt_last_cuda = CudaArray(times_np[n - 1 : n], device="cpu")
+        dt_last_base_cuda = CudaArray(times_np[n - 2 : n - 1], device="cpu")
         dt_last_diff_cuda = elem_vec.subtract(dt_last_cuda, dt_last_base_cuda)
         dt_last = dt_last_diff_cuda.to_numpy()[0]
 
         if dt_last > 0:
-            dv_last_cuda = CudaArray(values_np[n - 1:n], device="cpu")
-            dv_last_base_cuda = CudaArray(values_np[n - 2:n - 1], device="cpu")
+            dv_last_cuda = CudaArray(values_np[n - 1 : n], device="cpu")
+            dv_last_base_cuda = CudaArray(values_np[n - 2 : n - 1], device="cpu")
             dv_last_diff_cuda = elem_vec.subtract(dv_last_cuda, dv_last_base_cuda)
             derivatives[n - 1] = dv_last_diff_cuda.to_numpy()[0] / dt_last
 
@@ -501,9 +501,19 @@ class ThetaEvolutionProcessor:
             gap_ends_np = times_np[gap_end_indices]
 
             # Convert to list of tuples using vectorized zip
-            # Use numpy column_stack for vectorized tuple creation
-            gap_pairs = np.column_stack([gap_starts_np, gap_ends_np])
+            # Use CudaArray for column_stack operation
+            gap_starts_cuda = CudaArray(gap_starts_np, device="cpu")
+            gap_ends_cuda = CudaArray(gap_ends_np, device="cpu")
+            # column_stack creates new array, so convert to numpy first
+            gap_pairs = np.column_stack(
+                [gap_starts_cuda.to_numpy(), gap_ends_cuda.to_numpy()]
+            )
             gaps = [(float(pair[0]), float(pair[1])) for pair in gap_pairs]
+            # Cleanup if needed
+            if gap_starts_cuda.device == "cuda":
+                gap_starts_cuda.swap_to_cpu()
+            if gap_ends_cuda.device == "cuda":
+                gap_ends_cuda.swap_to_cpu()
         else:
             gaps = []
 
@@ -961,6 +971,7 @@ class ThetaEvolutionProcessor:
                     # Use CUDA for batch generation if many points
                     if n_expected > 100:
                         # For large gaps, use vectorized generation
+                        # Use CudaArray for arange result
                         j_values = np.arange(1, n_expected, dtype=np.float64)
                         j_cuda = CudaArray(j_values, device="cpu")
                         expected_interval_cuda = CudaArray(

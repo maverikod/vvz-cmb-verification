@@ -25,9 +25,7 @@ from cmb.theta_data_parser import (
 
 # Try to import CUDA utilities for large array validation
 try:
-    from utils.cuda.array_model import CudaArray
-    from utils.cuda.elementwise_vectorizer import ElementWiseVectorizer
-    from utils.cuda.reduction_vectorizer import ReductionVectorizer
+    from utils.cuda import CudaArray, ElementWiseVectorizer, ReductionVectorizer
 
     CUDA_AVAILABLE = True
 except ImportError:

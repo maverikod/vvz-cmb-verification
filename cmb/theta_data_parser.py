@@ -104,7 +104,11 @@ def parse_csv_frequency_spectrum(
             # CSV format: one value per row, need to reshape based on
             # original frequencies and times order
             # Vectorized approach using numpy searchsorted
-            spectrum_2d = np.zeros((len(frequencies), len(times)))
+            # Use CudaArray for zero initialization
+            spectrum_2d_cuda = CudaArray(
+                np.zeros((len(frequencies), len(times))), device="cpu"
+            )
+            spectrum_2d = spectrum_2d_cuda.to_numpy()
 
             # Use searchsorted for vectorized index finding
             # This is faster than dictionary lookup for large arrays

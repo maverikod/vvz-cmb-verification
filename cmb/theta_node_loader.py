@@ -123,8 +123,10 @@ def load_node_geometry(
         phi_cuda = CudaArray(phi, device="cpu")
         reduction_vec = ReductionVectorizer(use_gpu=True)
 
-        theta_max = reduction_vec.vectorize_reduction(theta_cuda, "max")
-        phi_max = reduction_vec.vectorize_reduction(phi_cuda, "max")
+        theta_max_result = reduction_vec.vectorize_reduction(theta_cuda, "max")
+        phi_max_result = reduction_vec.vectorize_reduction(phi_cuda, "max")
+        theta_max = float(theta_max_result.to_numpy().item() if hasattr(theta_max_result, "to_numpy") else theta_max_result)
+        phi_max = float(phi_max_result.to_numpy().item() if hasattr(phi_max_result, "to_numpy") else phi_max_result)
 
         if theta_max > 2 * np.pi:
             # Use CUDA-accelerated conversion
@@ -202,7 +204,12 @@ def load_node_geometry(
 
         # Check if scales are in arcmin (2-5 arcmin) and convert to pc
         config = get_config()
-        scales_max = reduction_vec.vectorize_reduction(scales_cuda, "max")
+        scales_max_result = reduction_vec.vectorize_reduction(scales_cuda, "max")
+        scales_max = float(
+            scales_max_result.to_numpy().item()
+            if hasattr(scales_max_result, "to_numpy")
+            else scales_max_result
+        )
         if scales_max < 10:  # Likely in arcmin
             # Use CUDA-accelerated multiplication
             scales_cuda = elem_vec.multiply(
@@ -240,8 +247,10 @@ def load_node_geometry(
             phi_cuda = CudaArray(phi, device="cpu")
             reduction_vec = ReductionVectorizer(use_gpu=True)
 
-            theta_max = reduction_vec.vectorize_reduction(theta_cuda, "max")
-            phi_max = reduction_vec.vectorize_reduction(phi_cuda, "max")
+            theta_max_result = reduction_vec.vectorize_reduction(theta_cuda, "max")
+            phi_max_result = reduction_vec.vectorize_reduction(phi_cuda, "max")
+            theta_max = float(theta_max_result.to_numpy().item() if hasattr(theta_max_result, "to_numpy") else theta_max_result)
+            phi_max = float(phi_max_result.to_numpy().item() if hasattr(phi_max_result, "to_numpy") else phi_max_result)
 
             if theta_max > 2 * np.pi:
                 theta_deg_cuda = CudaArray(np.deg2rad(theta), device="cpu")
@@ -314,7 +323,12 @@ def load_node_geometry(
 
         # Check if scales are in arcmin and convert to pc
         config = get_config()
-        scales_max = reduction_vec.vectorize_reduction(scales_cuda, "max")
+        scales_max_result = reduction_vec.vectorize_reduction(scales_cuda, "max")
+        scales_max = float(
+            scales_max_result.to_numpy().item()
+            if hasattr(scales_max_result, "to_numpy")
+            else scales_max_result
+        )
         if scales_max < 10:  # Likely in arcmin
             scales_cuda = elem_vec.multiply(
                 scales_cuda, config.constants.arcmin_to_pc_at_z1100

@@ -276,10 +276,15 @@ class NodePropertiesCalculator:
             neighborhood_size = 5
             half_size = neighborhood_size // 2
 
-            # Initialize result arrays
-            depths = np.zeros(n_nodes, dtype=np.float64)
-            areas = np.zeros(n_nodes, dtype=np.float64)
-            curvatures = np.zeros(n_nodes, dtype=np.float64)
+            # Initialize result arrays using CudaArray
+            depths_cuda = CudaArray(np.zeros(n_nodes, dtype=np.float64), device="cpu")
+            areas_cuda = CudaArray(np.zeros(n_nodes, dtype=np.float64), device="cpu")
+            curvatures_cuda = CudaArray(
+                np.zeros(n_nodes, dtype=np.float64), device="cpu"
+            )
+            depths = depths_cuda.to_numpy()
+            areas = areas_cuda.to_numpy()
+            curvatures = curvatures_cuda.to_numpy()
 
             # Process each node using CUDA-accelerated operations
             # Note: Neighborhood extraction requires iteration, but all

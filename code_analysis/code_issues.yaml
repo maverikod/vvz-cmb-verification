@@ -6,18 +6,22 @@ issues:
     file: cmb/theta_node_loader.py
     limit: 400
     lines: 466
-  - exceeds_limit: 70
+  - exceeds_limit: 74
     file: cmb/theta_data_parser.py
     limit: 400
-    lines: 470
-  - exceeds_limit: 768
+    lines: 474
+  - exceeds_limit: 776
     file: cmb/theta_evolution_processor.py
     limit: 400
-    lines: 1168
-  - exceeds_limit: 214
+    lines: 1176
+  - exceeds_limit: 300
     file: cmb/theta_data_loader.py
     limit: 400
-    lines: 614
+    lines: 700
+  - exceeds_limit: 4
+    file: cmb/nodes/node_properties.py
+    limit: 400
+    lines: 404
   - exceeds_limit: 95
     file: utils/cuda/memory_watchdog.py
     limit: 400
@@ -198,19 +202,19 @@ issues:
   methods_without_docstrings:
   - class: null
     file: cmb/theta_data_parser.py
-    line: 153
+    line: 157
     method: _to_float
   - class: null
     file: cmb/theta_data_parser.py
-    line: 250
+    line: 254
     method: _to_float
   - class: null
     file: cmb/theta_data_parser.py
-    line: 364
+    line: 368
     method: _to_float
   - class: null
     file: cmb/theta_data_parser.py
-    line: 441
+    line: 445
     method: _to_float
   - class: null
     file: tests/unit/test_cuda_array.py
@@ -240,7 +244,7 @@ issues:
 summary:
   any_type_usage: 0
   classes_without_docstrings: 0
-  files_too_large: 10
+  files_too_large: 11
   files_without_docstrings: 0
   generic_exception_usage: 0
   imports_in_middle: 0
@@ -249,4 +253,4 @@ summary:
   methods_with_pass: 0
   methods_without_docstrings: 9
   not_implemented_in_non_abstract: 1
-  total_issues: 45
+  total_issues: 46

@@ -25,7 +25,7 @@ classes:
 
       Uses CUDA-accelerated operations for efficient map creation.'
     file: cmb/nodes/node_map_creator.py
-    line: 16
+    line: 19
     methods:
     - __init__
     - create_omega_min_map
@@ -100,7 +100,7 @@ classes:
       \ t\n    omega_min: ω_min(t) values\n    omega_macro: ω_macro(t) values\n  \
       \  metadata: Additional metadata"
     file: cmb/theta_data_loader.py
-    line: 64
+    line: 62
     methods: []
     name: ThetaEvolution
   cmb/theta_data_loader.py:ThetaFrequencySpectrum:
@@ -109,7 +109,7 @@ classes:
       \ Frequency array ω in Hz\n    times: Time array t\n    spectrum: Spectrum values\
       \ ρ_Θ(ω,t) as 2D array\n    metadata: Additional metadata (units, ranges, etc.)"
     file: cmb/theta_data_loader.py
-    line: 46
+    line: 44
     methods: []
     name: ThetaFrequencySpectrum
   cmb/theta_evolution_processor.py:ThetaEvolutionProcessor:
@@ -1908,7 +1908,7 @@ functions:
       \ Element-wise vectorizer for element operations\n    omega_field_shape: Shape\
       \ of omega field"
     file: cmb/nodes/node_map_creator.py
-    line: 23
+    line: 26
     name: __init__
   cmb/nodes/node_map_creator.py:create_node_mask:
     args:
@@ -1918,7 +1918,7 @@ functions:
       \ Array of node positions\n\nReturns:\n    Binary mask (1 at nodes, 0 elsewhere)\n\
       \nRaises:\n    ValueError: If mask creation fails"
     file: cmb/nodes/node_map_creator.py
-    line: 165
+    line: 178
     name: create_node_mask
   cmb/nodes/node_map_creator.py:create_omega_min_map:
     args:
@@ -1928,7 +1928,7 @@ functions:
       \ of node positions\n\nReturns:\n    Map of ω_min(x) values at each grid point\n\
       \nRaises:\n    ValueError: If map creation fails"
     file: cmb/nodes/node_map_creator.py
-    line: 44
+    line: 47
     name: create_omega_min_map
   cmb/nodes/node_map_validator.py:__init__:
     args:
@@ -2123,7 +2123,7 @@ functions:
       \ FileNotFoundError: If data file doesn't exist\n    ValueError: If data format\
       \ is invalid"
     file: cmb/theta_data_loader.py
-    line: 164
+    line: 162
     name: load_evolution_data
   cmb/theta_data_loader.py:load_frequency_spectrum:
     args:
@@ -2138,7 +2138,7 @@ functions:
       \    ThetaFrequencySpectrum instance\n\nRaises:\n    FileNotFoundError: If data\
       \ file doesn't exist\n    ValueError: If data format is invalid"
     file: cmb/theta_data_loader.py
-    line: 81
+    line: 79
     name: load_frequency_spectrum
   cmb/theta_data_loader.py:validate_evolution_data:
     args:
@@ -2148,7 +2148,7 @@ functions:
       \ have same length)\n\nArgs:\n    evolution: ThetaEvolution to validate\n\n\
       Returns:\n    True if valid\n\nRaises:\n    ValueError: If data is invalid"
     file: cmb/theta_data_loader.py
-    line: 407
+    line: 435
     name: validate_evolution_data
   cmb/theta_data_loader.py:validate_frequency_spectrum:
     args:
@@ -2159,14 +2159,14 @@ functions:
       \nArgs:\n    spectrum: ThetaFrequencySpectrum to validate\n\nReturns:\n    True\
       \ if valid\n\nRaises:\n    ValueError: If data is invalid"
     file: cmb/theta_data_loader.py
-    line: 241
+    line: 239
     name: validate_frequency_spectrum
   cmb/theta_data_parser.py:_to_float:
     args:
     - value
     docstring: null
     file: cmb/theta_data_parser.py
-    line: 441
+    line: 445
     name: _to_float
   cmb/theta_data_parser.py:parse_csv_evolution_data:
     args:
@@ -2177,7 +2177,7 @@ functions:
       \nReturns:\n    ThetaEvolution instance\n\nRaises:\n    ValueError: If required\
       \ columns are missing or data format is invalid"
     file: cmb/theta_data_parser.py
-    line: 292
+    line: 296
     name: parse_csv_evolution_data
   cmb/theta_data_parser.py:parse_csv_frequency_spectrum:
     args:
@@ -2203,7 +2203,7 @@ functions:
       Returns:\n    ThetaEvolution instance\n\nRaises:\n    ValueError: If required\
       \ keys are missing or data format is invalid"
     file: cmb/theta_data_parser.py
-    line: 395
+    line: 399
     name: parse_json_evolution_data
   cmb/theta_data_parser.py:parse_json_frequency_spectrum:
     args:
@@ -2214,7 +2214,7 @@ functions:
       Returns:\n    ThetaFrequencySpectrum instance\n\nRaises:\n    ValueError: If\
       \ required keys are missing or data format is invalid"
     file: cmb/theta_data_parser.py
-    line: 190
+    line: 194
     name: parse_json_frequency_spectrum
   cmb/theta_evolution_processor.py:__init__:
     args:
@@ -2265,7 +2265,7 @@ functions:
       \    max_gap_ratio: Maximum allowed gap ratio (gap / median_interval)\n\nReturns:\n\
       \    List of (gap_start, gap_end) tuples for gaps exceeding threshold"
     file: cmb/theta_evolution_processor.py
-    line: 415
+    line: 423
     name: _check_time_coverage_gaps
   cmb/theta_evolution_processor.py:_compute_statistics:
     args:
@@ -2279,7 +2279,7 @@ functions:
       \  omega_min: ω_min values\n    omega_macro: ω_macro values\n    domega_min_dt:\
       \ Evolution rates for ω_min\n    domega_macro_dt: Evolution rates for ω_macro"
     file: cmb/theta_evolution_processor.py
-    line: 508
+    line: 516
     name: _compute_statistics
   cmb/theta_evolution_processor.py:_to_float:
     args:
@@ -2298,7 +2298,7 @@ functions:
       \ allowed gap ratio.\n                  If None, uses default (5.0)\n\nReturns:\n\
       \    List of (gap_start, gap_end) tuples for gaps exceeding threshold"
     file: cmb/theta_evolution_processor.py
-    line: 819
+    line: 827
     name: check_time_coverage_gaps
   cmb/theta_evolution_processor.py:generate_quality_report:
     args:
@@ -2308,7 +2308,7 @@ functions:
       - Data quality issues\n\nReturns:\n    Dictionary with quality issues, warnings,\
       \ and statistics"
     file: cmb/theta_evolution_processor.py
-    line: 1050
+    line: 1058
     name: generate_quality_report
   cmb/theta_evolution_processor.py:get_evolution_rate_macro:
     args:
@@ -2318,7 +2318,7 @@ functions:
       \   time: Time value\n\nReturns:\n    Evolution rate\n\nRaises:\n    ValueError:\
       \ If time is out of range or processor\n        not initialized"
     file: cmb/theta_evolution_processor.py
-    line: 732
+    line: 740
     name: get_evolution_rate_macro
   cmb/theta_evolution_processor.py:get_evolution_rate_min:
     args:
@@ -2328,7 +2328,7 @@ functions:
       \ time: Time value\n\nReturns:\n    Evolution rate\n\nRaises:\n    ValueError:\
       \ If time is out of range or processor\n        not initialized"
     file: cmb/theta_evolution_processor.py
-    line: 710
+    line: 718
     name: get_evolution_rate_min
   cmb/theta_evolution_processor.py:get_evolution_statistics:
     args:
@@ -2336,7 +2336,7 @@ functions:
     docstring: "Get evolution statistics.\n\nReturns:\n    Dictionary with statistics\
       \ about evolution data\n\nRaises:\n    ValueError: If processor not initialized"
     file: cmb/theta_evolution_processor.py
-    line: 805
+    line: 813
     name: get_evolution_statistics
   cmb/theta_evolution_processor.py:get_omega_macro:
     args:
@@ -2346,7 +2346,7 @@ functions:
       Returns:\n    ω_macro(t) value\n\nRaises:\n    ValueError: If time is out of\
       \ range or processor\n        not initialized"
     file: cmb/theta_evolution_processor.py
-    line: 688
+    line: 696
     name: get_omega_macro
   cmb/theta_evolution_processor.py:get_omega_min:
     args:
@@ -2356,7 +2356,7 @@ functions:
       Returns:\n    ω_min(t) value\n\nRaises:\n    ValueError: If time is out of range\
       \ or processor\n        not initialized"
     file: cmb/theta_evolution_processor.py
-    line: 666
+    line: 674
     name: get_omega_min
   cmb/theta_evolution_processor.py:process:
     args:
@@ -2377,7 +2377,7 @@ functions:
       Returns:\n    ThetaEvolutionProcessor instance with processed data\n\nRaises:\n\
       \    ValueError: If processing fails"
     file: cmb/theta_evolution_processor.py
-    line: 1149
+    line: 1157
     name: process_evolution_data
   cmb/theta_evolution_processor.py:validate_against_config:
     args:
@@ -2387,7 +2387,7 @@ functions:
       \ data meets configuration requirements\n\nRaises:\n    ValueError: If data\
       \ does not meet requirements"
     file: cmb/theta_evolution_processor.py
-    line: 773
+    line: 781
     name: validate_against_config
   cmb/theta_evolution_processor.py:validate_time_range:
     args:
@@ -2397,7 +2397,7 @@ functions:
       \ value to validate\n\nReturns:\n    True if time is within range\n\nRaises:\n\
       \    ValueError: If time is out of range"
     file: cmb/theta_evolution_processor.py
-    line: 754
+    line: 762
     name: validate_time_range
   cmb/theta_evolution_processor.py:verify_time_array_completeness:
     args:
@@ -2411,7 +2411,7 @@ functions:
       \    - missing_points: List[float] - List of expected but missing times\n  \
       \  - coverage_ratio: float - Ratio of actual to expected points"
     file: cmb/theta_evolution_processor.py
-    line: 842
+    line: 850
     name: verify_time_array_completeness
   cmb/theta_node_loader.py:load_node_depths:
     args:
@@ -7775,6 +7775,24 @@ imports:
     module: utils.cuda
     name: ElementWiseVectorizer
     type: import_from
+  cmb/nodes/node_map_creator.py:GridVectorizer:
+    file: cmb/nodes/node_map_creator.py
+    line: 16
+    module: utils.cuda
+    name: GridVectorizer
+    type: import_from
+  cmb/nodes/node_map_creator.py:ReductionVectorizer:
+    file: cmb/nodes/node_map_creator.py
+    line: 13
+    module: utils.cuda
+    name: ReductionVectorizer
+    type: import_from
+  cmb/nodes/node_map_creator.py:TYPE_CHECKING:
+    file: cmb/nodes/node_map_creator.py
+    line: 10
+    module: typing
+    name: TYPE_CHECKING
+    type: import_from
   cmb/nodes/node_map_creator.py:Tuple:
     file: cmb/nodes/node_map_creator.py
     line: 10
@@ -7826,6 +7844,12 @@ imports:
     line: 13
     module: utils.cuda
     name: GridVectorizer
+    type: import_from
+  cmb/nodes/node_properties.py:Optional:
+    file: cmb/nodes/node_properties.py
+    line: 10
+    module: typing
+    name: Optional
     type: import_from
   cmb/nodes/node_properties.py:ReductionVectorizer:
     file: cmb/nodes/node_properties.py
@@ -7936,7 +7960,7 @@ imports:
   cmb/theta_data_loader.py:CudaArray:
     file: cmb/theta_data_loader.py
     line: 28
-    module: utils.cuda.array_model
+    module: utils.cuda
     name: CudaArray
     type: import_from
   cmb/theta_data_loader.py:DataIndex:
@@ -7947,8 +7971,8 @@ imports:
     type: import_from
   cmb/theta_data_loader.py:ElementWiseVectorizer:
     file: cmb/theta_data_loader.py
-    line: 29
-    module: utils.cuda.elementwise_vectorizer
+    line: 28
+    module: utils.cuda
     name: ElementWiseVectorizer
     type: import_from
   cmb/theta_data_loader.py:Optional:
@@ -7965,8 +7989,8 @@ imports:
     type: import_from
   cmb/theta_data_loader.py:ReductionVectorizer:
     file: cmb/theta_data_loader.py
-    line: 30
-    module: utils.cuda.reduction_vectorizer
+    line: 28
+    module: utils.cuda
     name: ReductionVectorizer
     type: import_from
   cmb/theta_data_loader.py:dataclass:
@@ -8065,13 +8089,13 @@ imports:
     type: import_from
   cmb/theta_data_parser.py:ThetaEvolution:
     file: cmb/theta_data_parser.py
-    line: 462
+    line: 466
     module: cmb.theta_data_loader
     name: ThetaEvolution
     type: import_from
   cmb/theta_data_parser.py:ThetaFrequencySpectrum:
     file: cmb/theta_data_parser.py
-    line: 282
+    line: 286
     module: cmb.theta_data_loader
     name: ThetaFrequencySpectrum
     type: import_from

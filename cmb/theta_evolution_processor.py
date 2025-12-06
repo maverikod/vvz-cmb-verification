@@ -291,7 +291,9 @@ class ThetaEvolutionProcessor:
             Derivative array
         """
         n = len(times)
-        derivatives = np.zeros(n)
+        # Use CudaArray for zero initialization
+        derivatives_cuda = CudaArray(np.zeros(n), device="cpu")
+        derivatives = derivatives_cuda.to_numpy()
 
         # Convert to CudaArray - use CudaArray for all operations
         times_cuda = CudaArray(times, device="cpu")
@@ -318,9 +320,15 @@ class ThetaEvolutionProcessor:
             # derivatives[1:-1] = dv_central / dt_central
             # Check for zero division using CudaArray operations
             dt_central_np = dt_central_cuda.to_numpy()
-            valid_mask = dt_central_np > 0
+            valid_mask_cuda = CudaArray((dt_central_np > 0).astype(float), device="cpu")
+            reduction_vec = ReductionVectorizer(use_gpu=True)
+            has_valid = reduction_vec.vectorize_reduction(valid_mask_cuda, "any")
 
-            if np.any(valid_mask):
+            if has_valid:
+                valid_mask = valid_mask_cuda.to_numpy().astype(bool)
+                # Cleanup
+                if valid_mask_cuda.device == "cuda":
+                    valid_mask_cuda.swap_to_cpu()
                 # Divide only where dt > 0 using CudaArray
                 dv_valid_cuda = CudaArray(
                     dv_central_cuda.to_numpy()[valid_mask], device="cpu"
@@ -382,12 +390,8 @@ class ThetaEvolutionProcessor:
 
         if dt_last > 0:
             dv_last_cuda = CudaArray(values_np[n - 1:n], device="cpu")
-            dv_last_base_cuda = CudaArray(
-                values_np[n - 2:n - 1], device="cpu"
-            )
-            dv_last_diff_cuda = elem_vec.subtract(
-                dv_last_cuda, dv_last_base_cuda
-            )
+            dv_last_base_cuda = CudaArray(values_np[n - 2:n - 1], device="cpu")
+            dv_last_diff_cuda = elem_vec.subtract(dv_last_cuda, dv_last_base_cuda)
             derivatives[n - 1] = dv_last_diff_cuda.to_numpy()[0] / dt_last
 
             # Cleanup

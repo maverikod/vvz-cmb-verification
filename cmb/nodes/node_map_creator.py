@@ -10,7 +10,7 @@ Email: vasilyvz@gmail.com
 from typing import Tuple, TYPE_CHECKING
 import numpy as np
 
-from utils.cuda import CudaArray, ElementWiseVectorizer
+from utils.cuda import CudaArray, ElementWiseVectorizer, ReductionVectorizer
 
 if TYPE_CHECKING:
     from utils.cuda import GridVectorizer
@@ -77,8 +77,11 @@ class NodeMapCreator:
             # Set node positions to actual omega values
             # using vectorized operations
             if len(node_positions) > 0:
-                # Create node mask using numpy (fast for sparse indexing)
-                node_mask = np.zeros(self.omega_field_shape, dtype=bool)
+                # Create node mask using CudaArray
+                node_mask_cuda_init = CudaArray(
+                    np.zeros(self.omega_field_shape, dtype=bool), device="cpu"
+                )
+                node_mask = node_mask_cuda_init.to_numpy()
 
                 if len(node_positions.shape) == 2:
                     # Multi-dimensional case - use advanced indexing
@@ -102,11 +105,20 @@ class NodeMapCreator:
                         valid_mask &= (pos_arr >= 0) & (pos_arr < shape_array[i])
 
                     # Use advanced indexing for vectorized mask setting
-                    if np.any(valid_mask):
+                    # Use CUDA for any() check
+                    valid_mask_cuda = CudaArray(valid_mask.astype(float), device="cpu")
+                    reduction_vec = ReductionVectorizer(use_gpu=True)
+                    has_valid = reduction_vec.vectorize_reduction(
+                        valid_mask_cuda, "any"
+                    )
+                    if has_valid:
                         valid_indices = tuple(
                             pos_arr[valid_mask] for pos_arr in pos_arrays
                         )
                         node_mask[valid_indices] = True
+                    # Cleanup GPU memory
+                    if valid_mask_cuda.device == "cuda":
+                        valid_mask_cuda.swap_to_cpu()
                 else:
                     # 1D case - use vectorized indexing
                     pos_ints = node_positions.astype(int)
@@ -179,8 +191,11 @@ class NodeMapCreator:
             ValueError: If mask creation fails
         """
         try:
-            # Create mask
-            node_mask = np.zeros(self.omega_field_shape, dtype=bool)
+            # Create mask using CudaArray
+            node_mask_cuda_init = CudaArray(
+                np.zeros(self.omega_field_shape, dtype=bool), device="cpu"
+            )
+            node_mask = node_mask_cuda_init.to_numpy()
 
             if len(node_positions) == 0:
                 # Convert to int32 using CudaArray for consistency
@@ -207,9 +222,16 @@ class NodeMapCreator:
                     valid_mask &= (pos_arr >= 0) & (pos_arr < shape_array[i])
 
                 # Apply advanced indexing with valid positions only
-                if np.any(valid_mask):
+                # Use CUDA for any() check
+                valid_mask_cuda = CudaArray(valid_mask.astype(float), device="cpu")
+                reduction_vec = ReductionVectorizer(use_gpu=True)
+                has_valid = reduction_vec.vectorize_reduction(valid_mask_cuda, "any")
+                if has_valid:
                     valid_indices = tuple(pos_arr[valid_mask] for pos_arr in pos_arrays)
                     node_mask[valid_indices] = True
+                # Cleanup GPU memory
+                if valid_mask_cuda.device == "cuda":
+                    valid_mask_cuda.swap_to_cpu()
             else:
                 # 1D case - use vectorized indexing
                 pos_ints = node_positions.astype(int)

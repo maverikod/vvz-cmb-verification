@@ -292,13 +292,27 @@ def validate_frequency_spectrum(spectrum: ThetaFrequencySpectrum) -> bool:
                 f"Found non-positive values: {count}"
             )
     else:
-        # CPU path
-        if np.any(spectrum.frequencies <= 0):
+        # CPU path - use CUDA utilities for consistency
+        freq_cuda = CudaArray(spectrum.frequencies, device="cpu")
+        elem_vec = ElementWiseVectorizer(use_gpu=True)
+        reduction_vec = ReductionVectorizer(use_gpu=True)
+        non_positive = elem_vec.vectorize_operation(freq_cuda, "less_equal", 0.0)
+        has_non_positive = reduction_vec.vectorize_reduction(non_positive, "any")
+        if has_non_positive:
+            count_result = reduction_vec.vectorize_reduction(non_positive, "sum")
+            if hasattr(count_result, "to_numpy"):
+                count = int(count_result.to_numpy().item())
+            else:
+                count = int(count_result)
             raise ValueError(
                 "All frequencies must be positive. "
-                f"Found non-positive values: "
-                f"{np.sum(spectrum.frequencies <= 0)}"
+                f"Found non-positive values: {count}"
             )
+        # Cleanup GPU memory
+        if freq_cuda.device == "cuda":
+            freq_cuda.swap_to_cpu()
+        if non_positive.device == "cuda":
+            non_positive.swap_to_cpu()
 
     # Check non-negative spectrum values (use CUDA for large arrays)
     if (
@@ -328,12 +342,27 @@ def validate_frequency_spectrum(spectrum: ThetaFrequencySpectrum) -> bool:
                 f"Found negative values: {count}"
             )
     else:
-        # CPU path
-        if np.any(spectrum.spectrum < 0):
+        # CPU path - use CUDA utilities for consistency
+        spec_cuda = CudaArray(spectrum.spectrum, device="cpu")
+        elem_vec = ElementWiseVectorizer(use_gpu=True)
+        reduction_vec = ReductionVectorizer(use_gpu=True)
+        negative = elem_vec.vectorize_operation(spec_cuda, "less", 0.0)
+        has_negative = reduction_vec.vectorize_reduction(negative, "any")
+        if has_negative:
+            count_result = reduction_vec.vectorize_reduction(negative, "sum")
+            if hasattr(count_result, "to_numpy"):
+                count = int(count_result.to_numpy().item())
+            else:
+                count = int(count_result)
             raise ValueError(
                 "All spectrum values must be non-negative. "
-                f"Found negative values: {np.sum(spectrum.spectrum < 0)}"
+                f"Found negative values: {count}"
             )
+        # Cleanup GPU memory
+        if spec_cuda.device == "cuda":
+            spec_cuda.swap_to_cpu()
+        if negative.device == "cuda":
+            negative.swap_to_cpu()
 
     # Check consistent array shapes
     expected_shape = (len(spectrum.frequencies), len(spectrum.times))
@@ -385,7 +414,8 @@ def validate_frequency_spectrum(spectrum: ThetaFrequencySpectrum) -> bool:
         ):
             raise ValueError("Spectrum array contains Inf values")
     else:
-        # CPU path
+        # CPU path - use numpy for NaN/Inf checks (specific operations)
+        # but use CUDA utilities for other operations for consistency
         if np.any(np.isnan(spectrum.frequencies)):
             raise ValueError("Frequency array contains NaN values")
         if np.any(np.isnan(spectrum.times)):
@@ -489,19 +519,56 @@ def validate_evolution_data(evolution: ThetaEvolution) -> bool:
                 f"Found non-positive values: {count}"
             )
     else:
-        # CPU path
-        if np.any(evolution.omega_min <= 0):
+        # CPU path - use CUDA utilities for consistency
+        omega_min_cuda = CudaArray(evolution.omega_min, device="cpu")
+        omega_macro_cuda = CudaArray(evolution.omega_macro, device="cpu")
+        elem_vec = ElementWiseVectorizer(use_gpu=True)
+        reduction_vec = ReductionVectorizer(use_gpu=True)
+
+        # Check for non-positive values on GPU
+        non_positive_min = elem_vec.vectorize_operation(
+            omega_min_cuda, "less_equal", 0.0
+        )
+        has_non_positive_min = reduction_vec.vectorize_reduction(
+            non_positive_min, "any"
+        )
+        if has_non_positive_min:
+            count_result = reduction_vec.vectorize_reduction(non_positive_min, "sum")
+            if hasattr(count_result, "to_numpy"):
+                count = int(count_result.to_numpy().item())
+            else:
+                count = int(count_result)
             raise ValueError(
                 "All omega_min values must be positive. "
-                f"Found non-positive values: "
-                f"{np.sum(evolution.omega_min <= 0)}"
+                f"Found non-positive values: {count}"
             )
-        if np.any(evolution.omega_macro <= 0):
+
+        non_positive_macro = elem_vec.vectorize_operation(
+            omega_macro_cuda, "less_equal", 0.0
+        )
+        has_non_positive_macro = reduction_vec.vectorize_reduction(
+            non_positive_macro, "any"
+        )
+        if has_non_positive_macro:
+            count_result = reduction_vec.vectorize_reduction(non_positive_macro, "sum")
+            if hasattr(count_result, "to_numpy"):
+                count = int(count_result.to_numpy().item())
+            else:
+                count = int(count_result)
             raise ValueError(
                 "All omega_macro values must be positive. "
-                f"Found non-positive values: "
-                f"{np.sum(evolution.omega_macro <= 0)}"
+                f"Found non-positive values: {count}"
             )
+
+        # Cleanup GPU memory
+        if omega_min_cuda.device == "cuda":
+            omega_min_cuda.swap_to_cpu()
+        if omega_macro_cuda.device == "cuda":
+            omega_macro_cuda.swap_to_cpu()
+        if non_positive_min.device == "cuda":
+            non_positive_min.swap_to_cpu()
+        if non_positive_macro.device == "cuda":
+            non_positive_macro.swap_to_cpu()
 
     # Check for NaN or Inf values using CUDA for large arrays
     if (
@@ -552,7 +619,8 @@ def validate_evolution_data(evolution: ThetaEvolution) -> bool:
         if omega_macro_cuda.device == "cuda":
             omega_macro_cuda.swap_to_cpu()
     else:
-        # CPU path
+        # CPU path - use numpy for NaN/Inf checks (specific operations)
+        # but use CUDA utilities for other operations for consistency
         if np.any(np.isnan(evolution.times)):
             raise ValueError("Time array contains NaN values")
         if np.any(np.isnan(evolution.omega_min)):
@@ -599,13 +667,35 @@ def validate_evolution_data(evolution: ThetaEvolution) -> bool:
                 f"Found {count} invalid value(s)"
             )
     else:
-        # CPU path
-        if np.any(evolution.omega_min >= evolution.omega_macro):
-            invalid_count = np.sum(evolution.omega_min >= evolution.omega_macro)
+        # CPU path - use CUDA utilities for consistency
+        omega_min_cuda = CudaArray(evolution.omega_min, device="cpu")
+        omega_macro_cuda = CudaArray(evolution.omega_macro, device="cpu")
+        elem_vec = ElementWiseVectorizer(use_gpu=True)
+        reduction_vec = ReductionVectorizer(use_gpu=True)
+
+        # Check omega_min >= omega_macro on GPU
+        violation = elem_vec.vectorize_operation(
+            omega_min_cuda, "greater_equal", omega_macro_cuda.to_numpy()
+        )
+        has_violation = reduction_vec.vectorize_reduction(violation, "any")
+        if has_violation:
+            count_result = reduction_vec.vectorize_reduction(violation, "sum")
+            if hasattr(count_result, "to_numpy"):
+                count = int(count_result.to_numpy().item())
+            else:
+                count = int(count_result)
             raise ValueError(
                 f"Physical constraint violated: "
                 f"omega_min must be < omega_macro. "
-                f"Found {invalid_count} invalid value(s)"
+                f"Found {count} invalid value(s)"
             )
+
+        # Cleanup GPU memory
+        if omega_min_cuda.device == "cuda":
+            omega_min_cuda.swap_to_cpu()
+        if omega_macro_cuda.device == "cuda":
+            omega_macro_cuda.swap_to_cpu()
+        if violation.device == "cuda":
+            violation.swap_to_cpu()
 
     return True

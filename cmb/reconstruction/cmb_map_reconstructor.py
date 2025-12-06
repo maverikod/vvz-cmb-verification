@@ -239,23 +239,12 @@ class CmbMapReconstructor:
                 )
 
             # Add pixel sums to CMB map using CUDA-accelerated addition
-            # Use ElementWiseVectorizer.add() for CUDA acceleration
-            # Ensure both arrays have the same size (should already be verified above)
-            cmb_map_np_check = cmb_map_cuda.to_numpy()
-            pixel_sums_np_check = pixel_sums_cuda.to_numpy()
-
-            if len(cmb_map_np_check) != len(pixel_sums_np_check):
-                raise ValueError(
-                    f"Array size mismatch: cmb_map={len(cmb_map_np_check)}, "
-                    f"pixel_sums={len(pixel_sums_np_check)}, expected npix={npix}"
-                )
-
-            # Add arrays using CUDA-accelerated ElementWiseVectorizer
-            # For same-size arrays, use whole_array mode to avoid block size issues
-            # Ensure both arrays are on the same device before operation
-            # Convert to numpy for simple addition (acceptable for same-size arrays)
+            # For same-size arrays, convert to numpy, add, then wrap back in CudaArray
+            # This is acceptable for simple addition of same-size arrays
             # CUDA is used for all intermediate operations (scatter_add, multiply, etc.)
-            cmb_map_np = cmb_map_np_check + pixel_sums_np_check
+            cmb_map_np = cmb_map_cuda.to_numpy()
+            pixel_sums_np = pixel_sums_cuda.to_numpy()
+            cmb_map_np = cmb_map_np + pixel_sums_np
             cmb_map_cuda = CudaArray(cmb_map_np, block_size=None, device="cpu")
 
             # Cleanup pixel indices arrays

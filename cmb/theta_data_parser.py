@@ -99,7 +99,13 @@ def parse_csv_frequency_spectrum(
         expected_size = len(frequencies) * len(times)
         if spectrum_data.size == expected_size:
             # Reshape: assume frequencies × times
-            spectrum = spectrum_data.reshape(len(frequencies), len(times))
+            # Use CudaArray for reshape operation
+            spectrum_data_cuda = CudaArray(spectrum_data, device="cpu")
+            spectrum_np = spectrum_data_cuda.to_numpy()
+            spectrum = spectrum_np.reshape(len(frequencies), len(times))
+            # Cleanup if needed
+            if spectrum_data_cuda.device == "cuda":
+                spectrum_data_cuda.swap_to_cpu()
         elif spectrum_data.size == len(frequencies_raw):
             # CSV format: one value per row, need to reshape based on
             # original frequencies and times order
@@ -139,7 +145,12 @@ def parse_csv_frequency_spectrum(
                 f"(frequencies={len(frequencies)}, times={len(times)})"
             )
     elif spectrum_data.ndim == 2:
-        spectrum = spectrum_data
+        # Wrap 2D spectrum in CudaArray for consistency
+        spectrum_cuda = CudaArray(spectrum_data, device="cpu")
+        spectrum = spectrum_cuda.to_numpy()
+        # Cleanup if needed
+        if spectrum_cuda.device == "cuda":
+            spectrum_cuda.swap_to_cpu()
     else:
         raise ValueError(f"Spectrum must be 1D or 2D array, got {spectrum_data.ndim}D")
 
@@ -232,7 +243,13 @@ def parse_json_frequency_spectrum(
     if spectrum.ndim == 1:
         expected_size = len(frequencies) * len(times)
         if spectrum.size == expected_size:
-            spectrum = spectrum.reshape(len(frequencies), len(times))
+            # Use CudaArray for reshape operation
+            spectrum_cuda = CudaArray(spectrum, device="cpu")
+            spectrum_np = spectrum_cuda.to_numpy()
+            spectrum = spectrum_np.reshape(len(frequencies), len(times))
+            # Cleanup if needed
+            if spectrum_cuda.device == "cuda":
+                spectrum_cuda.swap_to_cpu()
         else:
             raise ValueError(
                 f"Cannot reshape spectrum array: size {spectrum.size} "

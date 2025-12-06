@@ -6,10 +6,10 @@ issues:
     file: cmb/theta_node_loader.py
     limit: 400
     lines: 538
-  - exceeds_limit: 74
+  - exceeds_limit: 91
     file: cmb/theta_data_parser.py
     limit: 400
-    lines: 474
+    lines: 491
   - exceeds_limit: 783
     file: cmb/theta_evolution_processor.py
     limit: 400
@@ -202,19 +202,19 @@ issues:
   methods_without_docstrings:
   - class: null
     file: cmb/theta_data_parser.py
-    line: 157
+    line: 168
     method: _to_float
   - class: null
     file: cmb/theta_data_parser.py
-    line: 254
+    line: 271
     method: _to_float
   - class: null
     file: cmb/theta_data_parser.py
-    line: 368
+    line: 385
     method: _to_float
   - class: null
     file: cmb/theta_data_parser.py
-    line: 445
+    line: 462
     method: _to_float
   - class: null
     file: tests/unit/test_cuda_array.py

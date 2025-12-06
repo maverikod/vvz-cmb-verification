@@ -158,6 +158,9 @@ HighlPeakPredictor:
 - predict_peak
 - compare_with_observations
 - calculate_agreement_metrics
+IndexData:
+- total_segments
+- line_span
 InvarianceTestResult: []
 LoggingConfig: []
 LssStructure: []
@@ -256,6 +259,9 @@ ReductionVectorizer:
 - _reduce_along_axis
 - _process_block
 - _process_whole_array
+Segment:
+- length
+- from_dict
 SpectrumComparator:
 - __init__
 - load_observed_spectrum

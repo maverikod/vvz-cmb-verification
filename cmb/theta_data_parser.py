@@ -82,14 +82,31 @@ def parse_csv_frequency_spectrum(
             f"Found columns: {list(data.keys())}"
         )
 
-    frequencies_raw = np.asarray(data[freq_key], dtype=np.float64)
-    times_raw = np.asarray(data[time_key], dtype=np.float64)
-    spectrum_data = np.asarray(data[spectrum_key], dtype=np.float64)
+    # Wrap in CudaArray immediately for CUDA acceleration
+    frequencies_raw_cuda = CudaArray(
+        np.asarray(data[freq_key], dtype=np.float64), device="cpu"
+    )
+    times_raw_cuda = CudaArray(
+        np.asarray(data[time_key], dtype=np.float64), device="cpu"
+    )
+    spectrum_data_cuda = CudaArray(
+        np.asarray(data[spectrum_key], dtype=np.float64), device="cpu"
+    )
+
+    # Get numpy for unique operation (requires sorting, use numpy)
+    frequencies_raw = frequencies_raw_cuda.to_numpy()
+    times_raw = times_raw_cuda.to_numpy()
+    spectrum_data = spectrum_data_cuda.to_numpy()
 
     # Extract unique frequencies and times (in case CSV has
     # repeated values for each combination)
-    frequencies = np.unique(frequencies_raw)
-    times = np.unique(times_raw)
+    # np.unique requires sorting, so use numpy then wrap in CudaArray
+    frequencies_unique = np.unique(frequencies_raw)
+    times_unique = np.unique(times_raw)
+    frequencies_cuda = CudaArray(frequencies_unique, device="cpu")
+    times_cuda = CudaArray(times_unique, device="cpu")
+    frequencies = frequencies_cuda.to_numpy()
+    times = times_cuda.to_numpy()
 
     # Handle 2D spectrum: if spectrum is 1D, reshape based on
     # frequencies and times. For CSV, spectrum might be stored as
@@ -112,14 +129,19 @@ def parse_csv_frequency_spectrum(
             # Vectorized approach using numpy searchsorted
             # Use CudaArray for zero initialization
             spectrum_2d_cuda = CudaArray(
-                np.zeros((len(frequencies), len(times))), device="cpu"
+                np.zeros((len(frequencies), len(times)), dtype=np.float64), device="cpu"
             )
             spectrum_2d = spectrum_2d_cuda.to_numpy()
 
             # Use searchsorted for vectorized index finding
             # This is faster than dictionary lookup for large arrays
-            freq_indices = np.searchsorted(frequencies, frequencies_raw)
-            time_indices = np.searchsorted(times, times_raw)
+            # np.searchsorted requires sorted array, use numpy then wrap in CudaArray
+            freq_indices_np = np.searchsorted(frequencies, frequencies_raw)
+            time_indices_np = np.searchsorted(times, times_raw)
+            freq_indices_cuda = CudaArray(freq_indices_np, device="cpu")
+            time_indices_cuda = CudaArray(time_indices_np, device="cpu")
+            freq_indices = freq_indices_cuda.to_numpy()
+            time_indices = time_indices_cuda.to_numpy()
 
             # Block processing for very large arrays to reduce memory usage
             if block_size is not None and len(frequencies_raw) > block_size:
@@ -138,6 +160,14 @@ def parse_csv_frequency_spectrum(
                 spectrum_2d[freq_indices, time_indices] = spectrum_data
 
             spectrum = spectrum_2d
+
+            # Cleanup GPU memory
+            if freq_indices_cuda.device == "cuda":
+                freq_indices_cuda.swap_to_cpu()
+            if time_indices_cuda.device == "cuda":
+                time_indices_cuda.swap_to_cpu()
+            if spectrum_2d_cuda.device == "cuda":
+                spectrum_2d_cuda.swap_to_cpu()
         else:
             raise ValueError(
                 f"Cannot reshape spectrum array: size {spectrum_data.size} "
@@ -155,9 +185,8 @@ def parse_csv_frequency_spectrum(
         raise ValueError(f"Spectrum must be 1D or 2D array, got {spectrum_data.ndim}D")
 
     # Extract metadata using CUDA-accelerated reductions
+    # Use already created CudaArray instances (frequencies_cuda, times_cuda)
     reduction_vec = ReductionVectorizer(use_gpu=True)
-    frequencies_cuda = CudaArray(frequencies, device="cpu")
-    times_cuda = CudaArray(times, device="cpu")
 
     freq_min_result = reduction_vec.vectorize_reduction(frequencies_cuda, "min")
     freq_max_result = reduction_vec.vectorize_reduction(frequencies_cuda, "max")
@@ -235,9 +264,17 @@ def parse_json_frequency_spectrum(
             f"Found keys: {list(data.keys())}"
         )
 
-    frequencies = np.asarray(data["frequencies"], dtype=np.float64)
-    times = np.asarray(data["times"], dtype=np.float64)
-    spectrum = np.asarray(data["spectrum"], dtype=np.float64)
+    # Wrap in CudaArray immediately for CUDA acceleration
+    frequencies_cuda = CudaArray(
+        np.asarray(data["frequencies"], dtype=np.float64), device="cpu"
+    )
+    times_cuda = CudaArray(np.asarray(data["times"], dtype=np.float64), device="cpu")
+    spectrum_cuda = CudaArray(
+        np.asarray(data["spectrum"], dtype=np.float64), device="cpu"
+    )
+    frequencies = frequencies_cuda.to_numpy()
+    times = times_cuda.to_numpy()
+    spectrum = spectrum_cuda.to_numpy()
 
     # Ensure spectrum is 2D
     if spectrum.ndim == 1:
@@ -299,6 +336,8 @@ def parse_json_frequency_spectrum(
         frequencies_cuda.swap_to_cpu()
     if times_cuda.device == "cuda":
         times_cuda.swap_to_cpu()
+    if spectrum_cuda.device == "cuda":
+        spectrum_cuda.swap_to_cpu()
 
     from cmb.theta_data_loader import ThetaFrequencySpectrum
 
@@ -370,9 +409,17 @@ def parse_csv_evolution_data(
             f"Found columns: {list(data.keys())}"
         )
 
-    times = np.asarray(data[time_key], dtype=np.float64)
-    omega_min = np.asarray(data[omega_min_key], dtype=np.float64)
-    omega_macro = np.asarray(data[omega_macro_key], dtype=np.float64)
+    # Wrap in CudaArray immediately for CUDA acceleration
+    times_cuda = CudaArray(np.asarray(data[time_key], dtype=np.float64), device="cpu")
+    omega_min_cuda = CudaArray(
+        np.asarray(data[omega_min_key], dtype=np.float64), device="cpu"
+    )
+    omega_macro_cuda = CudaArray(
+        np.asarray(data[omega_macro_key], dtype=np.float64), device="cpu"
+    )
+    times = times_cuda.to_numpy()
+    omega_min = omega_min_cuda.to_numpy()
+    omega_macro = omega_macro_cuda.to_numpy()
 
     # Extract metadata using CUDA-accelerated reductions
     reduction_vec = ReductionVectorizer(use_gpu=True)
@@ -395,6 +442,10 @@ def parse_csv_evolution_data(
     # Cleanup GPU memory
     if times_cuda.device == "cuda":
         times_cuda.swap_to_cpu()
+    if omega_min_cuda.device == "cuda":
+        omega_min_cuda.swap_to_cpu()
+    if omega_macro_cuda.device == "cuda":
+        omega_macro_cuda.swap_to_cpu()
 
     metadata = {
         "source_file": str(file_path),
@@ -446,9 +497,17 @@ def parse_json_evolution_data(
             f"Found keys: {list(data.keys())}"
         )
 
-    times = np.asarray(data["times"], dtype=np.float64)
-    omega_min = np.asarray(data["omega_min"], dtype=np.float64)
-    omega_macro = np.asarray(data["omega_macro"], dtype=np.float64)
+    # Wrap in CudaArray immediately for CUDA acceleration
+    times_cuda = CudaArray(np.asarray(data["times"], dtype=np.float64), device="cpu")
+    omega_min_cuda = CudaArray(
+        np.asarray(data["omega_min"], dtype=np.float64), device="cpu"
+    )
+    omega_macro_cuda = CudaArray(
+        np.asarray(data["omega_macro"], dtype=np.float64), device="cpu"
+    )
+    times = times_cuda.to_numpy()
+    omega_min = omega_min_cuda.to_numpy()
+    omega_macro = omega_macro_cuda.to_numpy()
 
     # Extract metadata using CUDA-accelerated reductions
     metadata = data.get("metadata", {})
@@ -479,6 +538,10 @@ def parse_json_evolution_data(
     # Cleanup GPU memory
     if times_cuda.device == "cuda":
         times_cuda.swap_to_cpu()
+    if omega_min_cuda.device == "cuda":
+        omega_min_cuda.swap_to_cpu()
+    if omega_macro_cuda.device == "cuda":
+        omega_macro_cuda.swap_to_cpu()
 
     from cmb.theta_data_loader import ThetaEvolution
 

@@ -112,15 +112,16 @@ def load_node_geometry(
                 f"Found columns: {list(data.keys())}"
             )
 
-        # Extract data
-        theta = np.asarray(data[theta_key], dtype=float)
-        phi = np.asarray(data[phi_key], dtype=float)
-        scales = np.asarray(data[scale_key], dtype=float)
+        # Extract data - wrap in CudaArray immediately for CUDA acceleration
+        theta_cuda = CudaArray(np.asarray(data[theta_key], dtype=float), device="cpu")
+        phi_cuda = CudaArray(np.asarray(data[phi_key], dtype=float), device="cpu")
+        scales_cuda = CudaArray(np.asarray(data[scale_key], dtype=float), device="cpu")
+        theta = theta_cuda.to_numpy()
+        phi = phi_cuda.to_numpy()
+        scales = scales_cuda.to_numpy()
 
         # Convert to radians if needed (check if values are > 2π, likely degrees)
         # Use CUDA-accelerated reduction for max check
-        theta_cuda = CudaArray(theta, device="cpu")
-        phi_cuda = CudaArray(phi, device="cpu")
         reduction_vec = ReductionVectorizer(use_gpu=True)
 
         theta_max_result = reduction_vec.vectorize_reduction(theta_cuda, "max")
@@ -139,25 +140,21 @@ def load_node_geometry(
         if theta_max > 2 * np.pi:
             # Use CUDA-accelerated conversion: deg2rad(x) = x * (π/180)
             elem_vec = ElementWiseVectorizer(use_gpu=True)
-            theta_cuda_temp = CudaArray(theta, device="cpu")
             deg_to_rad = np.pi / 180.0
-            theta_deg_cuda = elem_vec.multiply(theta_cuda_temp, deg_to_rad)
+            # Use already created theta_cuda
+            theta_deg_cuda = elem_vec.multiply(theta_cuda, deg_to_rad)
             theta = theta_deg_cuda.to_numpy()
             # Cleanup GPU memory
-            if theta_cuda_temp.device == "cuda":
-                theta_cuda_temp.swap_to_cpu()
             if theta_deg_cuda.device == "cuda":
                 theta_deg_cuda.swap_to_cpu()
         if phi_max > 2 * np.pi:
             # Use CUDA-accelerated conversion: deg2rad(x) = x * (π/180)
             elem_vec = ElementWiseVectorizer(use_gpu=True)
-            phi_cuda_temp = CudaArray(phi, device="cpu")
             deg_to_rad = np.pi / 180.0
-            phi_deg_cuda = elem_vec.multiply(phi_cuda_temp, deg_to_rad)
+            # Use already created phi_cuda
+            phi_deg_cuda = elem_vec.multiply(phi_cuda, deg_to_rad)
             phi = phi_deg_cuda.to_numpy()
             # Cleanup GPU memory
-            if phi_cuda_temp.device == "cuda":
-                phi_cuda_temp.swap_to_cpu()
             if phi_deg_cuda.device == "cuda":
                 phi_deg_cuda.swap_to_cpu()
 
@@ -257,20 +254,32 @@ def load_node_geometry(
         # or {"theta": [...], "phi": [...], "scale": [...]}
         if "positions" in data and "scales" in data:
             positions_list = data["positions"]
-            scales = np.asarray(data["scales"], dtype=float)
+            # Wrap in CudaArray immediately for CUDA acceleration
+            scales_cuda = CudaArray(
+                np.asarray(data["scales"], dtype=float), device="cpu"
+            )
+            scales = scales_cuda.to_numpy()
 
-            positions = np.asarray(positions_list, dtype=float)
+            positions_cuda = CudaArray(
+                np.asarray(positions_list, dtype=float), device="cpu"
+            )
+            positions = positions_cuda.to_numpy()
             if positions.shape[1] != 2:
                 raise ValueError(
                     f"Positions must have shape (N, 2), got {positions.shape}"
                 )
         elif "theta" in data and "phi" in data and "scale" in data:
-            theta = np.asarray(data["theta"], dtype=float)
-            phi = np.asarray(data["phi"], dtype=float)
-            scales = np.asarray(data["scale"], dtype=float)
+            # Wrap in CudaArray immediately for CUDA acceleration
+            theta_cuda = CudaArray(np.asarray(data["theta"], dtype=float), device="cpu")
+            phi_cuda = CudaArray(np.asarray(data["phi"], dtype=float), device="cpu")
+            scales_cuda = CudaArray(
+                np.asarray(data["scale"], dtype=float), device="cpu"
+            )
+            theta = theta_cuda.to_numpy()
+            phi = phi_cuda.to_numpy()
+            scales = scales_cuda.to_numpy()
 
             # Convert to radians if needed using CUDA
-            theta_cuda = CudaArray(theta, device="cpu")
             phi_cuda = CudaArray(phi, device="cpu")
             reduction_vec = ReductionVectorizer(use_gpu=True)
 
@@ -491,23 +500,41 @@ def load_node_depths(data_path: Optional[Path] = None) -> np.ndarray:
                 f"Found columns: {list(data.keys())}"
             )
 
-        depths = np.asarray(data[depth_key], dtype=float)
+        # Wrap in CudaArray immediately for CUDA acceleration
+        depths_cuda = CudaArray(np.asarray(data[depth_key], dtype=float), device="cpu")
+        depths = depths_cuda.to_numpy()
 
     elif data_path.suffix.lower() == ".json":
         data = load_json_data(data_path)
 
         # Try common keys
         if "depths" in data:
-            depths = np.asarray(data["depths"], dtype=float)
+            # Wrap in CudaArray immediately for CUDA acceleration
+            depths_cuda = CudaArray(
+                np.asarray(data["depths"], dtype=float), device="cpu"
+            )
+            depths = depths_cuda.to_numpy()
         elif "depth" in data:
-            depths = np.asarray(data["depth"], dtype=float)
+            # Wrap in CudaArray immediately for CUDA acceleration
+            depths_cuda = CudaArray(
+                np.asarray(data["depth"], dtype=float), device="cpu"
+            )
+            depths = depths_cuda.to_numpy()
         elif "delta_omega" in data:
-            depths = np.asarray(data["delta_omega"], dtype=float)
+            # Wrap in CudaArray immediately for CUDA acceleration
+            depths_cuda = CudaArray(
+                np.asarray(data["delta_omega"], dtype=float), device="cpu"
+            )
+            depths = depths_cuda.to_numpy()
         else:
             # Try first array-like value
             for key, value in data.items():
                 if isinstance(value, (list, np.ndarray)):
-                    depths = np.asarray(value, dtype=float)
+                    # Wrap in CudaArray immediately for CUDA acceleration
+                    depths_cuda = CudaArray(
+                        np.asarray(value, dtype=float), device="cpu"
+                    )
+                    depths = depths_cuda.to_numpy()
                     break
             else:
                 raise ValueError(

@@ -809,6 +809,24 @@ classes:
     - validate_framework
     - generate_report
     name: ChainVerifier
+  docs/search_theory_index.py:IndexData:
+    bases: []
+    docstring: null
+    file: docs/search_theory_index.py
+    line: 155
+    methods:
+    - total_segments
+    - line_span
+    name: IndexData
+  docs/search_theory_index.py:Segment:
+    bases: []
+    docstring: Lightweight wrapper around a segment entry from the YAML index.
+    file: docs/search_theory_index.py
+    line: 93
+    methods:
+    - length
+    - from_dict
+    name: Segment
   tests/integration/test_config_integration.py:TestConfigurationIntegration:
     bases: []
     docstring: Integration tests for configuration usage.
@@ -2166,7 +2184,7 @@ functions:
     - value
     docstring: null
     file: cmb/theta_data_parser.py
-    line: 462
+    line: 521
     name: _to_float
   cmb/theta_data_parser.py:parse_csv_evolution_data:
     args:
@@ -2177,7 +2195,7 @@ functions:
       \nReturns:\n    ThetaEvolution instance\n\nRaises:\n    ValueError: If required\
       \ columns are missing or data format is invalid"
     file: cmb/theta_data_parser.py
-    line: 313
+    line: 352
     name: parse_csv_evolution_data
   cmb/theta_data_parser.py:parse_csv_frequency_spectrum:
     args:
@@ -2203,7 +2221,7 @@ functions:
       Returns:\n    ThetaEvolution instance\n\nRaises:\n    ValueError: If required\
       \ keys are missing or data format is invalid"
     file: cmb/theta_data_parser.py
-    line: 416
+    line: 467
     name: parse_json_evolution_data
   cmb/theta_data_parser.py:parse_json_frequency_spectrum:
     args:
@@ -2214,7 +2232,7 @@ functions:
       Returns:\n    ThetaFrequencySpectrum instance\n\nRaises:\n    ValueError: If\
       \ required keys are missing or data format is invalid"
     file: cmb/theta_data_parser.py
-    line: 205
+    line: 234
     name: parse_json_frequency_spectrum
   cmb/theta_evolution_processor.py:__init__:
     args:
@@ -2240,7 +2258,7 @@ functions:
       \   use_cuda: Use CUDA acceleration for large arrays\n\nReturns:\n    Derivative\
       \ array"
     file: cmb/theta_evolution_processor.py
-    line: 233
+    line: 239
     name: _calculate_derivative_central
   cmb/theta_evolution_processor.py:_calculate_derivative_central_cuda:
     args:
@@ -2252,7 +2270,7 @@ functions:
       \ Time array (must be sorted)\n    values: Value array\n\nReturns:\n    Derivative\
       \ array"
     file: cmb/theta_evolution_processor.py
-    line: 278
+    line: 294
     name: _calculate_derivative_central_cuda
   cmb/theta_evolution_processor.py:_check_time_coverage_gaps:
     args:
@@ -2265,7 +2283,7 @@ functions:
       \    max_gap_ratio: Maximum allowed gap ratio (gap / median_interval)\n\nReturns:\n\
       \    List of (gap_start, gap_end) tuples for gaps exceeding threshold"
     file: cmb/theta_evolution_processor.py
-    line: 419
+    line: 435
     name: _check_time_coverage_gaps
   cmb/theta_evolution_processor.py:_compute_statistics:
     args:
@@ -2279,7 +2297,7 @@ functions:
       \  omega_min: ω_min values\n    omega_macro: ω_macro values\n    domega_min_dt:\
       \ Evolution rates for ω_min\n    domega_macro_dt: Evolution rates for ω_macro"
     file: cmb/theta_evolution_processor.py
-    line: 522
+    line: 538
     name: _compute_statistics
   cmb/theta_evolution_processor.py:_to_float:
     args:
@@ -2298,7 +2316,7 @@ functions:
       \ allowed gap ratio.\n                  If None, uses default (5.0)\n\nReturns:\n\
       \    List of (gap_start, gap_end) tuples for gaps exceeding threshold"
     file: cmb/theta_evolution_processor.py
-    line: 833
+    line: 849
     name: check_time_coverage_gaps
   cmb/theta_evolution_processor.py:generate_quality_report:
     args:
@@ -2308,7 +2326,7 @@ functions:
       - Data quality issues\n\nReturns:\n    Dictionary with quality issues, warnings,\
       \ and statistics"
     file: cmb/theta_evolution_processor.py
-    line: 1065
+    line: 1094
     name: generate_quality_report
   cmb/theta_evolution_processor.py:get_evolution_rate_macro:
     args:
@@ -2318,7 +2336,7 @@ functions:
       \   time: Time value\n\nReturns:\n    Evolution rate\n\nRaises:\n    ValueError:\
       \ If time is out of range or processor\n        not initialized"
     file: cmb/theta_evolution_processor.py
-    line: 746
+    line: 762
     name: get_evolution_rate_macro
   cmb/theta_evolution_processor.py:get_evolution_rate_min:
     args:
@@ -2328,7 +2346,7 @@ functions:
       \ time: Time value\n\nReturns:\n    Evolution rate\n\nRaises:\n    ValueError:\
       \ If time is out of range or processor\n        not initialized"
     file: cmb/theta_evolution_processor.py
-    line: 724
+    line: 740
     name: get_evolution_rate_min
   cmb/theta_evolution_processor.py:get_evolution_statistics:
     args:
@@ -2336,7 +2354,7 @@ functions:
     docstring: "Get evolution statistics.\n\nReturns:\n    Dictionary with statistics\
       \ about evolution data\n\nRaises:\n    ValueError: If processor not initialized"
     file: cmb/theta_evolution_processor.py
-    line: 819
+    line: 835
     name: get_evolution_statistics
   cmb/theta_evolution_processor.py:get_omega_macro:
     args:
@@ -2346,7 +2364,7 @@ functions:
       Returns:\n    ω_macro(t) value\n\nRaises:\n    ValueError: If time is out of\
       \ range or processor\n        not initialized"
     file: cmb/theta_evolution_processor.py
-    line: 702
+    line: 718
     name: get_omega_macro
   cmb/theta_evolution_processor.py:get_omega_min:
     args:
@@ -2356,7 +2374,7 @@ functions:
       Returns:\n    ω_min(t) value\n\nRaises:\n    ValueError: If time is out of range\
       \ or processor\n        not initialized"
     file: cmb/theta_evolution_processor.py
-    line: 680
+    line: 696
     name: get_omega_min
   cmb/theta_evolution_processor.py:process:
     args:
@@ -2377,7 +2395,7 @@ functions:
       Returns:\n    ThetaEvolutionProcessor instance with processed data\n\nRaises:\n\
       \    ValueError: If processing fails"
     file: cmb/theta_evolution_processor.py
-    line: 1164
+    line: 1207
     name: process_evolution_data
   cmb/theta_evolution_processor.py:validate_against_config:
     args:
@@ -2387,7 +2405,7 @@ functions:
       \ data meets configuration requirements\n\nRaises:\n    ValueError: If data\
       \ does not meet requirements"
     file: cmb/theta_evolution_processor.py
-    line: 787
+    line: 803
     name: validate_against_config
   cmb/theta_evolution_processor.py:validate_time_range:
     args:
@@ -2397,7 +2415,7 @@ functions:
       \ value to validate\n\nReturns:\n    True if time is within range\n\nRaises:\n\
       \    ValueError: If time is out of range"
     file: cmb/theta_evolution_processor.py
-    line: 768
+    line: 784
     name: validate_time_range
   cmb/theta_evolution_processor.py:verify_time_array_completeness:
     args:
@@ -2411,7 +2429,7 @@ functions:
       \    - missing_points: List[float] - List of expected but missing times\n  \
       \  - coverage_ratio: float - Ratio of actual to expected points"
     file: cmb/theta_evolution_processor.py
-    line: 856
+    line: 879
     name: verify_time_array_completeness
   cmb/theta_node_loader.py:load_node_depths:
     args:
@@ -2421,7 +2439,7 @@ functions:
       \ location.\n\nReturns:\n    Array of node depths (Δω/ω)\n\nRaises:\n    FileNotFoundError:\
       \ If data file doesn't exist\n    ValueError: If data format is invalid"
     file: cmb/theta_node_loader.py
-    line: 408
+    line: 417
     name: load_node_depths
   cmb/theta_node_loader.py:load_node_geometry:
     args:
@@ -4158,6 +4176,226 @@ functions:
     file: docs/implementation_plan/phase_6_chain_verification/step_6.3_chain_report/chain_verifier.py
     line: 86
     name: verify_chain_components
+  docs/search_theory_index.py:_build_index:
+    args:
+    - raw
+    docstring: null
+    file: docs/search_theory_index.py
+    line: 245
+    name: _build_index
+  docs/search_theory_index.py:_build_segment_text:
+    args:
+    - seg
+    - theory_lines
+    docstring: 'Aggregate text for phrase search: keywords, summary and (optionally)
+      raw text.'
+    file: docs/search_theory_index.py
+    line: 284
+    name: _build_segment_text
+  docs/search_theory_index.py:_get_cache_path:
+    args:
+    - index_path
+    docstring: null
+    file: docs/search_theory_index.py
+    line: 176
+    name: _get_cache_path
+  docs/search_theory_index.py:_load_index_yaml:
+    args:
+    - path
+    docstring: Load the YAML index file without any caching.
+    file: docs/search_theory_index.py
+    line: 181
+    name: _load_index_yaml
+  docs/search_theory_index.py:_segments_overlapping_line:
+    args:
+    - index
+    - line
+    docstring: null
+    file: docs/search_theory_index.py
+    line: 434
+    name: _segments_overlapping_line
+  docs/search_theory_index.py:_segments_overlapping_range:
+    args:
+    - index
+    - lo
+    - hi
+    docstring: null
+    file: docs/search_theory_index.py
+    line: 438
+    name: _segments_overlapping_range
+  docs/search_theory_index.py:build_arg_parser:
+    args: []
+    docstring: null
+    file: docs/search_theory_index.py
+    line: 611
+    name: build_arg_parser
+  docs/search_theory_index.py:from_dict:
+    args:
+    - cls
+    - d
+    docstring: null
+    file: docs/search_theory_index.py
+    line: 110
+    name: from_dict
+  docs/search_theory_index.py:length:
+    args:
+    - self
+    docstring: null
+    file: docs/search_theory_index.py
+    line: 106
+    name: length
+  docs/search_theory_index.py:line_span:
+    args:
+    - self
+    docstring: null
+    file: docs/search_theory_index.py
+    line: 164
+    name: line_span
+  docs/search_theory_index.py:load_index:
+    args:
+    - path
+    - use_cache
+    docstring: "Load index with optional pickle-based caching.\n\nCache layout::\n\
+      \n    {\n        \"index_path\": \"/full/path/to/ALL_index.yaml\",\n       \
+      \ \"mtime\": <float>,\n        \"size\": <int>,\n        \"data\": <raw_yaml_dict>\n\
+      \    }"
+    file: docs/search_theory_index.py
+    line: 192
+    name: load_index
+  docs/search_theory_index.py:load_theory_lines:
+    args:
+    - path
+    docstring: Load theory markdown file as a list of lines (1-based mapping).
+    file: docs/search_theory_index.py
+    line: 262
+    name: load_theory_lines
+  docs/search_theory_index.py:main:
+    args:
+    - argv
+    docstring: null
+    file: docs/search_theory_index.py
+    line: 706
+    name: main
+  docs/search_theory_index.py:matches_category:
+    args:
+    - seg
+    - cat_substr
+    docstring: null
+    file: docs/search_theory_index.py
+    line: 278
+    name: matches_category
+  docs/search_theory_index.py:matches_phrase:
+    args:
+    - seg
+    - phrase
+    - theory_lines
+    - _cache
+    docstring: null
+    file: docs/search_theory_index.py
+    line: 306
+    name: matches_phrase
+  docs/search_theory_index.py:matches_tag:
+    args:
+    - seg
+    - tag_substr
+    docstring: null
+    file: docs/search_theory_index.py
+    line: 272
+    name: matches_tag
+  docs/search_theory_index.py:mode_assemble:
+    args:
+    - theory_lines
+    - filtered
+    - output_path
+    - add_headers
+    docstring: Assemble continuous text from theory file based on selected segments.
+    file: docs/search_theory_index.py
+    line: 510
+    name: mode_assemble
+  docs/search_theory_index.py:mode_export:
+    args:
+    - filtered
+    - export_path
+    docstring: null
+    file: docs/search_theory_index.py
+    line: 478
+    name: mode_export
+  docs/search_theory_index.py:mode_line:
+    args:
+    - index
+    - line_no
+    docstring: null
+    file: docs/search_theory_index.py
+    line: 446
+    name: mode_line
+  docs/search_theory_index.py:mode_range:
+    args:
+    - index
+    - line_range
+    docstring: null
+    file: docs/search_theory_index.py
+    line: 457
+    name: mode_range
+  docs/search_theory_index.py:mode_search:
+    args:
+    - index
+    - theory_lines
+    - tag
+    - category
+    - phrase
+    - show_text
+    - limit
+    - sort_by
+    - json_output
+    docstring: null
+    file: docs/search_theory_index.py
+    line: 556
+    name: mode_search
+  docs/search_theory_index.py:mode_stats:
+    args:
+    - index
+    docstring: null
+    file: docs/search_theory_index.py
+    line: 356
+    name: mode_stats
+  docs/search_theory_index.py:mode_stats_extended:
+    args:
+    - index
+    docstring: null
+    file: docs/search_theory_index.py
+    line: 369
+    name: mode_stats_extended
+  docs/search_theory_index.py:mode_tree:
+    args:
+    - index
+    docstring: Print simple category tree (flat, grouped by category).
+    file: docs/search_theory_index.py
+    line: 420
+    name: mode_tree
+  docs/search_theory_index.py:mode_validate:
+    args:
+    - index
+    docstring: null
+    file: docs/search_theory_index.py
+    line: 393
+    name: mode_validate
+  docs/search_theory_index.py:print_result_text:
+    args:
+    - seg
+    - theory_lines
+    - show_text
+    - snippet_lines
+    docstring: Pretty-print a single segment.
+    file: docs/search_theory_index.py
+    line: 326
+    name: print_result_text
+  docs/search_theory_index.py:total_segments:
+    args:
+    - self
+    docstring: null
+    file: docs/search_theory_index.py
+    line: 160
+    name: total_segments
   tests/integration/test_config_integration.py:test_cmb_config_available:
     args:
     - self
@@ -8089,13 +8327,13 @@ imports:
     type: import_from
   cmb/theta_data_parser.py:ThetaEvolution:
     file: cmb/theta_data_parser.py
-    line: 483
+    line: 546
     module: cmb.theta_data_loader
     name: ThetaEvolution
     type: import_from
   cmb/theta_data_parser.py:ThetaFrequencySpectrum:
     file: cmb/theta_data_parser.py
-    line: 303
+    line: 342
     module: cmb.theta_data_loader
     name: ThetaFrequencySpectrum
     type: import_from
@@ -9810,6 +10048,99 @@ imports:
     module: dataclasses
     name: dataclass
     type: import_from
+  docs/search_theory_index.py:Any:
+    file: docs/search_theory_index.py
+    line: 78
+    module: typing
+    name: Any
+    type: import_from
+  docs/search_theory_index.py:Dict:
+    file: docs/search_theory_index.py
+    line: 78
+    module: typing
+    name: Dict
+    type: import_from
+  docs/search_theory_index.py:List:
+    file: docs/search_theory_index.py
+    line: 78
+    module: typing
+    name: List
+    type: import_from
+  docs/search_theory_index.py:Optional:
+    file: docs/search_theory_index.py
+    line: 78
+    module: typing
+    name: Optional
+    type: import_from
+  docs/search_theory_index.py:Path:
+    file: docs/search_theory_index.py
+    line: 77
+    module: pathlib
+    name: Path
+    type: import_from
+  docs/search_theory_index.py:Sequence:
+    file: docs/search_theory_index.py
+    line: 78
+    module: typing
+    name: Sequence
+    type: import_from
+  docs/search_theory_index.py:Tuple:
+    file: docs/search_theory_index.py
+    line: 78
+    module: typing
+    name: Tuple
+    type: import_from
+  docs/search_theory_index.py:annotations:
+    file: docs/search_theory_index.py
+    line: 67
+    module: __future__
+    name: annotations
+    type: import_from
+  docs/search_theory_index.py:argparse:
+    file: docs/search_theory_index.py
+    line: 69
+    name: argparse
+    type: import
+  docs/search_theory_index.py:collections:
+    file: docs/search_theory_index.py
+    line: 70
+    name: collections
+    type: import
+  docs/search_theory_index.py:dataclasses:
+    file: docs/search_theory_index.py
+    line: 71
+    name: dataclasses
+    type: import
+  docs/search_theory_index.py:json:
+    file: docs/search_theory_index.py
+    line: 72
+    name: json
+    type: import
+  docs/search_theory_index.py:os:
+    file: docs/search_theory_index.py
+    line: 73
+    name: os
+    type: import
+  docs/search_theory_index.py:pickle:
+    file: docs/search_theory_index.py
+    line: 74
+    name: pickle
+    type: import
+  docs/search_theory_index.py:statistics:
+    file: docs/search_theory_index.py
+    line: 75
+    name: statistics
+    type: import
+  docs/search_theory_index.py:sys:
+    file: docs/search_theory_index.py
+    line: 76
+    name: sys
+    type: import
+  docs/search_theory_index.py:yaml:
+    file: docs/search_theory_index.py
+    line: 81
+    name: yaml
+    type: import
   tests/integration/test_config_integration.py:Config:
     file: tests/integration/test_config_integration.py
     line: 16

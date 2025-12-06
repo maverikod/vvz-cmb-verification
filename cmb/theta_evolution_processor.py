@@ -145,10 +145,16 @@ class ThetaEvolutionProcessor:
 
         if not all_sorted:
             # Sort if not already sorted
-            sort_indices = np.argsort(self.evolution.times)
+            # np.argsort requires sorting, use numpy then wrap in CudaArray
+            sort_indices_np = np.argsort(self.evolution.times)
+            sort_indices_cuda = CudaArray(sort_indices_np, device="cpu")
+            sort_indices = sort_indices_cuda.to_numpy()
             times_sorted = self.evolution.times[sort_indices]
             omega_min_sorted = self.evolution.omega_min[sort_indices]
             omega_macro_sorted = self.evolution.omega_macro[sort_indices]
+            # Cleanup
+            if sort_indices_cuda.device == "cuda":
+                sort_indices_cuda.swap_to_cpu()
         else:
             times_sorted = self.evolution.times
             omega_min_sorted = self.evolution.omega_min
@@ -252,15 +258,25 @@ class ThetaEvolutionProcessor:
         n = len(times)
 
         if n == 1:
-            return np.array([0.0])
+            # Use CudaArray for array creation
+            result_cuda = CudaArray(np.array([0.0], dtype=np.float64), device="cpu")
+            return result_cuda.to_numpy()
 
         if n == 2:
             # Only two points: use forward difference
             dt = times[1] - times[0]
             if dt > 0:
                 derivative = (values[1] - values[0]) / dt
-                return np.array([derivative, derivative])
-            return np.array([0.0, 0.0])
+                # Use CudaArray for array creation
+                result_cuda = CudaArray(
+                    np.array([derivative, derivative], dtype=np.float64), device="cpu"
+                )
+                return result_cuda.to_numpy()
+            # Use CudaArray for array creation
+            result_cuda = CudaArray(
+                np.array([0.0, 0.0], dtype=np.float64), device="cpu"
+            )
+            return result_cuda.to_numpy()
 
         # Threshold for using CUDA: arrays larger than 10k elements
         # For smaller arrays, GPU transfer overhead may not be worth it
@@ -850,8 +866,15 @@ class ThetaEvolutionProcessor:
             max_gap_ratio = 5.0
 
         # Get sorted times from evolution data
-        times = np.sort(self.evolution.times)
-        return self._check_time_coverage_gaps(times, max_gap_ratio)
+        # np.sort requires sorting, use numpy then wrap in CudaArray
+        times_sorted_np = np.sort(self.evolution.times)
+        times_sorted_cuda = CudaArray(times_sorted_np, device="cpu")
+        times = times_sorted_cuda.to_numpy()
+        result = self._check_time_coverage_gaps(times, max_gap_ratio)
+        # Cleanup
+        if times_sorted_cuda.device == "cuda":
+            times_sorted_cuda.swap_to_cpu()
+        return result
 
     def verify_time_array_completeness(
         self, expected_interval: Optional[float] = None
@@ -875,7 +898,10 @@ class ThetaEvolutionProcessor:
         if self._omega_min_interp is None:
             raise ValueError("Processor not initialized. Call process() first.")
 
-        times = np.sort(self.evolution.times)
+        # np.sort requires sorting, use numpy then wrap in CudaArray
+        times_sorted_np = np.sort(self.evolution.times)
+        times_sorted_cuda = CudaArray(times_sorted_np, device="cpu")
+        times = times_sorted_cuda.to_numpy()
         n_points = len(times)
 
         if n_points < 2:
@@ -956,6 +982,7 @@ class ThetaEvolutionProcessor:
                 threshold_cuda.swap_to_cpu()
 
             # Find gap indices
+            # np.where requires numpy, use it directly
             gap_indices = np.where(gap_mask)[0]
 
             # Generate missing points for each gap
@@ -1055,6 +1082,8 @@ class ThetaEvolutionProcessor:
         # Cleanup GPU memory
         if times_cuda.device == "cuda":
             times_cuda.swap_to_cpu()
+        if times_sorted_cuda.device == "cuda":
+            times_sorted_cuda.swap_to_cpu()
 
         return {
             "is_complete": len(missing_points) == 0,
@@ -1111,10 +1140,20 @@ class ThetaEvolutionProcessor:
             )
 
         # Check physical constraints: ω_min < ω_macro
-        times_sorted = np.sort(self.evolution.times)
-        sort_indices = np.argsort(self.evolution.times)
+        # np.sort and np.argsort require sorting, use numpy then wrap in CudaArray
+        times_sorted_np = np.sort(self.evolution.times)
+        sort_indices_np = np.argsort(self.evolution.times)
+        times_sorted_cuda = CudaArray(times_sorted_np, device="cpu")
+        sort_indices_cuda = CudaArray(sort_indices_np, device="cpu")
+        times_sorted = times_sorted_cuda.to_numpy()
+        sort_indices = sort_indices_cuda.to_numpy()
         omega_min_sorted = self.evolution.omega_min[sort_indices]
         omega_macro_sorted = self.evolution.omega_macro[sort_indices]
+        # Cleanup
+        if times_sorted_cuda.device == "cuda":
+            times_sorted_cuda.swap_to_cpu()
+        if sort_indices_cuda.device == "cuda":
+            sort_indices_cuda.swap_to_cpu()
 
         # Check physical constraints using CUDA
         omega_min_cuda = CudaArray(omega_min_sorted, device="cpu")
@@ -1157,6 +1196,10 @@ class ThetaEvolutionProcessor:
             mean_interval = self._statistics["time_coverage"]["mean_interval"]
             if mean_interval <= 0:
                 report["warnings"].append("Invalid time intervals detected")
+
+        # Cleanup GPU memory
+        if omega_min_ge_macro.device == "cuda":
+            omega_min_ge_macro.swap_to_cpu()
 
         return report
 

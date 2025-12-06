@@ -1,19 +1,22 @@
 issues:
   any_type_usage: []
-  classes_without_docstrings: []
+  classes_without_docstrings:
+  - class: IndexData
+    file: docs/search_theory_index.py
+    line: 155
   files_too_large:
-  - exceeds_limit: 138
+  - exceeds_limit: 165
     file: cmb/theta_node_loader.py
     limit: 400
-    lines: 538
-  - exceeds_limit: 91
+    lines: 565
+  - exceeds_limit: 154
     file: cmb/theta_data_parser.py
     limit: 400
-    lines: 491
-  - exceeds_limit: 783
+    lines: 554
+  - exceeds_limit: 826
     file: cmb/theta_evolution_processor.py
     limit: 400
-    lines: 1183
+    lines: 1226
   - exceeds_limit: 471
     file: cmb/theta_data_loader.py
     limit: 400
@@ -46,6 +49,10 @@ issues:
     file: tests/unit/test_theta_node_processor.py
     limit: 400
     lines: 493
+  - exceeds_limit: 393
+    file: docs/search_theory_index.py
+    limit: 400
+    lines: 793
   files_without_docstrings: []
   generic_exception_usage: []
   imports_in_middle: []
@@ -202,19 +209,19 @@ issues:
   methods_without_docstrings:
   - class: null
     file: cmb/theta_data_parser.py
-    line: 168
+    line: 197
     method: _to_float
   - class: null
     file: cmb/theta_data_parser.py
-    line: 271
+    line: 308
     method: _to_float
   - class: null
     file: cmb/theta_data_parser.py
-    line: 385
+    line: 432
     method: _to_float
   - class: null
     file: cmb/theta_data_parser.py
-    line: 462
+    line: 521
     method: _to_float
   - class: null
     file: tests/unit/test_cuda_array.py
@@ -228,6 +235,102 @@ issues:
     file: tests/unit/test_cuda_array.py
     line: 207
     method: square
+  - class: Segment
+    file: docs/search_theory_index.py
+    line: 106
+    method: length
+  - class: Segment
+    file: docs/search_theory_index.py
+    line: 110
+    method: from_dict
+  - class: IndexData
+    file: docs/search_theory_index.py
+    line: 160
+    method: total_segments
+  - class: IndexData
+    file: docs/search_theory_index.py
+    line: 164
+    method: line_span
+  - class: null
+    file: docs/search_theory_index.py
+    line: 176
+    method: _get_cache_path
+  - class: null
+    file: docs/search_theory_index.py
+    line: 245
+    method: _build_index
+  - class: null
+    file: docs/search_theory_index.py
+    line: 272
+    method: matches_tag
+  - class: null
+    file: docs/search_theory_index.py
+    line: 278
+    method: matches_category
+  - class: null
+    file: docs/search_theory_index.py
+    line: 306
+    method: matches_phrase
+  - class: null
+    file: docs/search_theory_index.py
+    line: 356
+    method: mode_stats
+  - class: null
+    file: docs/search_theory_index.py
+    line: 369
+    method: mode_stats_extended
+  - class: null
+    file: docs/search_theory_index.py
+    line: 393
+    method: mode_validate
+  - class: null
+    file: docs/search_theory_index.py
+    line: 434
+    method: _segments_overlapping_line
+  - class: null
+    file: docs/search_theory_index.py
+    line: 438
+    method: _segments_overlapping_range
+  - class: null
+    file: docs/search_theory_index.py
+    line: 446
+    method: mode_line
+  - class: null
+    file: docs/search_theory_index.py
+    line: 457
+    method: mode_range
+  - class: null
+    file: docs/search_theory_index.py
+    line: 478
+    method: mode_export
+  - class: null
+    file: docs/search_theory_index.py
+    line: 556
+    method: mode_search
+  - class: null
+    file: docs/search_theory_index.py
+    line: 611
+    method: build_arg_parser
+  - class: null
+    file: docs/search_theory_index.py
+    line: 706
+    method: main
+  - class: null
+    file: docs/search_theory_index.py
+    line: 106
+    method: length
+  - class: null
+    file: docs/search_theory_index.py
+    line: 110
+    method: from_dict
+  - class: null
+    file: docs/search_theory_index.py
+    line: 160
+    method: total_segments
+  - class: null
+    file: docs/search_theory_index.py
+    line: 164
+    method: line_span
   - class: null
     file: docs/implementation_plan/phase_0_foundation/step_0.2_utilities/data_saver.py
     line: 171
@@ -243,14 +346,14 @@ issues:
     method: _process_whole_array
 summary:
   any_type_usage: 0
-  classes_without_docstrings: 0
-  files_too_large: 11
+  classes_without_docstrings: 1
+  files_too_large: 12
   files_without_docstrings: 0
   generic_exception_usage: 0
   imports_in_middle: 0
   invalid_imports: 25
   max_lines_limit: 400
   methods_with_pass: 0
-  methods_without_docstrings: 9
+  methods_without_docstrings: 33
   not_implemented_in_non_abstract: 1
-  total_issues: 46
+  total_issues: 72

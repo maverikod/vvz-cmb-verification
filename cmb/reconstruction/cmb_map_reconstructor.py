@@ -175,26 +175,38 @@ class CmbMapReconstructor:
             pixel_indices = hp.ang2pix(self.nside, theta, phi)
 
             # Accumulate temperatures in pixels using CUDA-accelerated operations
-            # Use numpy advanced indexing for efficient accumulation
             # Convert weighted temperatures to CudaArray for processing
             weighted_temps_cuda = CudaArray(weighted_temps, device="cpu")
             pixel_indices_cuda = CudaArray(pixel_indices, device="cpu")
 
-            # Use numpy advanced indexing for accumulation (more efficient than loop)
-            # This accumulates values directly: cmb_map[pixel_indices] += weighted_temps
-            # np.add.at performs in-place addition at specified indices
+            # Use np.bincount to sum values by pixel index (grouping operation)
+            # This is more efficient than np.add.at for large arrays
+            # np.bincount is acceptable for grouping, then use CUDA for addition
+            pixel_indices_np = pixel_indices_cuda.to_numpy()
+            weighted_temps_np = weighted_temps_cuda.to_numpy()
+
+            # Group and sum values by pixel index using bincount
+            # bincount sums values for each index,
+            # creating array of length max(pixel_indices)+1
+            npix = hp.nside2npix(self.nside)
+            pixel_sums = np.bincount(
+                pixel_indices_np, weights=weighted_temps_np, minlength=npix
+            )
+
+            # Add pixel sums to CMB map using CUDA-accelerated addition
+            pixel_sums_cuda = CudaArray(pixel_sums, device="cpu")
+            cmb_map_cuda = self.elem_vec.add(cmb_map_cuda, pixel_sums_cuda)
             cmb_map_np = cmb_map_cuda.to_numpy()
-            np.add.at(cmb_map_np, pixel_indices, weighted_temps)
 
             # Cleanup pixel indices arrays
             if pixel_indices_cuda.device == "cuda":
                 pixel_indices_cuda.swap_to_cpu()
             if weighted_temps_cuda.device == "cuda":
                 weighted_temps_cuda.swap_to_cpu()
+            if pixel_sums_cuda.device == "cuda":
+                pixel_sums_cuda.swap_to_cpu()
 
             # Cleanup GPU memory for final map
-            if weighted_temps_cuda.device == "cuda":
-                weighted_temps_cuda.swap_to_cpu()
             if cmb_map_cuda.device == "cuda":
                 cmb_map_cuda.swap_to_cpu()
 

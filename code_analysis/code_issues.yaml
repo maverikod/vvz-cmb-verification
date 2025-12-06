@@ -21,14 +21,14 @@ issues:
     file: cmb/theta_data_loader.py
     limit: 400
     lines: 871
-  - exceeds_limit: 102
+  - exceeds_limit: 146
     file: cmb/nodes/node_properties.py
     limit: 400
-    lines: 502
-  - exceeds_limit: 70
+    lines: 546
+  - exceeds_limit: 82
     file: cmb/reconstruction/cmb_map_reconstructor.py
     limit: 400
-    lines: 470
+    lines: 482
   - exceeds_limit: 95
     file: utils/cuda/memory_watchdog.py
     limit: 400

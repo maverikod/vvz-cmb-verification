@@ -38,28 +38,48 @@ def _cuda_maximum(a: np.ndarray, b: float) -> np.ndarray:
 
     # For maximum operation: result = max(a, b)
     # Use vectorize_operation with "greater" to create mask, then apply
-    # Or use direct comparison: max(a, b) = a if a > b else b
-    # Use element-wise comparison and selection
+    # Use CUDA-accelerated conditional selection via mathematical trick:
+    # result = mask * a + (1 - mask) * b, where mask = (a > b) as float
     a_gt_b = elem_vec.vectorize_operation(a_cuda, "greater", b)
-    a_gt_b_np = a_gt_b.to_numpy()
 
-    # Create result: where a > b, use a, else use b
-    # Use CUDA for this operation
+    # Create b array as CudaArray
     b_array_np = np.full_like(a, b)
     b_array_cuda = CudaArray(b_array_np, device="cpu")
 
-    # Select: result = a where a > b, else b
-    # This requires conditional selection, which we do via numpy mask
-    # but the comparison is done via CUDA
-    result_np = np.where(a_gt_b_np, a, b_array_np)
+    # Convert mask to float (0.0 or 1.0) for CUDA operations
+    # mask = (a > b) as float
+    mask_cuda = CudaArray(a_gt_b.to_numpy().astype(np.float64), device="cpu")
+
+    # Create complement mask: (1 - mask)
+    ones_cuda = CudaArray(np.ones_like(a, dtype=np.float64), device="cpu")
+    complement_mask_cuda = elem_vec.subtract(ones_cuda, mask_cuda)
+
+    # Calculate: result = mask * a + (1 - mask) * b
+    # Using CUDA-accelerated operations
+    a_cuda_float = CudaArray(a.astype(np.float64), device="cpu")
+    b_array_cuda_float = CudaArray(b_array_np.astype(np.float64), device="cpu")
+
+    term1_cuda = elem_vec.multiply(mask_cuda, a_cuda_float)
+    term2_cuda = elem_vec.multiply(complement_mask_cuda, b_array_cuda_float)
+    result_cuda = elem_vec.add(term1_cuda, term2_cuda)
+    result_np = result_cuda.to_numpy()
 
     # Cleanup GPU memory
-    if a_cuda.device == "cuda":
-        a_cuda.swap_to_cpu()
-    if a_gt_b.device == "cuda":
-        a_gt_b.swap_to_cpu()
-    if b_array_cuda.device == "cuda":
-        b_array_cuda.swap_to_cpu()
+    for arr in [
+        a_cuda,
+        a_gt_b,
+        b_array_cuda,
+        mask_cuda,
+        ones_cuda,
+        complement_mask_cuda,
+        a_cuda_float,
+        b_array_cuda_float,
+        term1_cuda,
+        term2_cuda,
+        result_cuda,
+    ]:
+        if arr.device == "cuda":
+            arr.swap_to_cpu()
 
     return result_np
 
@@ -95,20 +115,44 @@ def _cuda_minimum(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     elem_vec = ElementWiseVectorizer(use_gpu=True)
 
     # For minimum operation: result = min(a, b)
-    # Use element-wise comparison: a < b
+    # Use CUDA-accelerated conditional selection via mathematical trick:
+    # result = mask * a + (1 - mask) * b, where mask = (a < b) as float
     a_lt_b = elem_vec.vectorize_operation(a_cuda, "less", b_array_cuda.to_numpy())
-    a_lt_b_np = a_lt_b.to_numpy()
 
-    # Select: result = a where a < b, else b
-    result_np = np.where(a_lt_b_np, a, b_array_np)
+    # Convert mask to float (0.0 or 1.0) for CUDA operations
+    # mask = (a < b) as float
+    mask_cuda = CudaArray(a_lt_b.to_numpy().astype(np.float64), device="cpu")
+
+    # Create complement mask: (1 - mask)
+    ones_cuda = CudaArray(np.ones_like(a, dtype=np.float64), device="cpu")
+    complement_mask_cuda = elem_vec.subtract(ones_cuda, mask_cuda)
+
+    # Calculate: result = mask * a + (1 - mask) * b
+    # Using CUDA-accelerated operations
+    a_cuda_float = CudaArray(a.astype(np.float64), device="cpu")
+    b_array_cuda_float = CudaArray(b_array_np.astype(np.float64), device="cpu")
+
+    term1_cuda = elem_vec.multiply(mask_cuda, a_cuda_float)
+    term2_cuda = elem_vec.multiply(complement_mask_cuda, b_array_cuda_float)
+    result_cuda = elem_vec.add(term1_cuda, term2_cuda)
+    result_np = result_cuda.to_numpy()
 
     # Cleanup GPU memory
-    if a_cuda.device == "cuda":
-        a_cuda.swap_to_cpu()
-    if b_array_cuda.device == "cuda":
-        b_array_cuda.swap_to_cpu()
-    if a_lt_b.device == "cuda":
-        a_lt_b.swap_to_cpu()
+    for arr in [
+        a_cuda,
+        b_array_cuda,
+        a_lt_b,
+        mask_cuda,
+        ones_cuda,
+        complement_mask_cuda,
+        a_cuda_float,
+        b_array_cuda_float,
+        term1_cuda,
+        term2_cuda,
+        result_cuda,
+    ]:
+        if arr.device == "cuda":
+            arr.swap_to_cpu()
 
     return result_np
 

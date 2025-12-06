@@ -25,10 +25,10 @@ issues:
     file: cmb/nodes/node_properties.py
     limit: 400
     lines: 502
-  - exceeds_limit: 93
+  - exceeds_limit: 70
     file: cmb/reconstruction/cmb_map_reconstructor.py
     limit: 400
-    lines: 493
+    lines: 470
   - exceeds_limit: 95
     file: utils/cuda/memory_watchdog.py
     limit: 400

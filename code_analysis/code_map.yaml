@@ -2205,7 +2205,7 @@ functions:
       \ fluctuations for each node in μK\n\nRaises:\n    ValueError: If conversion\
       \ fails"
     file: cmb/reconstruction/cmb_map_reconstructor.py
-    line: 231
+    line: 206
     name: _convert_nodes_to_temperature
   cmb/reconstruction/cmb_map_reconstructor.py:_integrate_frequency_spectrum:
     args:
@@ -2216,7 +2216,7 @@ functions:
       \ operations for all calculations.\n\nReturns:\n    Array of integrated spectrum\
       \ weights for each node\n\nRaises:\n    ValueError: If integration fails"
     file: cmb/reconstruction/cmb_map_reconstructor.py
-    line: 339
+    line: 314
     name: _integrate_frequency_spectrum
   cmb/reconstruction/cmb_map_reconstructor.py:_project_nodes_to_sky:
     args:
@@ -2229,7 +2229,7 @@ functions:
       \ (theta, phi) sky coordinates for each node in radians\n\nRaises:\n    ValueError:\
       \ If projection fails"
     file: cmb/reconstruction/cmb_map_reconstructor.py
-    line: 258
+    line: 233
     name: _project_nodes_to_sky
   cmb/reconstruction/cmb_map_reconstructor.py:_to_float:
     args:

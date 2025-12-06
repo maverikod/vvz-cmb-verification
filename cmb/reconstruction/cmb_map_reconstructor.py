@@ -34,6 +34,15 @@ from utils.cuda import (
     TransformVectorizer,
 )
 
+# Try to import CuPy for CUDA operations
+try:
+    import cupy as cp
+
+    CUPY_AVAILABLE = True
+except ImportError:
+    CUPY_AVAILABLE = False
+    cp = None
+
 
 def _to_float(value) -> float:
     """
@@ -219,33 +228,51 @@ class CmbMapReconstructor:
             pixel_sums_np_check = pixel_sums_cuda.to_numpy()
 
             # Verify sizes match and are correct
-            if len(cmb_map_np_check) != npix:
-                # Recreate cmb_map with correct size
-                # (no block_size for whole array operations)
-                cmb_map_np_new = np.zeros(npix, dtype=cmb_map_np_check.dtype)
-                # Copy existing data if any
+            # Recreate both arrays with correct size to ensure consistency
+            cmb_map_np_final = np.zeros(npix, dtype=np.float64)
+            if len(cmb_map_np_check) == npix:
+                cmb_map_np_final = cmb_map_np_check.copy()
+            else:
                 copy_len = min(len(cmb_map_np_check), npix)
-                cmb_map_np_new[:copy_len] = cmb_map_np_check[:copy_len]
-                cmb_map_cuda = CudaArray(cmb_map_np_new, block_size=None, device="cpu")
+                cmb_map_np_final[:copy_len] = cmb_map_np_check[:copy_len]
+            cmb_map_cuda = CudaArray(cmb_map_np_final, block_size=None, device="cpu")
 
-            if len(pixel_sums_np_check) != npix:
-                # Recreate pixel_sums with correct size
-                # (no block_size for whole array operations)
-                pixel_sums_np_new = np.zeros(npix, dtype=pixel_sums_np_check.dtype)
+            pixel_sums_np_final = np.zeros(npix, dtype=np.float64)
+            if len(pixel_sums_np_check) == npix:
+                pixel_sums_np_final = pixel_sums_np_check.copy()
+            else:
                 copy_len = min(len(pixel_sums_np_check), npix)
-                pixel_sums_np_new[:copy_len] = pixel_sums_np_check[:copy_len]
-                pixel_sums_cuda = CudaArray(
-                    pixel_sums_np_new, block_size=None, device="cpu"
-                )
+                pixel_sums_np_final[:copy_len] = pixel_sums_np_check[:copy_len]
+            pixel_sums_cuda = CudaArray(
+                pixel_sums_np_final, block_size=None, device="cpu"
+            )
 
             # Add pixel sums to CMB map using CUDA-accelerated addition
-            # For same-size arrays, convert to numpy, add, then wrap back in CudaArray
-            # This is acceptable for simple addition of same-size arrays
-            # CUDA is used for all intermediate operations (scatter_add, multiply, etc.)
-            cmb_map_np = cmb_map_cuda.to_numpy()
-            pixel_sums_np = pixel_sums_cuda.to_numpy()
-            cmb_map_np = cmb_map_np + pixel_sums_np
-            cmb_map_cuda = CudaArray(cmb_map_np, block_size=None, device="cpu")
+            # Use whole arrays for addition to avoid block size mismatches
+            # Both arrays are guaranteed to have the same size (npix)
+            cmb_map_whole = cmb_map_cuda.use_whole_array()
+            pixel_sums_whole = pixel_sums_cuda.use_whole_array()
+
+            # Perform addition using CUDA if available
+            if self.elem_vec.use_gpu and CUPY_AVAILABLE:
+                try:
+                    import cupy as cp
+
+                    if not isinstance(cmb_map_whole, cp.ndarray):
+                        cmb_map_whole = cp.asarray(cmb_map_whole)
+                    if not isinstance(pixel_sums_whole, cp.ndarray):
+                        pixel_sums_whole = cp.asarray(pixel_sums_whole)
+                    result_whole = cmb_map_whole + pixel_sums_whole
+                    result_np = cp.asnumpy(result_whole)
+                except Exception:
+                    # Fallback to numpy
+                    result_np = cmb_map_whole + pixel_sums_whole
+            else:
+                # Use numpy
+                result_np = cmb_map_whole + pixel_sums_whole
+
+            # Wrap result back in CudaArray
+            cmb_map_cuda = CudaArray(result_np, block_size=None, device="cpu")
 
             # Cleanup pixel indices arrays
             if pixel_indices_cuda.device == "cuda":
@@ -461,7 +488,15 @@ class CmbMapReconstructor:
         # Integration: ∫[ω_min to ω_node] ω^alpha · (t/t_0)^beta dω
         # For power law: ∫ ω^alpha dω = ω^(alpha+1) / (alpha+1) if alpha != -1
         # Time factor: (t/t_0)^beta is constant for fixed time
-        time_factor = (mean_time / self.t_0) ** self.beta
+        # Use CUDA for consistency (even though it's a scalar)
+        time_ratio = mean_time / self.t_0
+        time_ratio_cuda = CudaArray(np.array([time_ratio]), device="cpu")
+        time_factor_cuda = self.elem_vec.power(time_ratio_cuda, self.beta)
+        time_factor = float(time_factor_cuda.to_numpy().item())
+        if time_ratio_cuda.device == "cuda":
+            time_ratio_cuda.swap_to_cpu()
+        if time_factor_cuda.device == "cuda":
+            time_factor_cuda.swap_to_cpu()
 
         # Integrate for each node using CUDA
         # For alpha != -1: integral = (ω_node^(alpha+1) - ω_min^(alpha+1)) / (alpha+1)

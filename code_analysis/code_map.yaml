@@ -1969,7 +1969,7 @@ functions:
       \ Node position (grid indices)\n\nReturns:\n    Local curvature value\n\nRaises:\n\
       \    ValueError: If curvature calculation fails"
     file: cmb/nodes/node_properties.py
-    line: 182
+    line: 192
     name: calculate_local_curvature
   cmb/nodes/node_properties.py:calculate_node_area:
     args:
@@ -2004,7 +2004,7 @@ functions:
       \nReturns:\n    Tuple of (depths, areas, curvatures) arrays, each of shape (N,)\n\
       \nRaises:\n    ValueError: If batch calculation fails"
     file: cmb/nodes/node_properties.py
-    line: 243
+    line: 253
     name: calculate_node_properties_batch
   cmb/nodes/theta_node_map.py:__init__:
     args:
@@ -2148,7 +2148,7 @@ functions:
       \ have same length)\n\nArgs:\n    evolution: ThetaEvolution to validate\n\n\
       Returns:\n    True if valid\n\nRaises:\n    ValueError: If data is invalid"
     file: cmb/theta_data_loader.py
-    line: 409
+    line: 407
     name: validate_evolution_data
   cmb/theta_data_loader.py:validate_frequency_spectrum:
     args:
@@ -2161,6 +2161,13 @@ functions:
     file: cmb/theta_data_loader.py
     line: 241
     name: validate_frequency_spectrum
+  cmb/theta_data_parser.py:_to_float:
+    args:
+    - value
+    docstring: null
+    file: cmb/theta_data_parser.py
+    line: 441
+    name: _to_float
   cmb/theta_data_parser.py:parse_csv_evolution_data:
     args:
     - data
@@ -2170,7 +2177,7 @@ functions:
       \nReturns:\n    ThetaEvolution instance\n\nRaises:\n    ValueError: If required\
       \ columns are missing or data format is invalid"
     file: cmb/theta_data_parser.py
-    line: 246
+    line: 292
     name: parse_csv_evolution_data
   cmb/theta_data_parser.py:parse_csv_frequency_spectrum:
     args:
@@ -2185,7 +2192,7 @@ functions:
       \ instance\n\nRaises:\n    ValueError: If required columns are missing or data\
       \ format is invalid"
     file: cmb/theta_data_parser.py
-    line: 18
+    line: 21
     name: parse_csv_frequency_spectrum
   cmb/theta_data_parser.py:parse_json_evolution_data:
     args:
@@ -2196,7 +2203,7 @@ functions:
       Returns:\n    ThetaEvolution instance\n\nRaises:\n    ValueError: If required\
       \ keys are missing or data format is invalid"
     file: cmb/theta_data_parser.py
-    line: 328
+    line: 395
     name: parse_json_evolution_data
   cmb/theta_data_parser.py:parse_json_frequency_spectrum:
     args:
@@ -2207,7 +2214,7 @@ functions:
       Returns:\n    ThetaFrequencySpectrum instance\n\nRaises:\n    ValueError: If\
       \ required keys are missing or data format is invalid"
     file: cmb/theta_data_parser.py
-    line: 168
+    line: 190
     name: parse_json_frequency_spectrum
   cmb/theta_evolution_processor.py:__init__:
     args:
@@ -8020,6 +8027,12 @@ imports:
     module: typing
     name: Any
     type: import_from
+  cmb/theta_data_parser.py:CudaArray:
+    file: cmb/theta_data_parser.py
+    line: 15
+    module: utils.cuda
+    name: CudaArray
+    type: import_from
   cmb/theta_data_parser.py:Dict:
     file: cmb/theta_data_parser.py
     line: 11
@@ -8038,6 +8051,12 @@ imports:
     module: pathlib
     name: Path
     type: import_from
+  cmb/theta_data_parser.py:ReductionVectorizer:
+    file: cmb/theta_data_parser.py
+    line: 15
+    module: utils.cuda
+    name: ReductionVectorizer
+    type: import_from
   cmb/theta_data_parser.py:TYPE_CHECKING:
     file: cmb/theta_data_parser.py
     line: 11
@@ -8046,13 +8065,13 @@ imports:
     type: import_from
   cmb/theta_data_parser.py:ThetaEvolution:
     file: cmb/theta_data_parser.py
-    line: 374
+    line: 462
     module: cmb.theta_data_loader
     name: ThetaEvolution
     type: import_from
   cmb/theta_data_parser.py:ThetaFrequencySpectrum:
     file: cmb/theta_data_parser.py
-    line: 236
+    line: 282
     module: cmb.theta_data_loader
     name: ThetaFrequencySpectrum
     type: import_from

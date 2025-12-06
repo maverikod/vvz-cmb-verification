@@ -62,9 +62,46 @@ class NodeMapValidator:
                 f"{len(node_map.node_classifications)} != {expected_nodes}"
             )
 
-        # Check node mask values (should be 0 or 1)
-        mask_valid = np.all((node_map.node_mask == 0) | (node_map.node_mask == 1))
-        if not mask_valid:
+        # Check node mask values (should be 0 or 1) using CUDA-accelerated operations
+        mask_cuda = CudaArray(node_map.node_mask.astype(np.float32), device="cpu")
+        mask_cuda.swap_to_gpu()
+
+        elem_vec = ElementWiseVectorizer(use_gpu=True)
+        reduction_vec = ReductionVectorizer(use_gpu=True)
+
+        # Check that all values are either 0 or 1
+        # We check: all values are <= 1 and >= 0, and all values are integers
+        # For binary mask: check that (mask == 0) OR (mask == 1) for all elements
+        # Since CUDA doesn't have direct OR, we check: NOT((mask != 0) AND (mask != 1))
+        # Which is: NOT((mask > 0) AND (mask < 1)) for values between 0 and 1
+        # But simpler: check that mask <= 1 and mask >= 0, and mask is integer
+        # For binary: check mask * (1 - mask) == 0 for all (only true for 0 and 1)
+        ones_cuda = CudaArray(
+            np.ones_like(node_map.node_mask, dtype=np.float32), device="cpu"
+        )
+        ones_cuda.swap_to_gpu()
+        mask_complement = elem_vec.subtract(ones_cuda, mask_cuda)
+        mask_product = elem_vec.multiply(mask_cuda, mask_complement)
+        # For binary mask: mask * (1 - mask) should be 0 for all elements
+        # (only true when mask is 0 or 1)
+        mask_product_ne_zero = elem_vec.vectorize_operation(
+            mask_product, "not_equal", 0.0
+        )
+        has_invalid = reduction_vec.vectorize_reduction(mask_product_ne_zero, "any")
+
+        # Cleanup GPU memory
+        if mask_cuda.device == "cuda":
+            mask_cuda.swap_to_cpu()
+        if ones_cuda.device == "cuda":
+            ones_cuda.swap_to_cpu()
+        if mask_complement.device == "cuda":
+            mask_complement.swap_to_cpu()
+        if mask_product.device == "cuda":
+            mask_product.swap_to_cpu()
+        if mask_product_ne_zero.device == "cuda":
+            mask_product_ne_zero.swap_to_cpu()
+
+        if has_invalid:
             raise ValueError("Node mask contains values other than 0 and 1")
 
         # Check that all nodes have valid classifications using vectorized ops

@@ -7,10 +7,13 @@ Author: Vasiliy Zdanovskiy
 Email: vasilyvz@gmail.com
 """
 
-from typing import Tuple
+from typing import Tuple, TYPE_CHECKING
 import numpy as np
 
 from utils.cuda import CudaArray, ElementWiseVectorizer
+
+if TYPE_CHECKING:
+    from utils.cuda import GridVectorizer
 
 
 class NodeMapCreator:
@@ -23,7 +26,7 @@ class NodeMapCreator:
     def __init__(
         self,
         omega_field_cuda: CudaArray,
-        grid_vec: "GridVectorizer",  # noqa: F821
+        grid_vec: "GridVectorizer",
         elem_vec: ElementWiseVectorizer,
         omega_field_shape: Tuple[int, ...],
     ):

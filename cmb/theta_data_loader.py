@@ -280,9 +280,7 @@ def validate_frequency_spectrum(spectrum: ThetaFrequencySpectrum) -> bool:
         reducer = ReductionVectorizer(use_gpu=True)
 
         # Check for non-positive values on GPU
-        non_positive = vectorizer.vectorize_operation(
-            cuda_freq, "less_equal", 0.0
-        )
+        non_positive = vectorizer.vectorize_operation(cuda_freq, "less_equal", 0.0)
         has_non_positive = reducer.vectorize_reduction(non_positive, "any")
         if has_non_positive:
             count_result = reducer.vectorize_reduction(non_positive, "sum")
@@ -464,9 +462,7 @@ def validate_evolution_data(evolution: ThetaEvolution) -> bool:
         non_positive_min = vectorizer.vectorize_operation(
             cuda_omega_min, "less_equal", 0.0
         )
-        has_non_positive_min = reducer.vectorize_reduction(
-            non_positive_min, "any"
-        )
+        has_non_positive_min = reducer.vectorize_reduction(non_positive_min, "any")
         if has_non_positive_min:
             count_result = reducer.vectorize_reduction(non_positive_min, "sum")
             # Convert to int (handles CudaArray, float, int)
@@ -482,13 +478,9 @@ def validate_evolution_data(evolution: ThetaEvolution) -> bool:
         non_positive_macro = vectorizer.vectorize_operation(
             cuda_omega_macro, "less_equal", 0.0
         )
-        has_non_positive_macro = reducer.vectorize_reduction(
-            non_positive_macro, "any"
-        )
+        has_non_positive_macro = reducer.vectorize_reduction(non_positive_macro, "any")
         if has_non_positive_macro:
-            count_result = reducer.vectorize_reduction(
-                non_positive_macro, "sum"
-            )
+            count_result = reducer.vectorize_reduction(non_positive_macro, "sum")
             # Convert to int (handles CudaArray, float, int)
             if hasattr(count_result, "to_numpy"):
                 count = int(count_result.to_numpy().item())
@@ -513,19 +505,68 @@ def validate_evolution_data(evolution: ThetaEvolution) -> bool:
                 f"{np.sum(evolution.omega_macro <= 0)}"
             )
 
-    # Check for NaN or Inf values
-    if np.any(np.isnan(evolution.times)):
-        raise ValueError("Time array contains NaN values")
-    if np.any(np.isnan(evolution.omega_min)):
-        raise ValueError("omega_min array contains NaN values")
-    if np.any(np.isnan(evolution.omega_macro)):
-        raise ValueError("omega_macro array contains NaN values")
-    if np.any(np.isinf(evolution.times)):
-        raise ValueError("Time array contains Inf values")
-    if np.any(np.isinf(evolution.omega_min)):
-        raise ValueError("omega_min array contains Inf values")
-    if np.any(np.isinf(evolution.omega_macro)):
-        raise ValueError("omega_macro array contains Inf values")
+    # Check for NaN or Inf values using CUDA for large arrays
+    if (
+        CUDA_AVAILABLE
+        and evolution.times.size > CUDA_THRESHOLD
+        and CudaArray is not None
+        and ReductionVectorizer is not None
+    ):
+        # Use CUDA-accelerated validation for large arrays
+        times_cuda = CudaArray(evolution.times, device="cuda")
+        omega_min_cuda = CudaArray(evolution.omega_min, device="cuda")
+        omega_macro_cuda = CudaArray(evolution.omega_macro, device="cuda")
+        reducer = ReductionVectorizer(use_gpu=True)
+
+        # Check NaN on GPU (convert to numpy for isnan check)
+        if reducer.vectorize_reduction(
+            CudaArray(np.isnan(times_cuda.to_numpy()), device="cuda"), "any"
+        ):
+            raise ValueError("Time array contains NaN values")
+        if reducer.vectorize_reduction(
+            CudaArray(np.isnan(omega_min_cuda.to_numpy()), device="cuda"), "any"
+        ):
+            raise ValueError("omega_min array contains NaN values")
+        if reducer.vectorize_reduction(
+            CudaArray(np.isnan(omega_macro_cuda.to_numpy()), device="cuda"), "any"
+        ):
+            raise ValueError("omega_macro array contains NaN values")
+
+        # Check Inf on GPU
+        if reducer.vectorize_reduction(
+            CudaArray(np.isinf(times_cuda.to_numpy()), device="cuda"), "any"
+        ):
+            raise ValueError("Time array contains Inf values")
+        if reducer.vectorize_reduction(
+            CudaArray(np.isinf(omega_min_cuda.to_numpy()), device="cuda"), "any"
+        ):
+            raise ValueError("omega_min array contains Inf values")
+        if reducer.vectorize_reduction(
+            CudaArray(np.isinf(omega_macro_cuda.to_numpy()), device="cuda"), "any"
+        ):
+            raise ValueError("omega_macro array contains Inf values")
+
+        # Cleanup GPU memory
+        if times_cuda.device == "cuda":
+            times_cuda.swap_to_cpu()
+        if omega_min_cuda.device == "cuda":
+            omega_min_cuda.swap_to_cpu()
+        if omega_macro_cuda.device == "cuda":
+            omega_macro_cuda.swap_to_cpu()
+    else:
+        # CPU path
+        if np.any(np.isnan(evolution.times)):
+            raise ValueError("Time array contains NaN values")
+        if np.any(np.isnan(evolution.omega_min)):
+            raise ValueError("omega_min array contains NaN values")
+        if np.any(np.isnan(evolution.omega_macro)):
+            raise ValueError("omega_macro array contains NaN values")
+        if np.any(np.isinf(evolution.times)):
+            raise ValueError("Time array contains Inf values")
+        if np.any(np.isinf(evolution.omega_min)):
+            raise ValueError("omega_min array contains Inf values")
+        if np.any(np.isinf(evolution.omega_macro)):
+            raise ValueError("omega_macro array contains Inf values")
 
     # Check that omega_min < omega_macro (physical constraint)
     # Use CUDA for large arrays
@@ -562,9 +603,7 @@ def validate_evolution_data(evolution: ThetaEvolution) -> bool:
     else:
         # CPU path
         if np.any(evolution.omega_min >= evolution.omega_macro):
-            invalid_count = np.sum(
-                evolution.omega_min >= evolution.omega_macro
-            )
+            invalid_count = np.sum(evolution.omega_min >= evolution.omega_macro)
             raise ValueError(
                 f"Physical constraint violated: "
                 f"omega_min must be < omega_macro. "

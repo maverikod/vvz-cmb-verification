@@ -7,7 +7,7 @@ Author: Vasiliy Zdanovskiy
 Email: vasilyvz@gmail.com
 """
 
-from typing import Tuple
+from typing import Tuple, Optional
 import numpy as np
 
 from utils.cuda import (
@@ -29,7 +29,7 @@ class NodePropertiesCalculator:
         omega_field_cuda: CudaArray,
         grid_vec: GridVectorizer,
         reduction_vec: ReductionVectorizer,
-        grid_spacing: float = None,
+        grid_spacing: Optional[float] = None,
     ):
         """
         Initialize properties calculator.
@@ -155,9 +155,19 @@ class NodePropertiesCalculator:
                 neighborhood_cuda, "local_minima", neighborhood_size=3
             )
 
-            # Count connected pixels (area)
-            node_mask = node_mask_cuda.to_numpy()
-            area = float(np.sum(node_mask))
+            # Count connected pixels (area) using CUDA-accelerated reduction
+            node_mask_sum_cuda = CudaArray(
+                node_mask_cuda.to_numpy().astype(np.float32), device="cpu"
+            )
+            node_mask_sum_cuda.swap_to_gpu()
+            area_sum = self.reduction_vec.vectorize_reduction(node_mask_sum_cuda, "sum")
+            if isinstance(area_sum, CudaArray):
+                area = float(area_sum.to_numpy().item())
+            else:
+                area = float(area_sum)
+            # Cleanup
+            if node_mask_sum_cuda.device == "cuda":
+                node_mask_sum_cuda.swap_to_cpu()
 
             # Convert to physical units if grid_spacing is provided
             if self.grid_spacing is not None:

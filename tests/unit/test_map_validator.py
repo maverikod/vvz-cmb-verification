@@ -255,11 +255,17 @@ class TestMapValidator:
             sample_reconstructed_map, sample_observed_map_path, sample_nside
         )
 
-        # Check that vectorizers are initialized
-        assert validator.elem_vec is not None
-        assert validator.reduction_vec is not None
-        assert validator.corr_vec is not None
-        assert validator.transform_vec is not None
+        # Check that helper classes are initialized
+        assert validator.map_loader is not None
+        assert validator.map_comparator is not None
+        assert validator.structure_validator is not None
+        assert validator.amplitude_validator is not None
+
+        # Check that vectorizers are initialized in helper classes
+        assert validator.map_comparator.elem_vec is not None
+        assert validator.map_comparator.reduction_vec is not None
+        assert validator.structure_validator.elem_vec is not None
+        assert validator.amplitude_validator.elem_vec is not None
 
         # Run operations to verify CUDA is used
         metrics = validator.compare_maps()
